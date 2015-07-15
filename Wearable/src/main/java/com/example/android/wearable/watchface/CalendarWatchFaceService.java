@@ -30,18 +30,25 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.provider.CalendarContract;
 import android.support.wearable.provider.WearableCalendarContract;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.DynamicLayout;
 import android.text.Editable;
-import android.text.Html;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.SurfaceHolder;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Proof of concept sample watch face that demonstrates how a watch face can load calendar data.
@@ -73,9 +80,9 @@ public class CalendarWatchFaceService extends CanvasWatchFaceService {
         /** Paint used to draw text. */
         final TextPaint mTextPaint = new TextPaint();
 
-        int mNumMeetings;
+        Set<EventInfo> mMeetings;
 
-        private AsyncTask<Void, Void, Integer> mLoadMeetingsTask;
+        private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
 
         /** Handler to load the meetings once a minute in interactive mode. */
         final Handler mLoadMeetingsHandler = new Handler() {
@@ -141,8 +148,15 @@ public class CalendarWatchFaceService extends CanvasWatchFaceService {
 
             // Update the contents of mEditable.
             mEditable.clear();
-            mEditable.append(Html.fromHtml(getResources().getQuantityString(
-                    R.plurals.calendar_meetings, mNumMeetings, mNumMeetings)));
+            if (mMeetings != null) {
+                Iterator<EventInfo> e = mMeetings.iterator();
+                while (e.hasNext()) {
+                    EventInfo ei = e.next();
+                    DateFormat sdf = new SimpleDateFormat("H:mm");
+                    mEditable.append(sdf.format(ei.DtStart) + " ");
+                    mEditable.append(ei.Title + "\n");
+                }
+            }
 
             // Draw the text on a solid background.
             canvas.drawColor(BACKGROUND_COLOR);
@@ -169,9 +183,9 @@ public class CalendarWatchFaceService extends CanvasWatchFaceService {
             }
         }
 
-        private void onMeetingsLoaded(Integer result) {
+        private void onMeetingsLoaded(Set<EventInfo> result) {
             if (result != null) {
-                mNumMeetings = result;
+                mMeetings = result;
                 invalidate();
             }
         }
@@ -182,15 +196,31 @@ public class CalendarWatchFaceService extends CanvasWatchFaceService {
             }
         }
 
+        public class EventInfo {
+            public final String Title;
+            private final Date DtStart;
+
+            EventInfo(String title, Date c) {
+                Title = title;
+                DtStart = c;
+            }
+        }
+
         /**
          * Asynchronous task to load the meetings from the content provider and report the number of
          * meetings back via {@link #onMeetingsLoaded}.
          */
-        private class LoadMeetingsTask extends AsyncTask<Void, Void, Integer> {
+        private class LoadMeetingsTask extends AsyncTask<Void, Void, Set<EventInfo>> {
             private PowerManager.WakeLock mWakeLock;
 
+            public final String[] EVENT_FIELDS = {
+                    CalendarContract.Events.TITLE,
+                    CalendarContract.Events.DTSTART,
+                    CalendarContract.Events.CALENDAR_ID,
+            };
+
             @Override
-            protected Integer doInBackground(Void... voids) {
+            protected Set<EventInfo> doInBackground(Void... voids) {
                 PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
                 mWakeLock = powerManager.newWakeLock(
                         PowerManager.PARTIAL_WAKE_LOCK, "CalendarWatchFaceWakeLock");
@@ -202,16 +232,20 @@ public class CalendarWatchFaceService extends CanvasWatchFaceService {
                 ContentUris.appendId(builder, begin);
                 ContentUris.appendId(builder, begin + DateUtils.DAY_IN_MILLIS);
                 final Cursor cursor = getContentResolver().query(builder.build(),
-                        null, null, null, null);
-                int numMeetings = cursor.getCount();
-                if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                    Log.v(TAG, "Num meetings: " + numMeetings);
+                        EVENT_FIELDS, null, null, null);
+
+                Set<EventInfo> eis = new HashSet<EventInfo>();
+                while (cursor.moveToNext()) {
+                    String title = cursor.getString(0);
+                    Date d = new Date(cursor.getLong(1));
+                    EventInfo ei = new EventInfo(title, d);
+                    eis.add(ei);
                 }
-                return numMeetings;
+                return eis;
             }
 
             @Override
-            protected void onPostExecute(Integer result) {
+            protected void onPostExecute(Set<EventInfo> result) {
                 releaseWakeLock();
                 onMeetingsLoaded(result);
             }

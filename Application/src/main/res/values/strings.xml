@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2014 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2014 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,9 +13,7 @@
  limitations under the License.
 -->
 <resources>
-    <string name="analog_config_text">This is the config activity for the Analog and Card Bounds watch faces</string>
     <string name="digital_config_text">Digital watch face configuration</string>
-    <string name="tilt_config_text">Tilt watch face configuration</string>
     <string name="digital_config_background">Background</string>
     <string name="digital_config_hours">Hours</string>
     <string name="digital_config_minutes">Minutes</string>

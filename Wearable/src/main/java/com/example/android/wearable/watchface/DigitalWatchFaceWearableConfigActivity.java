@@ -22,13 +22,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.view.BoxInsetLayout;
 import android.support.wearable.view.CircledImageView;
 import android.support.wearable.view.WearableListView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -65,7 +63,7 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
             public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
                 if (!insets.isRound()) {
                     v.setPaddingRelative(
-                            (int) getResources().getDimensionPixelSize(R.dimen.content_padding_start),
+                            getResources().getDimensionPixelSize(R.dimen.content_padding_start),
                             v.getPaddingTop(),
                             v.getPaddingEnd(),
                             v.getPaddingBottom());
