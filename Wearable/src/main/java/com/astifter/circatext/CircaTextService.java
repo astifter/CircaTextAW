@@ -152,10 +152,13 @@ public class CircaTextService extends CanvasWatchFaceService {
         final BroadcastReceiver mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mCalendar.setTimeZone(TimeZone.getDefault());
-                initFormats();
-                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction()) &&
-                    WearableCalendarContract.CONTENT_URI.equals(intent.getData())) {
+                if (Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()) ||
+                    Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())      ) {
+                    mCalendar.setTimeZone(TimeZone.getDefault());
+                    initFormats();
+                }
+                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction())     &&
+                    WearableCalendarContract.CONTENT_URI.equals(intent.getData())    ) {
                     cancelLoadMeetingTask();
                     mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
                 }
@@ -309,9 +312,17 @@ public class CircaTextService extends CanvasWatchFaceService {
                 return;
             }
             mRegisteredReceiver = true;
-            IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
-            filter.addAction(Intent.ACTION_LOCALE_CHANGED);
-            CircaTextService.this.registerReceiver(mReceiver, filter);
+            {
+                IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
+                filter.addAction(Intent.ACTION_LOCALE_CHANGED);
+                CircaTextService.this.registerReceiver(mReceiver, filter);
+            }
+            {
+                IntentFilter filter = new IntentFilter(Intent.ACTION_PROVIDER_CHANGED);
+                filter.addDataScheme("content");
+                filter.addDataAuthority(WearableCalendarContract.AUTHORITY, null);
+                CircaTextService.this.registerReceiver(mReceiver, filter);
+            }
         }
 
         private void unregisterReceiver() {
