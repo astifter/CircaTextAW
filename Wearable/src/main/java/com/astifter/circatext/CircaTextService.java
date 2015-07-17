@@ -17,21 +17,32 @@
 package com.astifter.circatext;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
+import android.provider.CalendarContract;
+import android.support.wearable.provider.WearableCalendarContract;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
@@ -47,9 +58,12 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -96,11 +110,11 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         static final int MSG_UPDATE_TIME = 0;
 
-        /** How often {@link #mUpdateTimeHandler} ticks in milliseconds. */
+        /** How often {@link #mUpdateHandler} ticks in milliseconds. */
         long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
 
         /** Handler to update the time periodically in interactive mode. */
-        final Handler mUpdateTimeHandler = new Handler() {
+        final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
                 switch (message.what) {
@@ -113,8 +127,14 @@ public class CircaTextService extends CanvasWatchFaceService {
                             long timeMs = System.currentTimeMillis();
                             long delayMs =
                                     mInteractiveUpdateRateMs - (timeMs % mInteractiveUpdateRateMs);
-                            mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
+                            mUpdateHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
                         }
+                        break;
+
+                    case MSG_LOAD_MEETINGS:
+                        cancelLoadMeetingTask();
+                        mLoadMeetingsTask = new LoadMeetingsTask();
+                        mLoadMeetingsTask.execute();
                         break;
                 }
             }
@@ -134,6 +154,11 @@ public class CircaTextService extends CanvasWatchFaceService {
             public void onReceive(Context context, Intent intent) {
                 mCalendar.setTimeZone(TimeZone.getDefault());
                 initFormats();
+                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction()) &&
+                    WearableCalendarContract.CONTENT_URI.equals(intent.getData())) {
+                    cancelLoadMeetingTask();
+                    mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
+                }
                 invalidate();
             }
         };
@@ -145,12 +170,13 @@ public class CircaTextService extends CanvasWatchFaceService {
         boolean mRegisteredReceiver = false;
 
         Paint mBackgroundPaint;
-        Paint mDatePaint;
-        Paint mHourPaint;
-        Paint mMinutePaint;
-        Paint mSecondPaint;
-        Paint mAmPmPaint;
-        Paint mColonPaint;
+        TextPaint mDatePaint;
+        TextPaint mCalendarPaint;
+        TextPaint mHourPaint;
+        TextPaint mMinutePaint;
+        TextPaint mSecondPaint;
+        TextPaint mAmPmPaint;
+        TextPaint mColonPaint;
         float mColonWidth;
         boolean mMute;
 
@@ -162,6 +188,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         boolean mShouldDrawColons;
         float mXOffset;
         float mYOffset;
+        float mCalendarOffset;
         float mLineHeight;
         String mAmString;
         String mPmString;
@@ -192,8 +219,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
                     .build());
+
             Resources resources = CircaTextService.this.getResources();
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
+            mCalendarOffset = resources.getDimension(R.dimen.digital_calendar_offset);
             mLineHeight = resources.getDimension(R.dimen.digital_line_height);
             mAmString = resources.getString(R.string.digital_am);
             mPmString = resources.getString(R.string.digital_pm);
@@ -201,6 +230,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
             mDatePaint = createTextPaint(resources.getColor(R.color.digital_date));
+            mCalendarPaint = createTextPaint(resources.getColor(R.color.digital_date));
             mHourPaint = createTextPaint(mInteractiveHourDigitsColor, BOLD_TYPEFACE);
             mMinutePaint = createTextPaint(mInteractiveMinuteDigitsColor);
             mSecondPaint = createTextPaint(mInteractiveSecondDigitsColor);
@@ -210,20 +240,24 @@ public class CircaTextService extends CanvasWatchFaceService {
             mCalendar = Calendar.getInstance();
             mDate = new Date();
             initFormats();
+
+            mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
         }
 
         @Override
         public void onDestroy() {
-            mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            mUpdateHandler.removeMessages(MSG_UPDATE_TIME);
+            mUpdateHandler.removeMessages(MSG_LOAD_MEETINGS);
+            cancelLoadMeetingTask();
             super.onDestroy();
         }
 
-        private Paint createTextPaint(int defaultInteractiveColor) {
+        private TextPaint createTextPaint(int defaultInteractiveColor) {
             return createTextPaint(defaultInteractiveColor, NORMAL_TYPEFACE);
         }
 
-        private Paint createTextPaint(int defaultInteractiveColor, Typeface typeface) {
-            Paint paint = new Paint();
+        private TextPaint createTextPaint(int defaultInteractiveColor, Typeface typeface) {
+            TextPaint paint = new TextPaint();
             paint.setColor(defaultInteractiveColor);
             paint.setTypeface(typeface);
             paint.setAntiAlias(true);
@@ -245,6 +279,8 @@ public class CircaTextService extends CanvasWatchFaceService {
                 // Update time zone and date formats, in case they changed while we weren't visible.
                 mCalendar.setTimeZone(TimeZone.getDefault());
                 initFormats();
+
+                mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
             } else {
                 unregisterReceiver();
 
@@ -252,6 +288,8 @@ public class CircaTextService extends CanvasWatchFaceService {
                     Wearable.DataApi.removeListener(mGoogleApiClient, this);
                     mGoogleApiClient.disconnect();
                 }
+
+                mUpdateHandler.removeMessages(MSG_LOAD_MEETINGS);
             }
 
             // Whether the timer should be running depends on whether we're visible (as well as
@@ -302,6 +340,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                     ? R.dimen.digital_am_pm_size_round : R.dimen.digital_am_pm_size);
 
             mDatePaint.setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
+            mCalendarPaint.setTextSize(resources.getDimension(R.dimen.digital_calendar_text_size));
             mHourPaint.setTextSize(textSize);
             mMinutePaint.setTextSize(textSize);
             mSecondPaint.setTextSize(textSize);
@@ -355,6 +394,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (mLowBitAmbient) {
                 boolean antiAlias = !inAmbientMode;
                 mDatePaint.setAntiAlias(antiAlias);
+                mCalendarPaint.setAntiAlias(antiAlias);
                 mHourPaint.setAntiAlias(antiAlias);
                 mMinutePaint.setAntiAlias(antiAlias);
                 mSecondPaint.setAntiAlias(antiAlias);
@@ -388,6 +428,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 mMute = inMuteMode;
                 int alpha = inMuteMode ? MUTE_ALPHA : NORMAL_ALPHA;
                 mDatePaint.setAlpha(alpha);
+                mCalendarPaint.setAlpha(alpha);
                 mHourPaint.setAlpha(alpha);
                 mMinutePaint.setAlpha(alpha);
                 mColonPaint.setAlpha(alpha);
@@ -509,25 +550,41 @@ public class CircaTextService extends CanvasWatchFaceService {
                 canvas.drawText(
                         mDateFormat.format(mDate),
                         mXOffset, mYOffset + mLineHeight * 2, mDatePaint);
+
+                if (!isInAmbientMode() && !mMute) {
+                    if (mMeetings != null) {
+                        if (mMeetings.size() == 0) {
+                            canvas.drawText("no meetings", mXOffset, mCalendarOffset, mCalendarPaint);
+                        } else {
+                            EventInfo eia[] = mMeetings.toArray(new EventInfo[mMeetings.size()]);
+                            Arrays.sort(eia);
+                            EventInfo ei = eia[0];
+                            SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+                            canvas.drawText(sdf.format(ei.DtStart) + " " + ei.Title, mXOffset, mCalendarOffset, mCalendarPaint);
+                            if (mMeetings.size() > 1)
+                                canvas.drawText("+" + (eia.length - 1) + " additional events", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mCalendarPaint);
+                        }
+                    }
+                }
             }
         }
 
         /**
-         * Starts the {@link #mUpdateTimeHandler} timer if it should be running and isn't currently
+         * Starts the {@link #mUpdateHandler} timer if it should be running and isn't currently
          * or stops it if it shouldn't be running but currently is.
          */
         private void updateTimer() {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "updateTimer");
             }
-            mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            mUpdateHandler.removeMessages(MSG_UPDATE_TIME);
             if (shouldTimerBeRunning()) {
-                mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+                mUpdateHandler.sendEmptyMessage(MSG_UPDATE_TIME);
             }
         }
 
         /**
-         * Returns whether the {@link #mUpdateTimeHandler} timer should be running. The timer should
+         * Returns whether the {@link #mUpdateHandler} timer should be running. The timer should
          * only run when we're visible and in interactive mode.
          */
         private boolean shouldTimerBeRunning() {
@@ -651,6 +708,101 @@ public class CircaTextService extends CanvasWatchFaceService {
         public void onConnectionFailed(ConnectionResult result) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "onConnectionFailed: " + result);
+            }
+        }
+
+        static final int MSG_LOAD_MEETINGS = 1;
+        Set<EventInfo> mMeetings;
+        private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
+        private void onMeetingsLoaded(Set<EventInfo> result) {
+            if (result != null) {
+                mMeetings = result;
+                invalidate();
+            }
+        }
+
+        private void cancelLoadMeetingTask() {
+            if (mLoadMeetingsTask != null) {
+                mLoadMeetingsTask.cancel(true);
+            }
+        }
+
+        public class EventInfo implements Comparable<EventInfo> {
+            public final String Title;
+            private final Date DtStart;
+
+            EventInfo(String title, Date c) {
+                Title = title;
+                DtStart = c;
+            }
+
+            @Override
+            public int compareTo(EventInfo another) {
+                long thistime = this.DtStart.getTime();
+                long othertime = another.DtStart.getTime();
+
+                if (othertime < thistime)
+                    return 1;
+                if (thistime < othertime)
+                    return -1;
+                return 0;
+            }
+        }
+
+        /**
+         * Asynchronous task to load the meetings from the content provider and report the number of
+         * meetings back via {@link #onMeetingsLoaded}.
+         */
+        private class LoadMeetingsTask extends AsyncTask<Void, Void, Set<EventInfo>> {
+            private PowerManager.WakeLock mWakeLock;
+
+            public final String[] EVENT_FIELDS = {
+                    CalendarContract.Instances.TITLE,
+                    CalendarContract.Instances.BEGIN,
+                    CalendarContract.Instances.CALENDAR_ID,
+            };
+
+            @Override
+            protected Set<EventInfo> doInBackground(Void... voids) {
+                PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+                mWakeLock = powerManager.newWakeLock(
+                        PowerManager.PARTIAL_WAKE_LOCK, "CalendarWatchFaceWakeLock");
+                mWakeLock.acquire();
+
+                long begin = System.currentTimeMillis();
+                Uri.Builder builder =
+                        WearableCalendarContract.Instances.CONTENT_URI.buildUpon();
+                ContentUris.appendId(builder, begin);
+                ContentUris.appendId(builder, begin + DateUtils.DAY_IN_MILLIS);
+                final Cursor cursor = getContentResolver().query(builder.build(),
+                        EVENT_FIELDS, null, null, null);
+
+                Set<EventInfo> eis = new HashSet<EventInfo>();
+                while (cursor.moveToNext()) {
+                    String title = cursor.getString(0);
+                    Date d = new Date(cursor.getLong(1));
+                    EventInfo ei = new EventInfo(title, d);
+                    eis.add(ei);
+                }
+                return eis;
+            }
+
+            @Override
+            protected void onPostExecute(Set<EventInfo> result) {
+                releaseWakeLock();
+                onMeetingsLoaded(result);
+            }
+
+            @Override
+            protected void onCancelled() {
+                releaseWakeLock();
+            }
+
+            private void releaseWakeLock() {
+                if (mWakeLock != null) {
+                    mWakeLock.release();
+                    mWakeLock = null;
+                }
             }
         }
     }
