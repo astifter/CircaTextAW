@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.wearable.watchface;
+package com.astifter.circatext;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -29,10 +29,10 @@ import com.google.android.gms.wearable.WearableListenerService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A {@link WearableListenerService} listening for {@link DigitalWatchFaceService} config messages
+ * A {@link WearableListenerService} listening for {@link CircaTextService} config messages
  * and updating the config {@link com.google.android.gms.wearable.DataItem} accordingly.
  */
-public class DigitalWatchFaceConfigListenerService extends WearableListenerService
+public class CircaTextConfigListenerService extends WearableListenerService
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "DigitalListenerService";
 
@@ -40,7 +40,7 @@ public class DigitalWatchFaceConfigListenerService extends WearableListenerServi
 
     @Override // WearableListenerService
     public void onMessageReceived(MessageEvent messageEvent) {
-        if (!messageEvent.getPath().equals(DigitalWatchFaceUtil.PATH_WITH_FEATURE)) {
+        if (!messageEvent.getPath().equals(CircaTextUtil.PATH_WITH_FEATURE)) {
             return;
         }
         byte[] rawData = messageEvent.getData();
@@ -65,7 +65,7 @@ public class DigitalWatchFaceConfigListenerService extends WearableListenerServi
             }
         }
 
-        DigitalWatchFaceUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
+        CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
     }
 
     @Override // GoogleApiClient.ConnectionCallbacks

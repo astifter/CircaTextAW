@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.wearable.watchface;
+package com.astifter.circatext;
 
 import android.graphics.Color;
 import android.net.Uri;
@@ -30,35 +30,35 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
-public final class DigitalWatchFaceUtil {
-    private static final String TAG = "DigitalWatchFaceUtil";
+public final class CircaTextUtil {
+    private static final String TAG = "CircaTextUtil";
 
     /**
-     * The {@link DataMap} key for {@link DigitalWatchFaceService} background color name.
+     * The {@link DataMap} key for {@link CircaTextService} background color name.
      * The color name must be a {@link String} recognized by {@link Color#parseColor}.
      */
     public static final String KEY_BACKGROUND_COLOR = "BACKGROUND_COLOR";
 
     /**
-     * The {@link DataMap} key for {@link DigitalWatchFaceService} hour digits color name.
+     * The {@link DataMap} key for {@link CircaTextService} hour digits color name.
      * The color name must be a {@link String} recognized by {@link Color#parseColor}.
      */
     public static final String KEY_HOURS_COLOR = "HOURS_COLOR";
 
     /**
-     * The {@link DataMap} key for {@link DigitalWatchFaceService} minute digits color name.
+     * The {@link DataMap} key for {@link CircaTextService} minute digits color name.
      * The color name must be a {@link String} recognized by {@link Color#parseColor}.
      */
     public static final String KEY_MINUTES_COLOR = "MINUTES_COLOR";
 
     /**
-     * The {@link DataMap} key for {@link DigitalWatchFaceService} second digits color name.
+     * The {@link DataMap} key for {@link CircaTextService} second digits color name.
      * The color name must be a {@link String} recognized by {@link Color#parseColor}.
      */
     public static final String KEY_SECONDS_COLOR = "SECONDS_COLOR";
 
     /**
-     * The path for the {@link DataItem} containing {@link DigitalWatchFaceService} configuration.
+     * The path for the {@link DataItem} containing {@link CircaTextService} configuration.
      */
     public static final String PATH_WITH_FEATURE = "/watch_face_config/Digital";
 
@@ -95,12 +95,12 @@ public final class DigitalWatchFaceUtil {
 
     /**
      * Callback interface to perform an action with the current config {@link DataMap} for
-     * {@link DigitalWatchFaceService}.
+     * {@link CircaTextService}.
      */
     public interface FetchConfigDataMapCallback {
         /**
          * Callback invoked with the current config {@link DataMap} for
-         * {@link DigitalWatchFaceService}.
+         * {@link CircaTextService}.
          */
         void onConfigDataMapFetched(DataMap config);
     }
@@ -110,7 +110,7 @@ public final class DigitalWatchFaceUtil {
     }
 
     /**
-     * Asynchronously fetches the current config {@link DataMap} for {@link DigitalWatchFaceService}
+     * Asynchronously fetches the current config {@link DataMap} for {@link CircaTextService}
      * and passes it to the given callback.
      * <p>
      * If the current config {@link DataItem} doesn't exist, it isn't created and the callback
@@ -125,7 +125,7 @@ public final class DigitalWatchFaceUtil {
                         String localNode = getLocalNodeResult.getNode().getId();
                         Uri uri = new Uri.Builder()
                                 .scheme("wear")
-                                .path(DigitalWatchFaceUtil.PATH_WITH_FEATURE)
+                                .path(CircaTextUtil.PATH_WITH_FEATURE)
                                 .authority(localNode)
                                 .build();
                         Wearable.DataApi.getDataItem(client, uri)
@@ -146,14 +146,14 @@ public final class DigitalWatchFaceUtil {
     public static void overwriteKeysInConfigDataMap(final GoogleApiClient googleApiClient,
             final DataMap configKeysToOverwrite) {
 
-        DigitalWatchFaceUtil.fetchConfigDataMap(googleApiClient,
+        CircaTextUtil.fetchConfigDataMap(googleApiClient,
                 new FetchConfigDataMapCallback() {
                     @Override
                     public void onConfigDataMapFetched(DataMap currentConfig) {
                         DataMap overwrittenConfig = new DataMap();
                         overwrittenConfig.putAll(currentConfig);
                         overwrittenConfig.putAll(configKeysToOverwrite);
-                        DigitalWatchFaceUtil.putConfigDataItem(googleApiClient, overwrittenConfig);
+                        CircaTextUtil.putConfigDataItem(googleApiClient, overwrittenConfig);
                     }
                 }
         );
@@ -201,5 +201,5 @@ public final class DigitalWatchFaceUtil {
         }
     }
 
-    private DigitalWatchFaceUtil() { }
+    private CircaTextUtil() { }
 }

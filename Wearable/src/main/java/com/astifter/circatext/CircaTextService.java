@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.wearable.watchface;
+package com.astifter.circatext;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -60,8 +60,8 @@ import java.util.concurrent.TimeUnit;
  * protection, the hours are drawn in normal rather than bold. The time is drawn with less contrast
  * and without seconds in mute mode.
  */
-public class DigitalWatchFaceService extends CanvasWatchFaceService {
-    private static final String TAG = "DigitalWatchFaceService";
+public class CircaTextService extends CanvasWatchFaceService {
+    private static final String TAG = "CircaTextService";
 
     private static final Typeface BOLD_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
@@ -120,7 +120,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
             }
         };
 
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(DigitalWatchFaceService.this)
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(CircaTextService.this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Wearable.API)
@@ -166,13 +166,13 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
         String mAmString;
         String mPmString;
         int mInteractiveBackgroundColor =
-                DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
+                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
         int mInteractiveHourDigitsColor =
-                DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS;
+                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS;
         int mInteractiveMinuteDigitsColor =
-                DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS;
+                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS;
         int mInteractiveSecondDigitsColor =
-                DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS;
+                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS;
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -187,12 +187,12 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
             }
             super.onCreate(holder);
 
-            setWatchFaceStyle(new WatchFaceStyle.Builder(DigitalWatchFaceService.this)
+            setWatchFaceStyle(new WatchFaceStyle.Builder(CircaTextService.this)
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
                     .build());
-            Resources resources = DigitalWatchFaceService.this.getResources();
+            Resources resources = CircaTextService.this.getResources();
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
             mLineHeight = resources.getDimension(R.dimen.digital_line_height);
             mAmString = resources.getString(R.string.digital_am);
@@ -262,7 +262,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
         private void initFormats() {
             mDayOfWeekFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
             mDayOfWeekFormat.setCalendar(mCalendar);
-            mDateFormat = DateFormat.getDateFormat(DigitalWatchFaceService.this);
+            mDateFormat = DateFormat.getDateFormat(CircaTextService.this);
             mDateFormat.setCalendar(mCalendar);
         }
 
@@ -273,7 +273,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
             mRegisteredReceiver = true;
             IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
             filter.addAction(Intent.ACTION_LOCALE_CHANGED);
-            DigitalWatchFaceService.this.registerReceiver(mReceiver, filter);
+            CircaTextService.this.registerReceiver(mReceiver, filter);
         }
 
         private void unregisterReceiver() {
@@ -281,7 +281,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
                 return;
             }
             mRegisteredReceiver = false;
-            DigitalWatchFaceService.this.unregisterReceiver(mReceiver);
+            CircaTextService.this.unregisterReceiver(mReceiver);
         }
 
         @Override
@@ -292,7 +292,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
             super.onApplyWindowInsets(insets);
 
             // Load resources that have alternate values for round watches.
-            Resources resources = DigitalWatchFaceService.this.getResources();
+            Resources resources = CircaTextService.this.getResources();
             boolean isRound = insets.isRound();
             mXOffset = resources.getDimension(isRound
                     ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
@@ -342,15 +342,15 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
                 Log.d(TAG, "onAmbientModeChanged: " + inAmbientMode);
             }
             adjustPaintColorToCurrentMode(mBackgroundPaint, mInteractiveBackgroundColor,
-                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
             adjustPaintColorToCurrentMode(mHourPaint, mInteractiveHourDigitsColor,
-                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
             adjustPaintColorToCurrentMode(mMinutePaint, mInteractiveMinuteDigitsColor,
-                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
             // Actually, the seconds are not rendered in the ambient mode, so we could pass just any
             // value as ambientColor here.
             adjustPaintColorToCurrentMode(mSecondPaint, mInteractiveSecondDigitsColor,
-                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
 
             if (mLowBitAmbient) {
                 boolean antiAlias = !inAmbientMode;
@@ -447,7 +447,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
             mCalendar.setTimeInMillis(now);
             mDate.setTime(now);
-            boolean is24Hour = DateFormat.is24HourFormat(DigitalWatchFaceService.this);
+            boolean is24Hour = DateFormat.is24HourFormat(CircaTextService.this);
 
             // Show colons for the first half of each second so the colons blink on when the time
             // updates.
@@ -535,14 +535,14 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
         }
 
         private void updateConfigDataItemAndUiOnStartup() {
-            DigitalWatchFaceUtil.fetchConfigDataMap(mGoogleApiClient,
-                    new DigitalWatchFaceUtil.FetchConfigDataMapCallback() {
+            CircaTextUtil.fetchConfigDataMap(mGoogleApiClient,
+                    new CircaTextUtil.FetchConfigDataMapCallback() {
                         @Override
                         public void onConfigDataMapFetched(DataMap startupConfig) {
                             // If the DataItem hasn't been created yet or some keys are missing,
                             // use the default values.
                             setDefaultValuesForMissingConfigKeys(startupConfig);
-                            DigitalWatchFaceUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
+                            CircaTextUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
 
                             updateUiForConfigDataMap(startupConfig);
                         }
@@ -551,14 +551,14 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
         }
 
         private void setDefaultValuesForMissingConfigKeys(DataMap config) {
-            addIntKeyIfMissing(config, DigitalWatchFaceUtil.KEY_BACKGROUND_COLOR,
-                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
-            addIntKeyIfMissing(config, DigitalWatchFaceUtil.KEY_HOURS_COLOR,
-                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
-            addIntKeyIfMissing(config, DigitalWatchFaceUtil.KEY_MINUTES_COLOR,
-                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-            addIntKeyIfMissing(config, DigitalWatchFaceUtil.KEY_SECONDS_COLOR,
-                    DigitalWatchFaceUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
+            addIntKeyIfMissing(config, CircaTextUtil.KEY_BACKGROUND_COLOR,
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
+            addIntKeyIfMissing(config, CircaTextUtil.KEY_HOURS_COLOR,
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
+            addIntKeyIfMissing(config, CircaTextUtil.KEY_MINUTES_COLOR,
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
+            addIntKeyIfMissing(config, CircaTextUtil.KEY_SECONDS_COLOR,
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
         }
 
         private void addIntKeyIfMissing(DataMap config, String key, int color) {
@@ -576,7 +576,7 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
 
                 DataItem dataItem = dataEvent.getDataItem();
                 if (!dataItem.getUri().getPath().equals(
-                        DigitalWatchFaceUtil.PATH_WITH_FEATURE)) {
+                        CircaTextUtil.PATH_WITH_FEATURE)) {
                     continue;
                 }
 
@@ -616,13 +616,13 @@ public class DigitalWatchFaceService extends CanvasWatchFaceService {
          * @return whether UI has been updated
          */
         private boolean updateUiForKey(String configKey, int color) {
-            if (configKey.equals(DigitalWatchFaceUtil.KEY_BACKGROUND_COLOR)) {
+            if (configKey.equals(CircaTextUtil.KEY_BACKGROUND_COLOR)) {
                 setInteractiveBackgroundColor(color);
-            } else if (configKey.equals(DigitalWatchFaceUtil.KEY_HOURS_COLOR)) {
+            } else if (configKey.equals(CircaTextUtil.KEY_HOURS_COLOR)) {
                 setInteractiveHourDigitsColor(color);
-            } else if (configKey.equals(DigitalWatchFaceUtil.KEY_MINUTES_COLOR)) {
+            } else if (configKey.equals(CircaTextUtil.KEY_MINUTES_COLOR)) {
                 setInteractiveMinuteDigitsColor(color);
-            } else if (configKey.equals(DigitalWatchFaceUtil.KEY_SECONDS_COLOR)) {
+            } else if (configKey.equals(CircaTextUtil.KEY_SECONDS_COLOR)) {
                 setInteractiveSecondDigitsColor(color);
             } else {
                 Log.w(TAG, "Ignoring unknown config key: " + configKey);

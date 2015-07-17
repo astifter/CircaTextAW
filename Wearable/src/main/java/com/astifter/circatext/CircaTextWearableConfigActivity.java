@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.wearable.watchface;
+package com.astifter.circatext;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -39,12 +39,12 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.Wearable;
 
 /**
- * The watch-side config activity for {@link DigitalWatchFaceService}, which allows for setting the
+ * The watch-side config activity for {@link CircaTextService}, which allows for setting the
  * background color.
  */
-public class DigitalWatchFaceWearableConfigActivity extends Activity implements
+public class CircaTextWearableConfigActivity extends Activity implements
         WearableListView.ClickListener, WearableListView.OnScrollListener {
-    private static final String TAG = "DigitalWatchFaceConfig";
+    private static final String TAG = "CircaTextConfig";
 
     private GoogleApiClient mGoogleApiClient;
     private TextView mHeader;
@@ -52,7 +52,7 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_digital_config);
+        setContentView(R.layout.activity_circa_text_config);
 
         mHeader = (TextView) findViewById(R.id.header);
         WearableListView listView = (WearableListView) findViewById(R.id.color_picker);
@@ -148,9 +148,9 @@ public class DigitalWatchFaceWearableConfigActivity extends Activity implements
 
     private void updateConfigDataItem(final int backgroundColor) {
         DataMap configKeysToOverwrite = new DataMap();
-        configKeysToOverwrite.putInt(DigitalWatchFaceUtil.KEY_BACKGROUND_COLOR,
+        configKeysToOverwrite.putInt(CircaTextUtil.KEY_BACKGROUND_COLOR,
                 backgroundColor);
-        DigitalWatchFaceUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
+        CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
     }
 
     private class ColorListAdapter extends WearableListView.Adapter {

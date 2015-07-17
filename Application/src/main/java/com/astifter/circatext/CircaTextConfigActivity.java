@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.wearable.watchface;
+package com.astifter.circatext;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -44,7 +44,7 @@ import com.google.android.gms.wearable.Wearable;
  * activity ({@code DigitalWatchFaceWearableConfigActivity}), allows for setting the background
  * color. Additionally, enables setting the color for hour, minute and second digits.
  */
-public class DigitalWatchFaceCompanionConfigActivity extends Activity
+public class CircaTextConfigActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<DataApi.DataItemResult> {
     private static final String TAG = "DigitalWatchFaceConfig";
@@ -62,7 +62,7 @@ public class DigitalWatchFaceCompanionConfigActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_digital_watch_face_config);
+        setContentView(R.layout.activity_circa_text_config);
 
         mPeerId = getIntent().getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
