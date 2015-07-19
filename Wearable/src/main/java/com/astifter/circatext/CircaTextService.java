@@ -29,6 +29,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -38,8 +39,6 @@ import android.support.wearable.provider.WearableCalendarContract;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
-import android.text.Layout;
-import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -162,6 +161,58 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         };
 
+        class BatteryInfo {
+            private final int mStatus;
+            private final int mPlugged;
+            private final float mPercent;
+            private final int mTemperature;
+
+            BatteryInfo(int status, int plugged, float pct, int temp) {
+                mStatus = status;
+                mPlugged = plugged;
+                mPercent = pct;
+                mTemperature = temp;
+            }
+
+            boolean isCharging () {
+                return mStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
+                       mStatus == BatteryManager.BATTERY_STATUS_FULL;
+            }
+
+            boolean isPlugged () {
+                return mPlugged == (BatteryManager.BATTERY_PLUGGED_AC | BatteryManager.BATTERY_PLUGGED_USB | BatteryManager.BATTERY_PLUGGED_WIRELESS);
+            }
+
+            public float getPercent() {
+                return mPercent;
+            }
+
+            public int getTemperature() {
+                return mTemperature;
+            }
+        }
+        private BatteryInfo mBatteryInfo;
+
+        final BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+                int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
+
+                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+                float pct = level / (float) scale;
+                mBatteryInfo = new BatteryInfo(status,
+                                               plugged,
+                                               pct,
+                                               temp);
+
+                invalidate();
+            }
+        };
+
         /**
          * Unregistering an unregistered receiver throws an exception. Keep track of the
          * registration state to prevent that.
@@ -170,10 +221,10 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         Paint mBackgroundPaint;
         TextPaint mSubduedPaint;
+        TextPaint mSmallSubduedPaint;
         TextPaint mHourPaint;
         TextPaint mMinutePaint;
         TextPaint mSecondPaint;
-        TextPaint mAmPmPaint;
         TextPaint mColonPaint;
         float mColonWidth;
         boolean mMute;
@@ -225,6 +276,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
 
+            mSmallSubduedPaint = createTextPaint(resources.getColor(R.color.digital_date));
             mSubduedPaint = createTextPaint(resources.getColor(R.color.digital_date));
             mHourPaint = createTextPaint(mInteractiveHourDigitsColor, BOLD_TYPEFACE, Paint.Align.LEFT);
             mMinutePaint = createTextPaint(mInteractiveMinuteDigitsColor);
@@ -247,14 +299,19 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private TextPaint createTextPaint(int defaultInteractiveColor) {
-            return createTextPaint(defaultInteractiveColor, NORMAL_TYPEFACE);
+            return createTextPaint(defaultInteractiveColor, NORMAL_TYPEFACE, Paint.Align.LEFT);
         }
 
-        private TextPaint createTextPaint(int defaultInteractiveColor, Typeface typeface) {
+        private TextPaint createTextPaint(int defaultInteractiveColor, Paint.Align align) {
+            return createTextPaint(defaultInteractiveColor, NORMAL_TYPEFACE, align);
+        }
+
+        private TextPaint createTextPaint(int defaultInteractiveColor, Typeface typeface, Paint.Align align) {
             TextPaint paint = new TextPaint();
             paint.setColor(defaultInteractiveColor);
             paint.setTypeface(typeface);
             paint.setAntiAlias(true);
+            paint.setTextAlign(align);
             return paint;
         }
 
@@ -311,6 +368,15 @@ public class CircaTextService extends CanvasWatchFaceService {
                 filter.addDataAuthority(WearableCalendarContract.AUTHORITY, null);
                 CircaTextService.this.registerReceiver(mReceiver, filter);
             }
+            {
+                IntentFilter filter = new IntentFilter();
+                filter.addAction(Intent.ACTION_POWER_CONNECTED);
+                filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+                filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+                filter.addAction(Intent.ACTION_BATTERY_LOW);
+                filter.addAction(Intent.ACTION_BATTERY_OKAY);
+                CircaTextService.this.registerReceiver(mPowerReceiver, filter);
+            }
         }
 
         private void unregisterReceiver() {
@@ -332,9 +398,8 @@ public class CircaTextService extends CanvasWatchFaceService {
                     ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
             float textSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
-            float amPmSize = resources.getDimension(isRound
-                    ? R.dimen.digital_am_pm_size_round : R.dimen.digital_am_pm_size);
 
+            mSmallSubduedPaint.setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mSubduedPaint.setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
             mHourPaint.setTextSize(textSize);
             mMinutePaint.setTextSize(textSize);
@@ -377,6 +442,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             if (mLowBitAmbient) {
                 boolean antiAlias = !inAmbientMode;
+                mSmallSubduedPaint.setAntiAlias(antiAlias);
                 mSubduedPaint.setAntiAlias(antiAlias);
                 mHourPaint.setAntiAlias(antiAlias);
                 mMinutePaint.setAntiAlias(antiAlias);
@@ -517,7 +583,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 if (!isInAmbientMode() && !mMute) {
                     if (mMeetings != null) {
                         if (mMeetings.size() == 0) {
-                            canvas.drawText("no meetings", mXOffset, mCalendarOffset, mSubduedPaint);
+                            canvas.drawText("no meetings", mXOffset, mCalendarOffset, mSmallSubduedPaint);
                         } else {
                             EventInfo eia[] = mMeetings.toArray(new EventInfo[mMeetings.size()]);
                             Arrays.sort(eia);
@@ -527,6 +593,12 @@ public class CircaTextService extends CanvasWatchFaceService {
                             if (mMeetings.size() > 1)
                                 canvas.drawText("+" + (eia.length - 1) + " additional events", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mSubduedPaint);
                         }
+                    }
+                    if (mBatteryInfo != null) {
+                        String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent()*100);
+                        Paint p = new Paint(mSmallSubduedPaint);
+                        p.setTextAlign(Paint.Align.RIGHT);
+                        canvas.drawText(pctText, bounds.width()-mXOffset, mYOffset-mHourPaint.getTextSize(), p);
                     }
                 }
             }
