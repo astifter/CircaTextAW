@@ -169,8 +169,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         boolean mRegisteredReceiver = false;
 
         Paint mBackgroundPaint;
-        TextPaint mDatePaint;
-        TextPaint mCalendarPaint;
+        TextPaint mSubduedPaint;
         TextPaint mHourPaint;
         TextPaint mMinutePaint;
         TextPaint mSecondPaint;
@@ -225,9 +224,9 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
-            mDatePaint = createTextPaint(resources.getColor(R.color.digital_date));
-            mCalendarPaint = createTextPaint(resources.getColor(R.color.digital_date));
-            mHourPaint = createTextPaint(mInteractiveHourDigitsColor, BOLD_TYPEFACE);
+
+            mSubduedPaint = createTextPaint(resources.getColor(R.color.digital_date));
+            mHourPaint = createTextPaint(mInteractiveHourDigitsColor, BOLD_TYPEFACE, Paint.Align.LEFT);
             mMinutePaint = createTextPaint(mInteractiveMinuteDigitsColor);
             mSecondPaint = createTextPaint(mInteractiveSecondDigitsColor);
             mAmPmPaint = createTextPaint(resources.getColor(R.color.digital_am_pm));
@@ -337,8 +336,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             float amPmSize = resources.getDimension(isRound
                     ? R.dimen.digital_am_pm_size_round : R.dimen.digital_am_pm_size);
 
-            mDatePaint.setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
-            mCalendarPaint.setTextSize(resources.getDimension(R.dimen.digital_calendar_text_size));
+            mSubduedPaint.setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
             mHourPaint.setTextSize(textSize);
             mMinutePaint.setTextSize(textSize);
             mSecondPaint.setTextSize(textSize);
@@ -381,7 +379,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             if (mLowBitAmbient) {
                 boolean antiAlias = !inAmbientMode;
-                mDatePaint.setAntiAlias(antiAlias);
+                mSubduedPaint.setAntiAlias(antiAlias);
                 mCalendarPaint.setAntiAlias(antiAlias);
                 mHourPaint.setAntiAlias(antiAlias);
                 mMinutePaint.setAntiAlias(antiAlias);
@@ -412,8 +410,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (mMute != inMuteMode) {
                 mMute = inMuteMode;
                 int alpha = inMuteMode ? MUTE_ALPHA : NORMAL_ALPHA;
-                mDatePaint.setAlpha(alpha);
-                mCalendarPaint.setAlpha(alpha);
+                mSubduedPaint.setAlpha(alpha);
                 mHourPaint.setAlpha(alpha);
                 mMinutePaint.setAlpha(alpha);
                 mColonPaint.setAlpha(alpha);
@@ -530,24 +527,24 @@ public class CircaTextService extends CanvasWatchFaceService {
                 // Day of week
                 canvas.drawText(
                         mDayOfWeekFormat.format(mDate),
-                        mXOffset, mYOffset + mLineHeight, mDatePaint);
+                        mXOffset, mYOffset + mLineHeight, mSubduedPaint);
                 // Date
                 canvas.drawText(
                         mDateFormat.format(mDate),
-                        mXOffset, mYOffset + mLineHeight * 2, mDatePaint);
+                        mXOffset, mYOffset + mLineHeight * 2, mSubduedPaint);
 
                 if (!isInAmbientMode() && !mMute) {
                     if (mMeetings != null) {
                         if (mMeetings.size() == 0) {
-                            canvas.drawText("no meetings", mXOffset, mCalendarOffset, mCalendarPaint);
+                            canvas.drawText("no meetings", mXOffset, mCalendarOffset, mSubduedPaint);
                         } else {
                             EventInfo eia[] = mMeetings.toArray(new EventInfo[mMeetings.size()]);
                             Arrays.sort(eia);
                             EventInfo ei = eia[0];
                             SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                            canvas.drawText(sdf.format(ei.DtStart) + " " + ei.Title, mXOffset, mCalendarOffset, mCalendarPaint);
+                            canvas.drawText(sdf.format(ei.DtStart) + " " + ei.Title, mXOffset, mCalendarOffset, mSubduedPaint);
                             if (mMeetings.size() > 1)
-                                canvas.drawText("+" + (eia.length - 1) + " additional events", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mCalendarPaint);
+                                canvas.drawText("+" + (eia.length - 1) + " additional events", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mSubduedPaint);
                         }
                     }
                 }
