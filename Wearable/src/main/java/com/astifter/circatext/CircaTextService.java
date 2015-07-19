@@ -229,7 +229,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             mHourPaint = createTextPaint(mInteractiveHourDigitsColor, BOLD_TYPEFACE, Paint.Align.LEFT);
             mMinutePaint = createTextPaint(mInteractiveMinuteDigitsColor);
             mSecondPaint = createTextPaint(mInteractiveSecondDigitsColor);
-            mAmPmPaint = createTextPaint(resources.getColor(R.color.digital_am_pm));
             mColonPaint = createTextPaint(resources.getColor(R.color.digital_colons));
 
             mCalendar = Calendar.getInstance();
@@ -340,7 +339,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             mHourPaint.setTextSize(textSize);
             mMinutePaint.setTextSize(textSize);
             mSecondPaint.setTextSize(textSize);
-            mAmPmPaint.setTextSize(amPmSize);
             mColonPaint.setTextSize(textSize);
 
             mColonWidth = mColonPaint.measureText(COLON_STRING);
@@ -380,11 +378,9 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (mLowBitAmbient) {
                 boolean antiAlias = !inAmbientMode;
                 mSubduedPaint.setAntiAlias(antiAlias);
-                mCalendarPaint.setAntiAlias(antiAlias);
                 mHourPaint.setAntiAlias(antiAlias);
                 mMinutePaint.setAntiAlias(antiAlias);
                 mSecondPaint.setAntiAlias(antiAlias);
-                mAmPmPaint.setAntiAlias(antiAlias);
                 mColonPaint.setAntiAlias(antiAlias);
             }
             invalidate();
@@ -414,7 +410,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 mHourPaint.setAlpha(alpha);
                 mMinutePaint.setAlpha(alpha);
                 mColonPaint.setAlpha(alpha);
-                mAmPmPaint.setAlpha(alpha);
                 invalidate();
             }
         }
@@ -470,7 +465,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
             mCalendar.setTimeInMillis(now);
             mDate.setTime(now);
-            boolean is24Hour = DateFormat.is24HourFormat(CircaTextService.this);
 
             // Show colons for the first half of each second so the colons blink on when the time
             // updates.
@@ -481,16 +475,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             // Draw the hours.
             float x = mXOffset;
-            String hourString;
-            if (is24Hour) {
-                hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
-            } else {
-                int hour = mCalendar.get(Calendar.HOUR);
-                if (hour == 0) {
-                    hour = 12;
-                }
-                hourString = String.valueOf(hour);
-            }
+            String hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
             canvas.drawText(hourString, x, mYOffset, mHourPaint);
             x += mHourPaint.measureText(hourString);
 
@@ -515,10 +500,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 x += mColonWidth;
                 canvas.drawText(formatTwoDigitNumber(
                         mCalendar.get(Calendar.SECOND)), x, mYOffset, mSecondPaint);
-            } else if (!is24Hour) {
-                x += mColonWidth;
-                canvas.drawText(getAmPmString(
-                        mCalendar.get(Calendar.AM_PM)), x, mYOffset, mAmPmPaint);
             }
 
             // Only render the day of week and date if there is no peek card, so they do not bleed
