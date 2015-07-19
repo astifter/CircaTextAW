@@ -17,7 +17,6 @@
 package com.astifter.circatext;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -47,9 +46,6 @@ public class CircaTextConfigListenerService extends WearableListenerService
         // It's allowed that the message carries only some of the keys used in the config DataItem
         // and skips the ones that we don't want to change.
         DataMap configKeysToOverwrite = DataMap.fromByteArray(rawData);
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "Received watch face config message: " + configKeysToOverwrite);
-        }
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
@@ -60,7 +56,6 @@ public class CircaTextConfigListenerService extends WearableListenerService
                     mGoogleApiClient.blockingConnect(30, TimeUnit.SECONDS);
 
             if (!connectionResult.isSuccess()) {
-                Log.e(TAG, "Failed to connect to GoogleApiClient.");
                 return;
             }
         }
@@ -70,22 +65,13 @@ public class CircaTextConfigListenerService extends WearableListenerService
 
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnected(Bundle connectionHint) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "onConnected: " + connectionHint);
-        }
     }
 
     @Override  // GoogleApiClient.ConnectionCallbacks
     public void onConnectionSuspended(int cause) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "onConnectionSuspended: " + cause);
-        }
     }
 
     @Override  // GoogleApiClient.OnConnectionFailedListener
     public void onConnectionFailed(ConnectionResult result) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "onConnectionFailed: " + result);
-        }
     }
 }

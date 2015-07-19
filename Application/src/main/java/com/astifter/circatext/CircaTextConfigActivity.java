@@ -24,7 +24,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.wearable.companion.WatchFaceCompanion;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -93,10 +92,6 @@ public class CircaTextConfigActivity extends Activity
 
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnected(Bundle connectionHint) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "onConnected: " + connectionHint);
-        }
-
         if (mPeerId != null) {
             Uri.Builder builder = new Uri.Builder();
             Uri uri = builder.scheme("wear").path(PATH_WITH_FEATURE).authority(mPeerId).build();
@@ -122,16 +117,10 @@ public class CircaTextConfigActivity extends Activity
 
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnectionSuspended(int cause) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "onConnectionSuspended: " + cause);
-        }
     }
 
     @Override // GoogleApiClient.OnConnectionFailedListener
     public void onConnectionFailed(ConnectionResult result) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "onConnectionFailed: " + result);
-        }
     }
 
     private void displayNoConnectedDeviceDialog() {
@@ -209,11 +198,6 @@ public class CircaTextConfigActivity extends Activity
             config.putInt(configKey, color);
             byte[] rawData = config.toByteArray();
             Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, PATH_WITH_FEATURE, rawData);
-
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Sent watch face config message: " + configKey + " -> "
-                        + Integer.toHexString(color));
-            }
         }
     }
 }
