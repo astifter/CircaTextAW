@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class CircaTextConfigListenerService extends WearableListenerService
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private static final String TAG = "DigitalListenerService";
 
     private GoogleApiClient mGoogleApiClient;
 

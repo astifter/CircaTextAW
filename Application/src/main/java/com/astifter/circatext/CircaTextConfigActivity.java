@@ -46,7 +46,6 @@ import com.google.android.gms.wearable.Wearable;
 public class CircaTextConfigActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<DataApi.DataItemResult> {
-    private static final String TAG = "DigitalWatchFaceConfig";
 
     // TODO: use the shared constants (needs covering all the samples with Gradle build model)
     private static final String KEY_BACKGROUND_COLOR = "BACKGROUND_COLOR";

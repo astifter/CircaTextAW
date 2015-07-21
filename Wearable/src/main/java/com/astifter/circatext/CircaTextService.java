@@ -16,6 +16,7 @@
 
 package com.astifter.circatext;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -35,6 +36,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.CalendarContract;
+import android.support.annotation.NonNull;
 import android.support.wearable.provider.WearableCalendarContract;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
@@ -73,7 +75,6 @@ import java.util.concurrent.TimeUnit;
  * and without seconds in mute mode.
  */
 public class CircaTextService extends CanvasWatchFaceService {
-    private static final String TAG = "CircaTextService";
 
     private static final Typeface BOLD_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
@@ -100,18 +101,89 @@ public class CircaTextService extends CanvasWatchFaceService {
             GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
         static final String COLON_STRING = ":";
 
-        /** Alpha value for drawing time when in mute mode. */
+        /**
+         * Alpha value for drawing time when in mute mode.
+         */
         static final int MUTE_ALPHA = 100;
 
-        /** Alpha value for drawing time when not in mute mode. */
+        /**
+         * Alpha value for drawing time when not in mute mode.
+         */
         static final int NORMAL_ALPHA = 255;
 
         static final int MSG_UPDATE_TIME = 0;
-
-        /** How often {@link #mUpdateHandler} ticks in milliseconds. */
+        static final int MSG_LOAD_MEETINGS = 1;
+        final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(CircaTextService.this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Wearable.API)
+                .build();
+        /**
+         * How often {@link #mUpdateHandler} ticks in milliseconds.
+         */
         long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
+        /**
+         * Unregistering an unregistered receiver throws an exception. Keep track of the
+         * registration state to prevent that.
+         */
+        boolean mRegisteredReceiver = false;
+        Paint mBackgroundPaint;
+        TextPaint mSubduedPaint;
+        TextPaint mSmallSubduedPaint;
+        TextPaint mHourPaint;
+        TextPaint mMinutePaint;
+        TextPaint mSecondPaint;
+        TextPaint mColonPaint;
+        float mColonWidth;
+        boolean mMute;
+        Calendar mCalendar;
+        Date mDate;
+        SimpleDateFormat mDayOfWeekFormat;
+        java.text.DateFormat mDateFormat;
+        boolean mShouldDrawColons;
+        float mXOffset;
+        float mYOffset;
+        float mCalendarOffset;
+        float mLineHeight;
+        int mInteractiveBackgroundColor =
+                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
+        int mInteractiveHourDigitsColor =
+                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS;
+        int mInteractiveMinuteDigitsColor =
+                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS;
+        int mInteractiveSecondDigitsColor =
+                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS;
+        /**
+         * Whether the display supports fewer bits for each color in ambient mode. When true, we
+         * disable anti-aliasing in ambient mode.
+         */
+        boolean mLowBitAmbient;
+        Set<EventInfo> mMeetings;
+        private BatteryInfo mBatteryInfo;
+        final BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+                int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 
-        /** Handler to update the time periodically in interactive mode. */
+                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+                float pct = level / (float) scale;
+                mBatteryInfo = new BatteryInfo(status,
+                        plugged,
+                        pct,
+                        temp);
+
+                invalidate();
+            }
+        };
+        private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
+        /**
+         * Handler to update the time periodically in interactive mode.
+         */
+        @SuppressLint("HandlerLeak")
         final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
@@ -134,13 +206,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
             }
         };
-
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(CircaTextService.this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Wearable.API)
-                .build();
-
         /**
          * Handles time zone and locale changes.
          */
@@ -148,111 +213,18 @@ public class CircaTextService extends CanvasWatchFaceService {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()) ||
-                    Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())      ) {
+                        Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())) {
                     mCalendar.setTimeZone(TimeZone.getDefault());
                     initFormats();
                 }
-                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction())     &&
-                    WearableCalendarContract.CONTENT_URI.equals(intent.getData())    ) {
+                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction()) &&
+                        WearableCalendarContract.CONTENT_URI.equals(intent.getData())) {
                     cancelLoadMeetingTask();
                     mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
                 }
                 invalidate();
             }
         };
-
-        class BatteryInfo {
-            private final int mStatus;
-            private final int mPlugged;
-            private final float mPercent;
-            private final int mTemperature;
-
-            BatteryInfo(int status, int plugged, float pct, int temp) {
-                mStatus = status;
-                mPlugged = plugged;
-                mPercent = pct;
-                mTemperature = temp;
-            }
-
-            boolean isCharging () {
-                return mStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
-                       mStatus == BatteryManager.BATTERY_STATUS_FULL;
-            }
-
-            boolean isPlugged () {
-                return mPlugged == (BatteryManager.BATTERY_PLUGGED_AC | BatteryManager.BATTERY_PLUGGED_USB | BatteryManager.BATTERY_PLUGGED_WIRELESS);
-            }
-
-            public float getPercent() {
-                return mPercent;
-            }
-
-            public int getTemperature() {
-                return mTemperature;
-            }
-        }
-        private BatteryInfo mBatteryInfo;
-
-        final BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-                int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-                int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
-
-                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-                float pct = level / (float) scale;
-                mBatteryInfo = new BatteryInfo(status,
-                                               plugged,
-                                               pct,
-                                               temp);
-
-                invalidate();
-            }
-        };
-
-        /**
-         * Unregistering an unregistered receiver throws an exception. Keep track of the
-         * registration state to prevent that.
-         */
-        boolean mRegisteredReceiver = false;
-
-        Paint mBackgroundPaint;
-        TextPaint mSubduedPaint;
-        TextPaint mSmallSubduedPaint;
-        TextPaint mHourPaint;
-        TextPaint mMinutePaint;
-        TextPaint mSecondPaint;
-        TextPaint mColonPaint;
-        float mColonWidth;
-        boolean mMute;
-
-        Calendar mCalendar;
-        Date mDate;
-        SimpleDateFormat mDayOfWeekFormat;
-        java.text.DateFormat mDateFormat;
-
-        boolean mShouldDrawColons;
-        float mXOffset;
-        float mYOffset;
-        float mCalendarOffset;
-        float mLineHeight;
-        int mInteractiveBackgroundColor =
-                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
-        int mInteractiveHourDigitsColor =
-                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS;
-        int mInteractiveMinuteDigitsColor =
-                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS;
-        int mInteractiveSecondDigitsColor =
-                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS;
-
-        /**
-         * Whether the display supports fewer bits for each color in ambient mode. When true, we
-         * disable anti-aliasing in ambient mode.
-         */
-        boolean mLowBitAmbient;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -274,7 +246,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             mSmallSubduedPaint = createTextPaint(resources.getColor(R.color.digital_date));
             mSubduedPaint = createTextPaint(resources.getColor(R.color.digital_date));
-            mHourPaint = createTextPaint(mInteractiveHourDigitsColor, BOLD_TYPEFACE, Paint.Align.LEFT);
+            mHourPaint = createTextPaint(mInteractiveHourDigitsColor, BOLD_TYPEFACE);
             mMinutePaint = createTextPaint(mInteractiveMinuteDigitsColor);
             mSecondPaint = createTextPaint(mInteractiveSecondDigitsColor);
             mColonPaint = createTextPaint(resources.getColor(R.color.digital_colons));
@@ -295,19 +267,15 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private TextPaint createTextPaint(int defaultInteractiveColor) {
-            return createTextPaint(defaultInteractiveColor, NORMAL_TYPEFACE, Paint.Align.LEFT);
+            return createTextPaint(defaultInteractiveColor, NORMAL_TYPEFACE);
         }
 
-        private TextPaint createTextPaint(int defaultInteractiveColor, Paint.Align align) {
-            return createTextPaint(defaultInteractiveColor, NORMAL_TYPEFACE, align);
-        }
-
-        private TextPaint createTextPaint(int defaultInteractiveColor, Typeface typeface, Paint.Align align) {
+        private TextPaint createTextPaint(int defaultInteractiveColor, Typeface typeface) {
             TextPaint paint = new TextPaint();
             paint.setColor(defaultInteractiveColor);
             paint.setTypeface(typeface);
             paint.setAntiAlias(true);
-            paint.setTextAlign(align);
+            paint.setTextAlign(Paint.Align.LEFT);
             return paint;
         }
 
@@ -580,17 +548,17 @@ public class CircaTextService extends CanvasWatchFaceService {
                             EventInfo eia[] = mMeetings.toArray(new EventInfo[mMeetings.size()]);
                             Arrays.sort(eia);
                             EventInfo ei = eia[0];
-                            SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
                             canvas.drawText(sdf.format(ei.DtStart) + " " + ei.Title, mXOffset, mCalendarOffset, mSubduedPaint);
                             if (mMeetings.size() > 1)
                                 canvas.drawText("+" + (eia.length - 1) + " additional events", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mSubduedPaint);
                         }
                     }
                     if (mBatteryInfo != null) {
-                        String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent()*100);
+                        String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
                         Paint p = new Paint(mSmallSubduedPaint);
                         p.setTextAlign(Paint.Align.RIGHT);
-                        canvas.drawText(pctText, bounds.width()-mXOffset, mYOffset-mHourPaint.getTextSize(), p);
+                        canvas.drawText(pctText, bounds.width() - mXOffset, mYOffset - mHourPaint.getTextSize(), p);
                     }
                 }
             }
@@ -690,16 +658,21 @@ public class CircaTextService extends CanvasWatchFaceService {
          * @return whether UI has been updated
          */
         private boolean updateUiForKey(String configKey, int color) {
-            if (configKey.equals(CircaTextUtil.KEY_BACKGROUND_COLOR)) {
-                setInteractiveBackgroundColor(color);
-            } else if (configKey.equals(CircaTextUtil.KEY_HOURS_COLOR)) {
-                setInteractiveHourDigitsColor(color);
-            } else if (configKey.equals(CircaTextUtil.KEY_MINUTES_COLOR)) {
-                setInteractiveMinuteDigitsColor(color);
-            } else if (configKey.equals(CircaTextUtil.KEY_SECONDS_COLOR)) {
-                setInteractiveSecondDigitsColor(color);
-            } else {
-                return false;
+            switch (configKey) {
+                case CircaTextUtil.KEY_BACKGROUND_COLOR:
+                    setInteractiveBackgroundColor(color);
+                    break;
+                case CircaTextUtil.KEY_HOURS_COLOR:
+                    setInteractiveHourDigitsColor(color);
+                    break;
+                case CircaTextUtil.KEY_MINUTES_COLOR:
+                    setInteractiveMinuteDigitsColor(color);
+                    break;
+                case CircaTextUtil.KEY_SECONDS_COLOR:
+                    setInteractiveSecondDigitsColor(color);
+                    break;
+                default:
+                    return false;
             }
             return true;
         }
@@ -718,9 +691,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         public void onConnectionFailed(ConnectionResult result) {
         }
 
-        static final int MSG_LOAD_MEETINGS = 1;
-        Set<EventInfo> mMeetings;
-        private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
         private void onMeetingsLoaded(Set<EventInfo> result) {
             if (result != null) {
                 mMeetings = result;
@@ -734,6 +704,37 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
 
+        class BatteryInfo {
+            private final int mStatus;
+            private final int mPlugged;
+            private final float mPercent;
+            private final int mTemperature;
+
+            BatteryInfo(int status, int plugged, float pct, int temp) {
+                mStatus = status;
+                mPlugged = plugged;
+                mPercent = pct;
+                mTemperature = temp;
+            }
+
+            boolean isCharging() {
+                return mStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
+                        mStatus == BatteryManager.BATTERY_STATUS_FULL;
+            }
+
+            boolean isPlugged() {
+                return mPlugged == (BatteryManager.BATTERY_PLUGGED_AC | BatteryManager.BATTERY_PLUGGED_USB | BatteryManager.BATTERY_PLUGGED_WIRELESS);
+            }
+
+            public float getPercent() {
+                return mPercent;
+            }
+
+            public int getTemperature() {
+                return mTemperature;
+            }
+        }
+
         public class EventInfo implements Comparable<EventInfo> {
             public final String Title;
             private final Date DtStart;
@@ -744,7 +745,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
 
             @Override
-            public int compareTo(EventInfo another) {
+            public int compareTo(@NonNull EventInfo another) {
                 long thistime = this.DtStart.getTime();
                 long othertime = another.DtStart.getTime();
 
@@ -761,13 +762,12 @@ public class CircaTextService extends CanvasWatchFaceService {
          * meetings back via {@link #onMeetingsLoaded}.
          */
         private class LoadMeetingsTask extends AsyncTask<Void, Void, Set<EventInfo>> {
-            private PowerManager.WakeLock mWakeLock;
-
             public final String[] EVENT_FIELDS = {
                     CalendarContract.Instances.TITLE,
                     CalendarContract.Instances.BEGIN,
                     CalendarContract.Instances.CALENDAR_ID,
             };
+            private PowerManager.WakeLock mWakeLock;
 
             @Override
             protected Set<EventInfo> doInBackground(Void... voids) {
@@ -784,13 +784,15 @@ public class CircaTextService extends CanvasWatchFaceService {
                 final Cursor cursor = getContentResolver().query(builder.build(),
                         EVENT_FIELDS, null, null, null);
 
-                Set<EventInfo> eis = new HashSet<EventInfo>();
+                Set<EventInfo> eis = new HashSet<>();
                 while (cursor.moveToNext()) {
                     String title = cursor.getString(0);
                     Date d = new Date(cursor.getLong(1));
                     EventInfo ei = new EventInfo(title, d);
                     eis.add(ei);
                 }
+
+                cursor.close();
                 return eis;
             }
 
