@@ -68,11 +68,11 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Sample digital watch face with blinking colons and seconds. In ambient mode, the seconds are
- * replaced with an AM/PM indicator and the colons don't blink. On devices with low-bit ambient
- * mode, the text is drawn without anti-aliasing in ambient mode. On devices which require burn-in
- * protection, the hours are drawn in normal rather than bold. The time is drawn with less contrast
- * and without seconds in mute mode.
+ * Sample digital watch face with blinking colons and seconds. In ambient mode, the seconds not
+ * shown and the colons don't blink. On devices with low-bit ambient mode, the text is drawn without
+ * anti-aliasing in ambient mode. On devices which require burn-in protection, the hours are drawn
+ * in normal rather than bold. The time is drawn with less contrast and without seconds in mute
+ * mode.
  */
 public class CircaTextService extends CanvasWatchFaceService {
 
@@ -101,32 +101,28 @@ public class CircaTextService extends CanvasWatchFaceService {
             GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
         static final String COLON_STRING = ":";
 
-        /**
-         * Alpha value for drawing time when in mute mode.
-         */
         static final int MUTE_ALPHA = 100;
-
-        /**
-         * Alpha value for drawing time when not in mute mode.
-         */
         static final int NORMAL_ALPHA = 255;
 
-        static final int MSG_UPDATE_TIME = 0;
-        static final int MSG_LOAD_MEETINGS = 1;
         final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(CircaTextService.this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Wearable.API)
                 .build();
+
+        Calendar mCalendar;
+        Date mDate;
+        Set<EventInfo> mMeetings;
+        private BatteryInfo mBatteryInfo;
+
+        boolean mMute;
+        boolean mShouldDrawColons;
         /**
-         * How often {@link #mUpdateHandler} ticks in milliseconds.
+         * Whether the display supports fewer bits for each color in ambient mode. When true, we
+         * disable anti-aliasing in ambient mode.
          */
-        long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
-        /**
-         * Unregistering an unregistered receiver throws an exception. Keep track of the
-         * registration state to prevent that.
-         */
-        boolean mRegisteredReceiver = false;
+        boolean mLowBitAmbient;
+
         Paint mBackgroundPaint;
         TextPaint mSubduedPaint;
         TextPaint mSmallSubduedPaint;
@@ -134,17 +130,16 @@ public class CircaTextService extends CanvasWatchFaceService {
         TextPaint mMinutePaint;
         TextPaint mSecondPaint;
         TextPaint mColonPaint;
+
         float mColonWidth;
-        boolean mMute;
-        Calendar mCalendar;
-        Date mDate;
-        SimpleDateFormat mDayOfWeekFormat;
-        java.text.DateFormat mDateFormat;
-        boolean mShouldDrawColons;
         float mXOffset;
         float mYOffset;
         float mCalendarOffset;
         float mLineHeight;
+
+        SimpleDateFormat mDayOfWeekFormat;
+        java.text.DateFormat mDateFormat;
+
         int mInteractiveBackgroundColor =
                 CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
         int mInteractiveHourDigitsColor =
@@ -153,33 +148,13 @@ public class CircaTextService extends CanvasWatchFaceService {
                 CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS;
         int mInteractiveSecondDigitsColor =
                 CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS;
-        /**
-         * Whether the display supports fewer bits for each color in ambient mode. When true, we
-         * disable anti-aliasing in ambient mode.
-         */
-        boolean mLowBitAmbient;
-        Set<EventInfo> mMeetings;
-        private BatteryInfo mBatteryInfo;
-        final BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-                int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-                int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 
-                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-                float pct = level / (float) scale;
-                mBatteryInfo = new BatteryInfo(status,
-                        plugged,
-                        pct,
-                        temp);
-
-                invalidate();
-            }
-        };
         private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
+
+        static final int MSG_UPDATE_TIME = 0;
+        static final int MSG_LOAD_MEETINGS = 1;
+        long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
+
         /**
          * Handler to update the time periodically in interactive mode.
          */
@@ -206,9 +181,27 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
             }
         };
-        /**
-         * Handles time zone and locale changes.
-         */
+
+        final BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+                int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+                int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
+
+                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+                float pct = level / (float) scale;
+                mBatteryInfo = new BatteryInfo(status,
+                        plugged,
+                        pct,
+                        temp);
+
+                invalidate();
+            }
+        };
+
         final BroadcastReceiver mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -316,6 +309,12 @@ public class CircaTextService extends CanvasWatchFaceService {
             mDateFormat.setCalendar(mCalendar);
         }
 
+        /**
+         * Unregistering an unregistered receiver throws an exception. Keep track of the
+         * registration state to prevent that.
+         */
+        boolean mRegisteredReceiver = false;
+
         private void registerReceiver() {
             if (mRegisteredReceiver) {
                 return;
@@ -349,6 +348,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
             mRegisteredReceiver = false;
             CircaTextService.this.unregisterReceiver(mReceiver);
+            CircaTextService.this.unregisterReceiver(mPowerReceiver);
         }
 
         @Override
@@ -399,8 +399,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
             adjustPaintColorToCurrentMode(mMinutePaint, mInteractiveMinuteDigitsColor,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-            // Actually, the seconds are not rendered in the ambient mode, so we could pass just any
-            // value as ambientColor here.
             adjustPaintColorToCurrentMode(mSecondPaint, mInteractiveSecondDigitsColor,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
 
@@ -430,7 +428,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             super.onInterruptionFilterChanged(interruptionFilter);
 
             boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
-            // We only need to update once a minute in mute mode.
             setInteractiveUpdateRateMs(inMuteMode ? MUTE_UPDATE_RATE_MS : NORMAL_UPDATE_RATE_MS);
 
             if (mMute != inMuteMode) {

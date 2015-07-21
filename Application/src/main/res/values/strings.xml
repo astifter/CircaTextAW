@@ -24,7 +24,7 @@
     <string name="digital_config_seconds">Seconds</string>
 
     <string name="title_no_device_connected">No wearable device is currently connected.</string>
-    <string name="ok_no_device_connected">Connected</string>
+    <string name="ok_no_device_connected">Connected.</string>
 
     <string name="color_black">Black</string>
     <string name="color_blue">Blue</string>

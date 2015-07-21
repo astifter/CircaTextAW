@@ -39,9 +39,8 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
 /**
- * The phone-side config activity for {@code DigitalWatchFaceService}. Like the watch-side config
- * activity ({@code DigitalWatchFaceWearableConfigActivity}), allows for setting the background
- * color. Additionally, enables setting the color for hour, minute and second digits.
+ * The phone-side config activity for {@code DigitalWatchFaceService}. Allows for setting the
+ * background color. Additionally, enables setting the color for hour, minute and second digits.
  */
 public class CircaTextConfigActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -140,12 +139,11 @@ public class CircaTextConfigActivity extends Activity
      * Sets up selected items for all pickers according to given {@code config} and sets up their
      * item selection listeners.
      *
-     * @param config the {@code DigitalWatchFaceService} config {@link DataMap}. If null, the
+     * @param config the {@code CircaTextService} config {@link DataMap}. If null, the
      *               default items are selected.
      */
     private void setUpAllPickers(DataMap config) {
-        setUpColorPickerSelection(R.id.background, KEY_BACKGROUND_COLOR, config,
-                R.string.color_black);
+        setUpColorPickerSelection(R.id.background, KEY_BACKGROUND_COLOR, config, R.string.color_black);
         setUpColorPickerSelection(R.id.hours, KEY_HOURS_COLOR, config, R.string.color_white);
         setUpColorPickerSelection(R.id.minutes, KEY_MINUTES_COLOR, config, R.string.color_white);
         setUpColorPickerSelection(R.id.seconds, KEY_SECONDS_COLOR, config, R.string.color_gray);
