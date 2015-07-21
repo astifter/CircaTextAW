@@ -123,9 +123,53 @@ public class CircaTextService extends CanvasWatchFaceService {
          */
         boolean mLowBitAmbient;
 
+        class DrawableText {
+            private float x;
+            private float y;
+            private Paint paint;
+            private float textSize;
+            private int alpha;
+
+            public DrawableText(int c) {
+                this.paint = createTextPaint(c);
+            }
+
+            public DrawableText(int c, Paint.Align a) {
+                this.paint = createTextPaint(c);
+                this.paint.setTextAlign(a);
+            }
+
+            public void draw(Canvas canvas, String text) {
+                canvas.drawText(text, x, y, paint);
+            }
+
+            public void setCoord(float x, float y) {
+                this.x = x;
+                this.y = y;
+            }
+
+            public void setTextSize(float s) {
+                this.paint.setTextSize(s);
+            }
+
+            public void setAntiAlias(boolean antiAlias) {
+                this.paint.setAntiAlias(antiAlias);
+            }
+
+            public void setAlpha(int alpha) {
+                this.paint.setAlpha(alpha);
+            }
+        }
+
+        private static final int eTF_DAY_OF_WEEK = 0;
+        private static final int eTF_DATE = 1;
+        private static final int eTF_CALENDAR_1 = 2;
+        private static final int eTF_CALENDAR_2 = 3;
+        private static final int eTF_BATTERY = 4;
+        private static final int eTF_SIZE = 5;
+        DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
+
         Paint mBackgroundPaint;
-        TextPaint mSubduedPaint;
-        TextPaint mSmallSubduedPaint;
         TextPaint mHourPaint;
         TextPaint mMinutePaint;
         TextPaint mSecondPaint;
@@ -225,7 +269,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             setWatchFaceStyle(new WatchFaceStyle.Builder(CircaTextService.this)
                     .setAmbientPeekMode(WatchFaceStyle.AMBIENT_PEEK_MODE_VISIBLE)   // default
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)             // default
-                    .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_PERSISTENT) // default
+                    .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)                                     // default
                     .build());
 
@@ -237,8 +281,12 @@ public class CircaTextService extends CanvasWatchFaceService {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
 
-            mSmallSubduedPaint = createTextPaint(resources.getColor(R.color.digital_date));
-            mSubduedPaint = createTextPaint(resources.getColor(R.color.digital_date));
+            mTextFields[eTF_DAY_OF_WEEK] = new DrawableText(resources.getColor(R.color.digital_date));
+            mTextFields[eTF_DATE] = new DrawableText(resources.getColor(R.color.digital_date));
+            mTextFields[eTF_CALENDAR_1] = new DrawableText(resources.getColor(R.color.digital_date));
+            mTextFields[eTF_CALENDAR_2] = new DrawableText(resources.getColor(R.color.digital_date));
+            mTextFields[eTF_BATTERY] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
+
             mHourPaint = createTextPaint(mInteractiveHourDigitsColor, BOLD_TYPEFACE);
             mMinutePaint = createTextPaint(mInteractiveMinuteDigitsColor);
             mSecondPaint = createTextPaint(mInteractiveSecondDigitsColor);
@@ -363,12 +411,26 @@ public class CircaTextService extends CanvasWatchFaceService {
             float textSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
 
-            mSmallSubduedPaint.setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-            mSubduedPaint.setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
+            for (DrawableText t : mTextFields) {
+                t.setTextSize(textSize);
+            }
+            mTextFields[eTF_DAY_OF_WEEK].setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
+            mTextFields[eTF_DATE].setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
+            mTextFields[eTF_CALENDAR_1].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
+            mTextFields[eTF_CALENDAR_2].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
+            mTextFields[eTF_BATTERY].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
+
             mHourPaint.setTextSize(textSize);
             mMinutePaint.setTextSize(textSize);
             mSecondPaint.setTextSize(textSize);
             mColonPaint.setTextSize(textSize);
+
+            int width = getApplicationContext().getResources().getDisplayMetrics().widthPixels;
+            mTextFields[eTF_DAY_OF_WEEK].setCoord(mXOffset, mYOffset + mLineHeight);
+            mTextFields[eTF_DATE].setCoord(mXOffset, mYOffset + mLineHeight * 2);
+            mTextFields[eTF_CALENDAR_1].setCoord(mXOffset, mCalendarOffset);
+            mTextFields[eTF_CALENDAR_2].setCoord(mXOffset, mCalendarOffset + mLineHeight * 0.7f);
+            mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mYOffset - mHourPaint.getTextSize());
 
             mColonWidth = mColonPaint.measureText(COLON_STRING);
         }
@@ -404,12 +466,14 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             if (mLowBitAmbient) {
                 boolean antiAlias = !inAmbientMode;
-                mSmallSubduedPaint.setAntiAlias(antiAlias);
-                mSubduedPaint.setAntiAlias(antiAlias);
                 mHourPaint.setAntiAlias(antiAlias);
                 mMinutePaint.setAntiAlias(antiAlias);
                 mSecondPaint.setAntiAlias(antiAlias);
                 mColonPaint.setAntiAlias(antiAlias);
+
+                for (DrawableText t : mTextFields) {
+                    t.setAntiAlias(!inAmbientMode);
+                }
             }
             invalidate();
 
@@ -433,10 +497,11 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (mMute != inMuteMode) {
                 mMute = inMuteMode;
                 int alpha = inMuteMode ? MUTE_ALPHA : NORMAL_ALPHA;
-                mSubduedPaint.setAlpha(alpha);
                 mHourPaint.setAlpha(alpha);
                 mMinutePaint.setAlpha(alpha);
                 mColonPaint.setAlpha(alpha);
+                mTextFields[eTF_DAY_OF_WEEK].setAlpha(alpha);
+                mTextFields[eTF_DATE].setAlpha(alpha);
                 invalidate();
             }
         }
@@ -523,43 +588,39 @@ public class CircaTextService extends CanvasWatchFaceService {
                 x += mColonWidth;
                 canvas.drawText(formatTwoDigitNumber(
                         mCalendar.get(Calendar.SECOND)), x, mYOffset, mSecondPaint);
+
+                if (mBatteryInfo != null) {
+                    String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
+                    mTextFields[eTF_BATTERY].draw(canvas, pctText);
+                }
             }
 
             // Only render the day of week and date if there is no peek card, so they do not bleed
             // into each other in ambient mode.
             if (getPeekCardPosition().isEmpty()) {
-                // Day of week
-                canvas.drawText(
-                        mDayOfWeekFormat.format(mDate),
-                        mXOffset, mYOffset + mLineHeight, mSubduedPaint);
-                // Date
-                canvas.drawText(
-                        mDateFormat.format(mDate),
-                        mXOffset, mYOffset + mLineHeight * 2, mSubduedPaint);
+
+                if (!mMute) {
+                    mTextFields[eTF_DAY_OF_WEEK].draw(canvas, mDayOfWeekFormat.format(mDate));
+                    mTextFields[eTF_DATE].draw(canvas, mDateFormat.format(mDate));
+                }
 
                 if (!isInAmbientMode() && !mMute) {
                     if (mMeetings != null) {
                         if (mMeetings.size() == 0) {
-                            canvas.drawText("no meetings", mXOffset, mCalendarOffset, mSmallSubduedPaint);
+                            mTextFields[eTF_CALENDAR_1].draw(canvas, "no meetings");
                         } else {
                             EventInfo eia[] = mMeetings.toArray(new EventInfo[mMeetings.size()]);
                             Arrays.sort(eia);
                             EventInfo ei = eia[0];
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                            canvas.drawText(sdf.format(ei.DtStart) + " " + ei.Title, mXOffset, mCalendarOffset, mSmallSubduedPaint);
+                            mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(ei.DtStart) + " " + ei.Title);
 
                             int additionalEvents = mMeetings.size()-1;
                             if (additionalEvents == 1)
-                                canvas.drawText("+" + (eia.length - 1) + " additional event", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mSmallSubduedPaint);
+                                mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + (eia.length - 1) + " additional event");
                             if (additionalEvents > 1)
-                                canvas.drawText("+" + (eia.length - 1) + " additional events", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mSmallSubduedPaint);
+                                mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + (eia.length - 1) + " additional events");
                         }
-                    }
-                    if (mBatteryInfo != null) {
-                        String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
-                        Paint p = new Paint(mSmallSubduedPaint);
-                        p.setTextAlign(Paint.Align.RIGHT);
-                        canvas.drawText(pctText, bounds.width() - mXOffset, mYOffset - mHourPaint.getTextSize(), p);
                     }
                 }
             }
