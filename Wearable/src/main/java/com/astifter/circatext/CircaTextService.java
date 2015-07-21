@@ -239,8 +239,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         float mYOffset;
         float mCalendarOffset;
         float mLineHeight;
-        String mAmString;
-        String mPmString;
         int mInteractiveBackgroundColor =
                 CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
         int mInteractiveHourDigitsColor =
@@ -270,8 +268,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
             mCalendarOffset = resources.getDimension(R.dimen.digital_calendar_offset);
             mLineHeight = resources.getDimension(R.dimen.digital_line_height);
-            mAmString = resources.getString(R.string.digital_am);
-            mPmString = resources.getString(R.string.digital_pm);
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
@@ -520,10 +516,6 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         private String formatTwoDigitNumber(int hour) {
             return String.format("%02d", hour);
-        }
-
-        private String getAmPmString(int amPm) {
-            return amPm == Calendar.AM ? mAmString : mPmString;
         }
 
         @Override

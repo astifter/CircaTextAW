@@ -17,10 +17,6 @@
     <string name="app_name">CircaText</string>
 
     <string name="digital_name">CircaText</string>
-    <string name="digital_background_color">Background Color</string>
-    <string name="digital_config_name">CircaText Configuration</string>
-    <string name="digital_am">AM</string>
-    <string name="digital_pm">PM</string>
 
     <!-- TODO: this should be shared (needs covering all the samples with Gradle build model) -->
     <string name="color_black">Black</string>
