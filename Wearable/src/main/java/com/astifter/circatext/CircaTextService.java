@@ -546,9 +546,13 @@ public class CircaTextService extends CanvasWatchFaceService {
                             Arrays.sort(eia);
                             EventInfo ei = eia[0];
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                            canvas.drawText(sdf.format(ei.DtStart) + " " + ei.Title, mXOffset, mCalendarOffset, mSubduedPaint);
-                            if (mMeetings.size() > 1)
-                                canvas.drawText("+" + (eia.length - 1) + " additional events", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mSubduedPaint);
+                            canvas.drawText(sdf.format(ei.DtStart) + " " + ei.Title, mXOffset, mCalendarOffset, mSmallSubduedPaint);
+
+                            int additionalEvents = mMeetings.size()-1;
+                            if (additionalEvents == 1)
+                                canvas.drawText("+" + (eia.length - 1) + " additional event", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mSmallSubduedPaint);
+                            if (additionalEvents > 1)
+                                canvas.drawText("+" + (eia.length - 1) + " additional events", mXOffset, mCalendarOffset + mLineHeight * 0.7f, mSmallSubduedPaint);
                         }
                     }
                     if (mBatteryInfo != null) {
