@@ -25,6 +25,7 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -102,9 +103,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
         static final String COLON_STRING = ":";
 
-        static final int MUTE_ALPHA = 100;
-        static final int NORMAL_ALPHA = 255;
-
         final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(CircaTextService.this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -113,7 +111,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         Calendar mCalendar;
         Date mDate;
-        Set<EventInfo> mMeetings;
+        EventInfo mMeetings[];
         private BatteryInfo mBatteryInfo;
 
         boolean mMute;
@@ -128,25 +126,42 @@ public class CircaTextService extends CanvasWatchFaceService {
             private float x;
             private float y;
             private Paint paint;
+            private int   color;
             private float textSize;
             private int alpha;
             WeakReference<DrawableText> stack;
             private float drawnsize;
 
+            private TextPaint createTextPaint(Typeface t, Paint.Align a) {
+                TextPaint paint = new TextPaint();
+                paint.setColor(this.color);
+                paint.setTypeface(t);
+                paint.setAntiAlias(true);
+                paint.setTextAlign(a);
+                return paint;
+            }
+
             public DrawableText(int c) {
-                this.paint = createTextPaint(c);
+                this.color = c;
+                this.paint = createTextPaint(NORMAL_TYPEFACE, Paint.Align.LEFT);
             }
 
             public DrawableText(int c, Paint.Align a) {
-                this.paint = createTextPaint(c);
-                this.paint.setTextAlign(a);
+                this.color = c;
+                this.paint = createTextPaint(NORMAL_TYPEFACE, a);
             }
 
             public DrawableText(int c, Typeface t) {
-                this.paint = createTextPaint(c, t);
+                this.color = c;
+                this.paint = createTextPaint(t, Paint.Align.LEFT);
             }
 
             public void draw(Canvas canvas, String text) {
+                if (isInAmbientMode()) {
+                    this.paint.setColor(Color.WHITE);
+                } else {
+                    this.paint.setColor(this.color);
+                }
                 float x;
                 if (this.stack != null && this.stack.get() != null) {
                     x = this.stack.get().getWidth();
@@ -183,28 +198,17 @@ public class CircaTextService extends CanvasWatchFaceService {
                 this.paint.setAntiAlias(antiAlias);
             }
 
-            public void setAlpha(int alpha) {
-                this.paint.setAlpha(alpha);
-            }
-
-            public void adjustColor(int interactiveColor, int ambientColor) {
-                this.paint.setColor(isInAmbientMode() ? ambientColor : interactiveColor);
-            }
-
             public float getTextSize() {
                 return this.paint.getTextSize();
-            }
-
-            public float measureText(String s) {
-                return this.paint.measureText(s);
             }
 
             public void setTypeface(Typeface t) {
                 this.paint.setTypeface(t);
             }
 
-            public void updatePaintIfInteractive(int c) {
-                if (!isInAmbientMode() && this.paint != null) {
+            public void setColor(int c) {
+                this.color = c;
+                if (!isInAmbientMode()) {
                     this.paint.setColor(c);
                 }
             }
@@ -304,7 +308,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
                 if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction()) &&
                         WearableCalendarContract.CONTENT_URI.equals(intent.getData())) {
-                    cancelLoadMeetingTask();
                     mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
                 }
                 invalidate();
@@ -354,19 +357,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             mUpdateHandler.removeMessages(MSG_LOAD_MEETINGS);
             cancelLoadMeetingTask();
             super.onDestroy();
-        }
-
-        private TextPaint createTextPaint(int defaultInteractiveColor) {
-            return createTextPaint(defaultInteractiveColor, NORMAL_TYPEFACE);
-        }
-
-        private TextPaint createTextPaint(int defaultInteractiveColor, Typeface typeface) {
-            TextPaint paint = new TextPaint();
-            paint.setColor(defaultInteractiveColor);
-            paint.setTypeface(typeface);
-            paint.setAntiAlias(true);
-            paint.setTextAlign(Paint.Align.LEFT);
-            return paint;
         }
 
         @Override
@@ -502,14 +492,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
 
-            adjustPaintColorToCurrentMode(mBackgroundPaint, mInteractiveBackgroundColor,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
-            mTextFields[eTF_HOUR].adjustColor(mInteractiveHourDigitsColor,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
-            mTextFields[eTF_MINUTE].adjustColor(mInteractiveMinuteDigitsColor,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-            mTextFields[eTF_SECOND].adjustColor(mInteractiveSecondDigitsColor,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
+            mBackgroundPaint.setColor(isInAmbientMode() ? mInteractiveBackgroundColor :
+                                                          CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
 
             if (mLowBitAmbient) {
                 for (DrawableText t : mTextFields) {
@@ -523,11 +507,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             updateTimer();
         }
 
-        private void adjustPaintColorToCurrentMode(Paint paint, int interactiveColor,
-                                                   int ambientColor) {
-            paint.setColor(isInAmbientMode() ? ambientColor : interactiveColor);
-        }
-
         @Override
         public void onInterruptionFilterChanged(int interruptionFilter) {
             super.onInterruptionFilterChanged(interruptionFilter);
@@ -537,13 +516,6 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             if (mMute != inMuteMode) {
                 mMute = inMuteMode;
-                int alpha = inMuteMode ? MUTE_ALPHA : NORMAL_ALPHA;
-                mTextFields[eTF_HOUR].setAlpha(alpha);
-                mTextFields[eTF_MINUTE].setAlpha(alpha);
-                mTextFields[eTF_COLON_1].setAlpha(alpha);
-                mTextFields[eTF_COLON_2].setAlpha(alpha);
-                mTextFields[eTF_DAY_OF_WEEK].setAlpha(alpha);
-                mTextFields[eTF_DATE].setAlpha(alpha);
                 invalidate();
             }
         }
@@ -560,31 +532,27 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
 
-        private void updatePaintIfInteractive(Paint paint, int interactiveColor) {
-            if (!isInAmbientMode() && paint != null) {
-                paint.setColor(interactiveColor);
-            }
-        }
-
         private void setInteractiveBackgroundColor(int color) {
             mInteractiveBackgroundColor = color;
-            updatePaintIfInteractive(mBackgroundPaint, color);
+            if (!isInAmbientMode() && mBackgroundPaint != null) {
+                mBackgroundPaint.setColor(color);
+            }
         }
 
         private void setInteractiveHourDigitsColor(int color) {
             mInteractiveHourDigitsColor = color;
-            mTextFields[eTF_HOUR].updatePaintIfInteractive(color);
+            mTextFields[eTF_HOUR].setColor(color);
 
         }
 
         private void setInteractiveMinuteDigitsColor(int color) {
             mInteractiveMinuteDigitsColor = color;
-            mTextFields[eTF_MINUTE].updatePaintIfInteractive(color);
+            mTextFields[eTF_MINUTE].setColor(color);
         }
 
         private void setInteractiveSecondDigitsColor(int color) {
             mInteractiveSecondDigitsColor = color;
-            mTextFields[eTF_SECOND].updatePaintIfInteractive(color);
+            mTextFields[eTF_SECOND].setColor(color);
         }
 
         private String formatTwoDigitNumber(int hour) {
@@ -644,20 +612,17 @@ public class CircaTextService extends CanvasWatchFaceService {
 
                 if (!isInAmbientMode() && !mMute) {
                     if (mMeetings != null) {
-                        if (mMeetings.size() == 0) {
+                        if (mMeetings.length == 0) {
                             mTextFields[eTF_CALENDAR_1].draw(canvas, "no meetings");
                         } else {
-                            EventInfo eia[] = mMeetings.toArray(new EventInfo[mMeetings.size()]);
-                            Arrays.sort(eia);
-                            EventInfo ei = eia[0];
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                            mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(ei.DtStart) + " " + ei.Title);
+                            mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(mMeetings[0].DtStart) + " " + mMeetings[0].Title);
 
-                            int additionalEvents = mMeetings.size()-1;
+                            int additionalEvents = mMeetings.length-1;
                             if (additionalEvents == 1)
-                                mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + (eia.length - 1) + " additional event");
+                                mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional event");
                             if (additionalEvents > 1)
-                                mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + (eia.length - 1) + " additional events");
+                                mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional events");
                         }
                     }
                 }
@@ -793,7 +758,8 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         private void onMeetingsLoaded(Set<EventInfo> result) {
             if (result != null) {
-                mMeetings = result;
+                mMeetings = result.toArray(new EventInfo[result.size()]);
+                Arrays.sort(mMeetings);
                 invalidate();
             }
         }
