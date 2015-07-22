@@ -57,6 +57,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -129,6 +130,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             private Paint paint;
             private float textSize;
             private int alpha;
+            WeakReference<DrawableText> stack;
+            private float drawnsize;
 
             public DrawableText(int c) {
                 this.paint = createTextPaint(c);
@@ -144,12 +147,32 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
 
             public void draw(Canvas canvas, String text) {
-                canvas.drawText(text, x, y, paint);
+                float x;
+                if (this.stack != null && this.stack.get() != null) {
+                    x = this.stack.get().getWidth();
+                } else {
+                    x = this.x;
+                }
+                canvas.drawText(text, x, this.y, paint);
+                this.drawnsize = paint.measureText(text);
+            }
+
+            private float getWidth() {
+                if (this.stack != null && this.stack.get() != null) {
+                    return drawnsize + this.stack.get().getWidth();
+                } else {
+                    return drawnsize + this.x;
+                }
             }
 
             public void setCoord(float x, float y) {
                 this.x = x;
                 this.y = y;
+            }
+
+            public void setCoord(DrawableText t, float y) {
+                this.y = y;
+                this.stack = new WeakReference<>(t);
             }
 
             public void setTextSize(float s) {
@@ -193,15 +216,15 @@ public class CircaTextService extends CanvasWatchFaceService {
         private static final int eTF_CALENDAR_2 = 3;
         private static final int eTF_BATTERY = 4;
         private static final int eTF_HOUR = 5;
-        private static final int eTF_SIZE = 6;
+        private static final int eTF_COLON_1 = 6;
+        private static final int eTF_MINUTE = 7;
+        private static final int eTF_COLON_2 = 8;
+        private static final int eTF_SECOND = 9;
+        private static final int eTF_SIZE = 10;
         DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
 
         Paint mBackgroundPaint;
-        TextPaint mMinutePaint;
-        TextPaint mSecondPaint;
-        TextPaint mColonPaint;
 
-        float mColonWidth;
         float mXOffset;
         float mYOffset;
         float mCalendarOffset;
@@ -313,10 +336,10 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2] = new DrawableText(resources.getColor(R.color.digital_date));
             mTextFields[eTF_BATTERY] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
             mTextFields[eTF_HOUR] = new DrawableText(mInteractiveHourDigitsColor, BOLD_TYPEFACE);
-
-            mMinutePaint = createTextPaint(mInteractiveMinuteDigitsColor);
-            mSecondPaint = createTextPaint(mInteractiveSecondDigitsColor);
-            mColonPaint = createTextPaint(resources.getColor(R.color.digital_colons));
+            mTextFields[eTF_COLON_1] = new DrawableText(resources.getColor(R.color.digital_colons));
+            mTextFields[eTF_MINUTE] = new DrawableText(mInteractiveMinuteDigitsColor);
+            mTextFields[eTF_COLON_2] = new DrawableText(resources.getColor(R.color.digital_colons));
+            mTextFields[eTF_SECOND] = new DrawableText(mInteractiveSecondDigitsColor);
 
             mCalendar = Calendar.getInstance();
             mDate = new Date();
@@ -446,10 +469,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_BATTERY].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
 
-            mMinutePaint.setTextSize(textSize);
-            mSecondPaint.setTextSize(textSize);
-            mColonPaint.setTextSize(textSize);
-
             int width = getApplicationContext().getResources().getDisplayMetrics().widthPixels;
             mTextFields[eTF_DAY_OF_WEEK].setCoord(mXOffset, mYOffset + mLineHeight);
             mTextFields[eTF_DATE].setCoord(mXOffset, mYOffset + mLineHeight * 2);
@@ -457,8 +476,10 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2].setCoord(mXOffset, mCalendarOffset + mLineHeight * 0.7f);
             mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mYOffset - mTextFields[eTF_HOUR].getTextSize());
             mTextFields[eTF_HOUR].setCoord(mXOffset, mYOffset);
-
-            mColonWidth = mColonPaint.measureText(COLON_STRING);
+            mTextFields[eTF_COLON_1].setCoord(mTextFields[eTF_HOUR], mYOffset);
+            mTextFields[eTF_MINUTE].setCoord(mTextFields[eTF_COLON_1], mYOffset);
+            mTextFields[eTF_COLON_2].setCoord(mTextFields[eTF_MINUTE], mYOffset);
+            mTextFields[eTF_SECOND].setCoord(mTextFields[eTF_COLON_2], mYOffset);
         }
 
         @Override
@@ -485,17 +506,12 @@ public class CircaTextService extends CanvasWatchFaceService {
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
             mTextFields[eTF_HOUR].adjustColor(mInteractiveHourDigitsColor,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
-            adjustPaintColorToCurrentMode(mMinutePaint, mInteractiveMinuteDigitsColor,
+            mTextFields[eTF_MINUTE].adjustColor(mInteractiveMinuteDigitsColor,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-            adjustPaintColorToCurrentMode(mSecondPaint, mInteractiveSecondDigitsColor,
+            mTextFields[eTF_SECOND].adjustColor(mInteractiveSecondDigitsColor,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
 
             if (mLowBitAmbient) {
-                boolean antiAlias = !inAmbientMode;
-                mMinutePaint.setAntiAlias(antiAlias);
-                mSecondPaint.setAntiAlias(antiAlias);
-                mColonPaint.setAntiAlias(antiAlias);
-
                 for (DrawableText t : mTextFields) {
                     t.setAntiAlias(!inAmbientMode);
                 }
@@ -523,8 +539,9 @@ public class CircaTextService extends CanvasWatchFaceService {
                 mMute = inMuteMode;
                 int alpha = inMuteMode ? MUTE_ALPHA : NORMAL_ALPHA;
                 mTextFields[eTF_HOUR].setAlpha(alpha);
-                mMinutePaint.setAlpha(alpha);
-                mColonPaint.setAlpha(alpha);
+                mTextFields[eTF_MINUTE].setAlpha(alpha);
+                mTextFields[eTF_COLON_1].setAlpha(alpha);
+                mTextFields[eTF_COLON_2].setAlpha(alpha);
                 mTextFields[eTF_DAY_OF_WEEK].setAlpha(alpha);
                 mTextFields[eTF_DATE].setAlpha(alpha);
                 invalidate();
@@ -562,12 +579,12 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         private void setInteractiveMinuteDigitsColor(int color) {
             mInteractiveMinuteDigitsColor = color;
-            updatePaintIfInteractive(mMinutePaint, color);
+            mTextFields[eTF_MINUTE].updatePaintIfInteractive(color);
         }
 
         private void setInteractiveSecondDigitsColor(int color) {
             mInteractiveSecondDigitsColor = color;
-            updatePaintIfInteractive(mSecondPaint, color);
+            mTextFields[eTF_SECOND].updatePaintIfInteractive(color);
         }
 
         private String formatTwoDigitNumber(int hour) {
@@ -588,32 +605,27 @@ public class CircaTextService extends CanvasWatchFaceService {
             canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
 
             // Draw the hours.
-            float x = mXOffset;
             String hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
             mTextFields[eTF_HOUR].draw(canvas, hourString);
-            x += mTextFields[eTF_HOUR].measureText(hourString);
 
             // In ambient and mute modes, always draw the first colon. Otherwise, draw the
             // first colon for the first half of each second.
             if (isInAmbientMode() || mMute || mShouldDrawColons) {
-                canvas.drawText(COLON_STRING, x, mYOffset, mColonPaint);
+                mTextFields[eTF_COLON_1].draw(canvas, COLON_STRING);
             }
-            x += mColonWidth;
 
             // Draw the minutes.
             String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
-            canvas.drawText(minuteString, x, mYOffset, mMinutePaint);
-            x += mMinutePaint.measureText(minuteString);
+            mTextFields[eTF_MINUTE].draw(canvas, minuteString);
 
             // In unmuted interactive mode, draw a second blinking colon followed by the seconds.
             // Otherwise, if we're in 12-hour mode, draw AM/PM
             if (!isInAmbientMode() && !mMute) {
                 if (mShouldDrawColons) {
-                    canvas.drawText(COLON_STRING, x, mYOffset, mColonPaint);
+                    mTextFields[eTF_COLON_2].draw(canvas, COLON_STRING);
                 }
-                x += mColonWidth;
-                canvas.drawText(formatTwoDigitNumber(
-                        mCalendar.get(Calendar.SECOND)), x, mYOffset, mSecondPaint);
+                String secondString = formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
+                mTextFields[eTF_SECOND].draw(canvas, secondString);
 
                 if (mBatteryInfo != null) {
                     String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
