@@ -43,7 +43,6 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.TextPaint;
-import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
@@ -130,14 +129,21 @@ public class CircaTextService extends CanvasWatchFaceService {
         boolean mLowBitAmbient;
 
         class DrawableText {
-            private float x;
-            private float y;
-            private Paint paint;
-            private int   color;
-            private float textSize;
-            private int alpha;
-            WeakReference<DrawableText> stack;
-            private float drawnsize;
+            class StackDirection {
+                static final int NONE = -1;
+                static final int HORIZONTAL = 0;
+                static final int ABOVE = 1;
+                static final int BELOW = 2;
+                private final int dir;
+
+                public StackDirection(int dir) {
+                    this.dir = dir;
+                }
+
+                public int direction() {
+                    return dir;
+                }
+            };
 
             private TextPaint createTextPaint(Typeface t, Paint.Align a) {
                 TextPaint paint = new TextPaint();
@@ -147,6 +153,17 @@ public class CircaTextService extends CanvasWatchFaceService {
                 paint.setTextAlign(a);
                 return paint;
             }
+
+            private float x;
+            private float y;
+            private Paint paint;
+            private int   color;
+            private float textSize;
+            private int alpha;
+            WeakReference<DrawableText> stack;
+            StackDirection stackDirection;
+            private float drawnsize;
+
             public DrawableText() {
                 this.paint = new Paint();
                 this.stackDirection = new StackDirection(StackDirection.NONE);
@@ -168,21 +185,59 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
 
             public void draw(Canvas canvas, String text) {
-                float x;
+                float x = this.x;
+                float y = this.y;
                 if (this.stack != null && this.stack.get() != null) {
-                    x = this.stack.get().getWidth();
-                } else {
-                    x = this.x;
+                    switch (this.stackDirection.direction()) {
+                        case StackDirection.HORIZONTAL:
+                            x = this.stack.get().getRight();
+                            break;
+                        case StackDirection.BELOW:
+                            y = this.stack.get().getBottom() + -this.paint.ascent();
+                            break;
+                        case StackDirection.ABOVE:
+                            y = this.stack.get().getTop() - this.paint.descent();
+                            break;
+                    }
                 }
-                canvas.drawText(text, x, this.y, paint);
+                canvas.drawText(text, x, y, paint);
                 this.drawnsize = paint.measureText(text);
+                // if (this.paint.getTextAlign() == Paint.Align.RIGHT)
+                //     this.drawnsize = -this.drawnsize;
+                // canvas.drawLine(x, y, x + this.drawnsize, y, this.paint);
+                // float a = this.paint.ascent();
+                // canvas.drawLine(x, y+a, x + this.drawnsize, y+a, this.paint);
+                // float d = this.paint.descent();
+                // canvas.drawLine(x, y+d, x + this.drawnsize, y+d, this.paint);
+                // canvas.drawLine(x, y+a, x, y+d, this.paint);
             }
 
-            private float getWidth() {
+            private float getRight() {
                 if (this.stack != null && this.stack.get() != null) {
-                    return drawnsize + this.stack.get().getWidth();
+                    return this.stack.get().getRight() + this.drawnsize;
                 } else {
-                    return drawnsize + this.x;
+                    return this.x + this.drawnsize;
+                }
+            }
+
+            private float getHeigth() {
+                Paint.FontMetrics fm = this.paint.getFontMetrics();
+                return -fm.ascent + fm.descent;
+            }
+
+            private float getBottom() {
+                if (this.stack != null && this.stack.get() != null) {
+                    return this.stack.get().getBottom() + this.getHeigth();
+                } else {
+                    return this.y + this.paint.descent();
+                }
+            }
+
+            private float getTop() {
+                if (this.stack != null && this.stack.get() != null) {
+                    return this.stack.get().getTop() - this.getHeigth();
+                } else {
+                    return this.y + this.paint.ascent();
                 }
             }
 
@@ -194,6 +249,13 @@ public class CircaTextService extends CanvasWatchFaceService {
             public void setCoord(DrawableText t, float y) {
                 this.y = y;
                 this.stack = new WeakReference<>(t);
+                this.stackDirection = new StackDirection(StackDirection.HORIZONTAL);
+            }
+
+            public void setCoord(float x, DrawableText t, int d) {
+                this.x = x;
+                this.stack = new WeakReference<>(t);
+                this.stackDirection = new StackDirection(d);
             }
 
             public void setTextSize(float s) {
@@ -226,7 +288,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private static final int eTF_DAY_OF_WEEK = 0;
-        private static final int eTF_CALENDAR_1 = eTF_DAY_OF_WEEK + 1;
+        private static final int eTF_DATE = eTF_DAY_OF_WEEK + 1;
+        private static final int eTF_CALENDAR_1 = eTF_DATE + 1;
         private static final int eTF_CALENDAR_2 = eTF_CALENDAR_1  + 1;
         private static final int eTF_BATTERY = eTF_CALENDAR_2  + 1;
         private static final int eTF_HOUR = eTF_BATTERY  + 1;
@@ -244,7 +307,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         float mCalendarOffset;
         float mLineHeight;
 
-        SimpleDateFormat mDayOfWeekFormat;
+        SimpleDateFormat mDayFormat;
+        SimpleDateFormat mDateFormat;
 
         int mInteractiveBackgroundColor =
                 CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
@@ -343,6 +407,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
 
             mTextFields[eTF_DAY_OF_WEEK] = new DrawableText(resources.getColor(R.color.digital_date));
+            mTextFields[eTF_DATE] = new DrawableText(resources.getColor(R.color.digital_date), Paint.Align.RIGHT);
             mTextFields[eTF_CALENDAR_1] = new DrawableText(resources.getColor(R.color.digital_date));
             mTextFields[eTF_CALENDAR_2] = new DrawableText(resources.getColor(R.color.digital_date));
             mTextFields[eTF_BATTERY] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
@@ -398,8 +463,10 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private void initFormats() {
-            mDayOfWeekFormat = new SimpleDateFormat("EEE, MMM d yyyy", Locale.getDefault());
-            mDayOfWeekFormat.setCalendar(mCalendar);
+            mDayFormat = new SimpleDateFormat("EEE,", Locale.getDefault());
+            mDayFormat.setCalendar(mCalendar);
+            mDateFormat = new SimpleDateFormat("MMM d yyyy", Locale.getDefault());
+            mDateFormat.setCalendar(mCalendar);
         }
 
         /**
@@ -460,15 +527,17 @@ public class CircaTextService extends CanvasWatchFaceService {
                 t.setTextSize(textSize);
             }
             mTextFields[eTF_DAY_OF_WEEK].setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
+            mTextFields[eTF_DATE].setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
             mTextFields[eTF_CALENDAR_1].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_CALENDAR_2].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_BATTERY].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
 
             int width = getApplicationContext().getResources().getDisplayMetrics().widthPixels;
-            mTextFields[eTF_DAY_OF_WEEK].setCoord(mXOffset, mYOffset + mLineHeight);
-            mTextFields[eTF_CALENDAR_1].setCoord(mXOffset, mCalendarOffset);
-            mTextFields[eTF_CALENDAR_2].setCoord(mXOffset, mCalendarOffset + mLineHeight * 0.7f);
-            mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mYOffset - mTextFields[eTF_HOUR].getTextSize());
+            mTextFields[eTF_DATE].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_DAY_OF_WEEK].setCoord(mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_CALENDAR_1].setCoord(mXOffset, mTextFields[eTF_DAY_OF_WEEK], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_CALENDAR_2].setCoord(mXOffset, mTextFields[eTF_CALENDAR_1], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.ABOVE);
             mTextFields[eTF_HOUR].setCoord(mXOffset, mYOffset);
             mTextFields[eTF_COLON_1].setCoord(mTextFields[eTF_HOUR], mYOffset);
             mTextFields[eTF_MINUTE].setCoord(mTextFields[eTF_COLON_1], mYOffset);
@@ -610,7 +679,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (getPeekCardPosition().isEmpty()) {
 
                 if (!mMute) {
-                    mTextFields[eTF_DAY_OF_WEEK].draw(canvas, mDayOfWeekFormat.format(mDate));
+                    mTextFields[eTF_DAY_OF_WEEK].draw(canvas, mDayFormat.format(mDate));
+                    mTextFields[eTF_DATE].draw(canvas, mDateFormat.format(mDate));
                 }
 
                 if (!isInAmbientMode() && !mMute) {
