@@ -101,6 +101,13 @@ public class CircaTextService extends CanvasWatchFaceService {
 
     private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener,
             GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+        Engine() {
+            for (int i = 0; i < eTF_SIZE; i++) {
+                mTextFields[i] = new DrawableText();
+            }
+        }
+
         static final String COLON_STRING = ":";
 
         final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(CircaTextService.this)
@@ -139,6 +146,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                 paint.setAntiAlias(true);
                 paint.setTextAlign(a);
                 return paint;
+            }
+            public DrawableText() {
+                this.paint = new Paint();
+                this.stackDirection = new StackDirection(StackDirection.NONE);
             }
 
             public DrawableText(int c) {
