@@ -157,11 +157,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
 
             public void draw(Canvas canvas, String text) {
-                if (isInAmbientMode()) {
-                    this.paint.setColor(Color.WHITE);
-                } else {
-                    this.paint.setColor(this.color);
-                }
                 float x;
                 if (this.stack != null && this.stack.get() != null) {
                     x = this.stack.get().getWidth();
@@ -194,8 +189,13 @@ public class CircaTextService extends CanvasWatchFaceService {
                 this.paint.setTextSize(s);
             }
 
-            public void setAntiAlias(boolean antiAlias) {
-                this.paint.setAntiAlias(antiAlias);
+            public void setAmbientMode(boolean inAmbientMode) {
+                this.paint.setAntiAlias(!inAmbientMode);
+                if (inAmbientMode) {
+                    this.paint.setColor(Color.WHITE);
+                } else {
+                    this.paint.setColor(this.color);
+                }
             }
 
             public float getTextSize() {
@@ -215,16 +215,15 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private static final int eTF_DAY_OF_WEEK = 0;
-        private static final int eTF_DATE = 1;
-        private static final int eTF_CALENDAR_1 = 2;
-        private static final int eTF_CALENDAR_2 = 3;
-        private static final int eTF_BATTERY = 4;
-        private static final int eTF_HOUR = 5;
-        private static final int eTF_COLON_1 = 6;
-        private static final int eTF_MINUTE = 7;
-        private static final int eTF_COLON_2 = 8;
-        private static final int eTF_SECOND = 9;
-        private static final int eTF_SIZE = 10;
+        private static final int eTF_CALENDAR_1 = eTF_DAY_OF_WEEK + 1;
+        private static final int eTF_CALENDAR_2 = eTF_CALENDAR_1  + 1;
+        private static final int eTF_BATTERY = eTF_CALENDAR_2  + 1;
+        private static final int eTF_HOUR = eTF_BATTERY  + 1;
+        private static final int eTF_COLON_1 = eTF_HOUR  + 1;
+        private static final int eTF_MINUTE = eTF_COLON_1  + 1;
+        private static final int eTF_COLON_2 = eTF_MINUTE  + 1;
+        private static final int eTF_SECOND = eTF_COLON_2  + 1;
+        private static final int eTF_SIZE = eTF_SECOND  + 1;
         DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
 
         Paint mBackgroundPaint;
@@ -235,7 +234,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         float mLineHeight;
 
         SimpleDateFormat mDayOfWeekFormat;
-        java.text.DateFormat mDateFormat;
 
         int mInteractiveBackgroundColor =
                 CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
@@ -334,7 +332,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
 
             mTextFields[eTF_DAY_OF_WEEK] = new DrawableText(resources.getColor(R.color.digital_date));
-            mTextFields[eTF_DATE] = new DrawableText(resources.getColor(R.color.digital_date));
             mTextFields[eTF_CALENDAR_1] = new DrawableText(resources.getColor(R.color.digital_date));
             mTextFields[eTF_CALENDAR_2] = new DrawableText(resources.getColor(R.color.digital_date));
             mTextFields[eTF_BATTERY] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
@@ -390,10 +387,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private void initFormats() {
-            mDayOfWeekFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+            mDayOfWeekFormat = new SimpleDateFormat("EEE, MMM d yyyy", Locale.getDefault());
             mDayOfWeekFormat.setCalendar(mCalendar);
-            mDateFormat = DateFormat.getDateFormat(CircaTextService.this);
-            mDateFormat.setCalendar(mCalendar);
         }
 
         /**
@@ -454,14 +449,12 @@ public class CircaTextService extends CanvasWatchFaceService {
                 t.setTextSize(textSize);
             }
             mTextFields[eTF_DAY_OF_WEEK].setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
-            mTextFields[eTF_DATE].setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
             mTextFields[eTF_CALENDAR_1].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_CALENDAR_2].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_BATTERY].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
 
             int width = getApplicationContext().getResources().getDisplayMetrics().widthPixels;
             mTextFields[eTF_DAY_OF_WEEK].setCoord(mXOffset, mYOffset + mLineHeight);
-            mTextFields[eTF_DATE].setCoord(mXOffset, mYOffset + mLineHeight * 2);
             mTextFields[eTF_CALENDAR_1].setCoord(mXOffset, mCalendarOffset);
             mTextFields[eTF_CALENDAR_2].setCoord(mXOffset, mCalendarOffset + mLineHeight * 0.7f);
             mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mYOffset - mTextFields[eTF_HOUR].getTextSize());
@@ -497,7 +490,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             if (mLowBitAmbient) {
                 for (DrawableText t : mTextFields) {
-                    t.setAntiAlias(!inAmbientMode);
+                    t.setAmbientMode(inAmbientMode);
                 }
             }
             invalidate();
@@ -607,7 +600,6 @@ public class CircaTextService extends CanvasWatchFaceService {
 
                 if (!mMute) {
                     mTextFields[eTF_DAY_OF_WEEK].draw(canvas, mDayOfWeekFormat.format(mDate));
-                    mTextFields[eTF_DATE].draw(canvas, mDateFormat.format(mDate));
                 }
 
                 if (!isInAmbientMode() && !mMute) {
