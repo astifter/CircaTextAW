@@ -16,6 +16,8 @@
 
 package com.astifter.circatext;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
@@ -60,10 +62,12 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -305,10 +309,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
             }
 
-            public float getTextSize() {
-                return this.paint.getTextSize();
-            }
-
             public void setTypeface(Typeface t) {
                 this.paint.setTypeface(t);
             }
@@ -318,6 +318,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                 if (!isInAmbientMode()) {
                     this.paint.setColor(c);
                 }
+            }
+
+            public void setAlpha(int a) {
+                this.paint.setAlpha(a);
             }
 
             public void setMaxWidht(float maxWidht) {
@@ -337,6 +341,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         private static final int eTF_SECOND = eTF_COLON_2  + 1;
         private static final int eTF_SIZE = eTF_SECOND  + 1;
         DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
+        ArrayList<DrawableText> mTextFieldsAnimated = new ArrayList<>();
 
         Paint mBackgroundPaint;
 
@@ -454,6 +459,11 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_MINUTE] = new DrawableText(mInteractiveMinuteDigitsColor);
             mTextFields[eTF_COLON_2] = new DrawableText(resources.getColor(R.color.digital_colons));
             mTextFields[eTF_SECOND] = new DrawableText(mInteractiveSecondDigitsColor);
+            mTextFieldsAnimated.add(mTextFields[eTF_CALENDAR_1]);
+            mTextFieldsAnimated.add(mTextFields[eTF_CALENDAR_2]);
+            mTextFieldsAnimated.add(mTextFields[eTF_COLON_2]);
+            mTextFieldsAnimated.add(mTextFields[eTF_SECOND]);
+            mTextFieldsAnimated.add(mTextFields[eTF_BATTERY]);
 
             mCalendar = Calendar.getInstance();
             mDate = new Date();
@@ -613,11 +623,28 @@ public class CircaTextService extends CanvasWatchFaceService {
                     t.setAmbientMode(inAmbientMode);
                 }
             }
-            invalidate();
+            if (!inAmbientMode) {
+                Iterator<DrawableText> it = mTextFieldsAnimated.iterator();
+                while (it.hasNext()) {
+                    createAnimation(it.next());
+                }
+            }
 
             // Whether the timer should be running depends on whether we're in ambient mode (as well
             // as whether we're visible), so we may need to start or stop the timer.
             updateTimer();
+        }
+
+        private void createAnimation(DrawableText t) {
+            ValueAnimator anim = ObjectAnimator.ofInt(t, "alpha", 0, 255);
+            anim.setDuration(500);
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    invalidate();
+                }
+            });
+            anim.start();
         }
 
         @Override
