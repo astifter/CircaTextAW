@@ -44,8 +44,9 @@ import com.google.android.gms.wearable.Wearable;
  * background color. Additionally, enables setting the color for hour, minute and second digits.
  */
 public class CircaTextConfigActivity extends Activity
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        ResultCallback<DataApi.DataItemResult> {
+        implements  GoogleApiClient.ConnectionCallbacks,
+                    GoogleApiClient.OnConnectionFailedListener,
+                    ResultCallback<DataApi.DataItemResult> {
 
     private GoogleApiClient mGoogleApiClient;
     private String mPeerId;
@@ -56,15 +57,18 @@ public class CircaTextConfigActivity extends Activity
         setContentView(R.layout.activity_circa_text_config);
 
         mPeerId = getIntent().getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+
+        mGoogleApiClient =
+            new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Wearable.API)
                 .build();
 
-        ComponentName name = getIntent().getParcelableExtra(
-                WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
-        TextView label = (TextView) findViewById(R.id.label);
+        ComponentName name =
+                getIntent().getParcelableExtra(WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
+
+        TextView label = (TextView)findViewById(R.id.label);
         label.setText(label.getText() + " (" + name.getClassName() + ")");
     }
 

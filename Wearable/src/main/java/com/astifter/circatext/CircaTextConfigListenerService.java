@@ -33,7 +33,8 @@ import java.util.concurrent.TimeUnit;
  * and updating the config {@link com.google.android.gms.wearable.DataItem} accordingly.
  */
 public class CircaTextConfigListenerService extends WearableListenerService
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements GoogleApiClient.ConnectionCallbacks,
+                   GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -48,8 +49,12 @@ public class CircaTextConfigListenerService extends WearableListenerService
         DataMap configKeysToOverwrite = DataMap.fromByteArray(rawData);
 
         if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this).addApi(Wearable.API).build();
+            mGoogleApiClient = new
+                    GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(Wearable.API)
+                    .build();
         }
         if (!mGoogleApiClient.isConnected()) {
             ConnectionResult connectionResult =
