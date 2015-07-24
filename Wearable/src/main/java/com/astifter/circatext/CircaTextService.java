@@ -156,6 +156,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             private float x;
             private float y;
+            private float maxWidht = -1;
             private Paint paint;
             private int   color;
             private float textSize;
@@ -200,8 +201,33 @@ public class CircaTextService extends CanvasWatchFaceService {
                             break;
                     }
                 }
-                canvas.drawText(text, x, y, paint);
+
+                /**
+                 * Some comments are in order:
+                 * We first measure the text to be drawn. In case the maximum width is set and the
+                 * text will exceed it do:
+                 * - Get the font metrics and measure the overflow text "..." (ellipsis).
+                 * - Draw the ellpsis right at the end of the allowed area (defined by x, y and
+                 *   maxWidht).
+                 * - Save the canvas and set a clipping rectangle for the text minus the width of
+                 *   the ellipsis.
+                 * - Adjust the actually used size (drawnSize) to the maxWidht.
+                 */
+                boolean hasSavedState = false;
                 this.drawnsize = paint.measureText(text);
+                if (this.maxWidht != -1 && this.drawnsize > this.maxWidht) {
+                    Paint.FontMetrics fm = this.paint.getFontMetrics();
+                    float ellipsisSize = paint.measureText("...");
+
+                    canvas.drawText("...", x+this.maxWidht-ellipsisSize, y, paint);
+
+                    canvas.save();
+                    hasSavedState = true;
+                    canvas.clipRect(x,y+fm.ascent,x+this.maxWidht-ellipsisSize,y+fm.descent);
+
+                    this.drawnsize = this.maxWidht;
+                }
+                canvas.drawText(text, x, y, paint);
                 // if (this.paint.getTextAlign() == Paint.Align.RIGHT)
                 //     this.drawnsize = -this.drawnsize;
                 // canvas.drawLine(x, y, x + this.drawnsize, y, this.paint);
@@ -210,6 +236,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                 // float d = this.paint.descent();
                 // canvas.drawLine(x, y+d, x + this.drawnsize, y+d, this.paint);
                 // canvas.drawLine(x, y+a, x, y+d, this.paint);
+                /** In case the state was saved for clipping text, restore state. */
+                if (hasSavedState) {
+                    canvas.restore();
+                }
             }
 
             private float getRight() {
@@ -284,6 +314,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                 if (!isInAmbientMode()) {
                     this.paint.setColor(c);
                 }
+            }
+
+            public void setMaxWidht(float maxWidht) {
+                this.maxWidht = maxWidht;
             }
         }
 
@@ -536,7 +570,9 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_DATE].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_DAY_OF_WEEK].setCoord(mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_CALENDAR_1].setCoord(mXOffset, mTextFields[eTF_DAY_OF_WEEK], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_CALENDAR_1].setMaxWidht(width - 2 * mXOffset);
             mTextFields[eTF_CALENDAR_2].setCoord(mXOffset, mTextFields[eTF_CALENDAR_1], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_CALENDAR_2].setMaxWidht(width - 2*mXOffset);
             mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.ABOVE);
             mTextFields[eTF_HOUR].setCoord(mXOffset, mYOffset);
             mTextFields[eTF_COLON_1].setCoord(mTextFields[eTF_HOUR], mYOffset);
