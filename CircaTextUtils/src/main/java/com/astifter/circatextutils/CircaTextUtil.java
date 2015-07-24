@@ -104,12 +104,12 @@ public final class CircaTextUtil {
                     public void onResult(NodeApi.GetLocalNodeResult getLocalNodeResult) {
                         String localNode = getLocalNodeResult.getNode().getId();
                         Uri uri = new Uri.Builder()
-                                .scheme("wear")
-                                .path(CircaTextUtil.PATH_WITH_FEATURE)
-                                .authority(localNode)
-                                .build();
+                                         .scheme("wear")
+                                         .path(CircaTextUtil.PATH_WITH_FEATURE)
+                                         .authority(localNode)
+                                         .build();
                         Wearable.DataApi.getDataItem(client, uri)
-                                .setResultCallback(new DataItemResultCallback(callback));
+                                        .setResultCallback(new DataItemResultCallback(callback));
                     }
                 }
         );

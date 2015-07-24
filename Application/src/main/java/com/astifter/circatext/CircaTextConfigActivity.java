@@ -15,7 +15,6 @@
  */
 
 package com.astifter.circatext;
-import com.astifter.circatextutils.CircaTextUtil;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.astifter.circatextutils.CircaTextUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -44,9 +44,9 @@ import com.google.android.gms.wearable.Wearable;
  * background color. Additionally, enables setting the color for hour, minute and second digits.
  */
 public class CircaTextConfigActivity extends Activity
-        implements  GoogleApiClient.ConnectionCallbacks,
-                    GoogleApiClient.OnConnectionFailedListener,
-                    ResultCallback<DataApi.DataItemResult> {
+        implements GoogleApiClient.ConnectionCallbacks,
+                   GoogleApiClient.OnConnectionFailedListener,
+                   ResultCallback<DataApi.DataItemResult> {
 
     private GoogleApiClient mGoogleApiClient;
     private String mPeerId;
@@ -59,16 +59,16 @@ public class CircaTextConfigActivity extends Activity
         mPeerId = getIntent().getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
 
         mGoogleApiClient =
-            new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Wearable.API)
-                .build();
+                new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(Wearable.API)
+                        .build();
 
         ComponentName name =
                 getIntent().getParcelableExtra(WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
 
-        TextView label = (TextView)findViewById(R.id.label);
+        TextView label = (TextView) findViewById(R.id.label);
         label.setText(label.getText() + " (" + name.getClassName() + ")");
     }
 
@@ -86,7 +86,7 @@ public class CircaTextConfigActivity extends Activity
         super.onStop();
     }
 
-    @Override // GoogleApiClient.ConnectionCallbacks
+    @Override
     public void onConnected(Bundle connectionHint) {
         if (mPeerId != null) {
             Uri.Builder builder = new Uri.Builder();
@@ -97,7 +97,7 @@ public class CircaTextConfigActivity extends Activity
         }
     }
 
-    @Override // ResultCallback<DataApi.DataItemResult>
+    @Override
     public void onResult(DataApi.DataItemResult dataItemResult) {
         if (dataItemResult.getStatus().isSuccess() && dataItemResult.getDataItem() != null) {
             DataItem configDataItem = dataItemResult.getDataItem();
@@ -105,41 +105,34 @@ public class CircaTextConfigActivity extends Activity
             DataMap config = dataMapItem.getDataMap();
             setUpAllPickers(config);
         } else {
-            // If DataItem with the current config can't be retrieved, select the default items on
-            // each picker.
             setUpAllPickers(null);
         }
     }
 
-    @Override // GoogleApiClient.ConnectionCallbacks
+    @Override
     public void onConnectionSuspended(int cause) {
     }
 
-    @Override // GoogleApiClient.OnConnectionFailedListener
+    @Override
     public void onConnectionFailed(ConnectionResult result) {
     }
 
     private void displayNoConnectedDeviceDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String messageText = getResources().getString(R.string.title_no_device_connected);
         String okText = getResources().getString(R.string.ok_no_device_connected);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(messageText)
-                .setCancelable(false)
-                .setPositiveButton(okText, new DialogInterface.OnClickListener() {
+               .setCancelable(false)
+               .setPositiveButton(okText, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                     }
-                });
+               });
+
         AlertDialog alert = builder.create();
         alert.show();
     }
 
-    /**
-     * Sets up selected items for all pickers according to given {@code config} and sets up their
-     * item selection listeners.
-     *
-     * @param config the {@code CircaTextService} config {@link DataMap}. If null, the
-     *               default items are selected.
-     */
     private void setUpAllPickers(DataMap config) {
         setUpColorPickerSelection(R.id.background, CircaTextUtil.KEY_BACKGROUND_COLOR, config, R.string.color_black);
         setUpColorPickerSelection(R.id.hours, CircaTextUtil.KEY_HOURS_COLOR, config, R.string.color_white);
@@ -157,12 +150,14 @@ public class CircaTextConfigActivity extends Activity
         String defaultColorName = getString(defaultColorNameResId);
         int defaultColor = Color.parseColor(defaultColorName);
         int color;
+
         if (config != null) {
             color = config.getInt(configKey, defaultColor);
         } else {
             color = defaultColor;
         }
-        Spinner spinner = (Spinner) findViewById(spinnerId);
+
+        Spinner spinner = (Spinner)findViewById(spinnerId);
         String[] colorNames = getResources().getStringArray(R.array.color_array);
         for (int i = 0; i < colorNames.length; i++) {
             if (Color.parseColor(colorNames[i]) == color) {
@@ -173,11 +168,11 @@ public class CircaTextConfigActivity extends Activity
     }
 
     private void setUpColorPickerListener(int spinnerId, final String configKey) {
-        Spinner spinner = (Spinner) findViewById(spinnerId);
+        Spinner spinner = (Spinner)findViewById(spinnerId);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                final String colorName = (String) adapterView.getItemAtPosition(pos);
+                final String colorName = (String)adapterView.getItemAtPosition(pos);
                 sendConfigUpdateMessage(configKey, Color.parseColor(colorName));
             }
 
