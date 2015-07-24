@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.astifter.circatext;
+package com.astifter.circatextutils;
 
 import android.graphics.Color;
 import android.net.Uri;
@@ -29,7 +29,7 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
-final class CircaTextUtil {
+public final class CircaTextUtil {
     /**
      * The {@link DataMap} key for {@link CircaTextService} background color name.
      * The color name must be a {@link String} recognized by {@link Color#parseColor}.

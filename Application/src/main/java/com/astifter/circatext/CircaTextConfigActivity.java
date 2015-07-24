@@ -15,6 +15,7 @@
  */
 
 package com.astifter.circatext;
+import com.astifter.circatextutils.CircaTextUtil;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -45,13 +46,6 @@ import com.google.android.gms.wearable.Wearable;
 public class CircaTextConfigActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ResultCallback<DataApi.DataItemResult> {
-
-    // TODO: use the shared constants (needs covering all the samples with Gradle build model)
-    private static final String KEY_BACKGROUND_COLOR = "BACKGROUND_COLOR";
-    private static final String KEY_HOURS_COLOR = "HOURS_COLOR";
-    private static final String KEY_MINUTES_COLOR = "MINUTES_COLOR";
-    private static final String KEY_SECONDS_COLOR = "SECONDS_COLOR";
-    private static final String PATH_WITH_FEATURE = "/watch_face_config/Digital";
 
     private GoogleApiClient mGoogleApiClient;
     private String mPeerId;
@@ -92,7 +86,7 @@ public class CircaTextConfigActivity extends Activity
     public void onConnected(Bundle connectionHint) {
         if (mPeerId != null) {
             Uri.Builder builder = new Uri.Builder();
-            Uri uri = builder.scheme("wear").path(PATH_WITH_FEATURE).authority(mPeerId).build();
+            Uri uri = builder.scheme("wear").path(CircaTextUtil.PATH_WITH_FEATURE).authority(mPeerId).build();
             Wearable.DataApi.getDataItem(mGoogleApiClient, uri).setResultCallback(this);
         } else {
             displayNoConnectedDeviceDialog();
@@ -143,15 +137,15 @@ public class CircaTextConfigActivity extends Activity
      *               default items are selected.
      */
     private void setUpAllPickers(DataMap config) {
-        setUpColorPickerSelection(R.id.background, KEY_BACKGROUND_COLOR, config, R.string.color_black);
-        setUpColorPickerSelection(R.id.hours, KEY_HOURS_COLOR, config, R.string.color_white);
-        setUpColorPickerSelection(R.id.minutes, KEY_MINUTES_COLOR, config, R.string.color_white);
-        setUpColorPickerSelection(R.id.seconds, KEY_SECONDS_COLOR, config, R.string.color_gray);
+        setUpColorPickerSelection(R.id.background, CircaTextUtil.KEY_BACKGROUND_COLOR, config, R.string.color_black);
+        setUpColorPickerSelection(R.id.hours, CircaTextUtil.KEY_HOURS_COLOR, config, R.string.color_white);
+        setUpColorPickerSelection(R.id.minutes, CircaTextUtil.KEY_MINUTES_COLOR, config, R.string.color_white);
+        setUpColorPickerSelection(R.id.seconds, CircaTextUtil.KEY_SECONDS_COLOR, config, R.string.color_gray);
 
-        setUpColorPickerListener(R.id.background, KEY_BACKGROUND_COLOR);
-        setUpColorPickerListener(R.id.hours, KEY_HOURS_COLOR);
-        setUpColorPickerListener(R.id.minutes, KEY_MINUTES_COLOR);
-        setUpColorPickerListener(R.id.seconds, KEY_SECONDS_COLOR);
+        setUpColorPickerListener(R.id.background, CircaTextUtil.KEY_BACKGROUND_COLOR);
+        setUpColorPickerListener(R.id.hours, CircaTextUtil.KEY_HOURS_COLOR);
+        setUpColorPickerListener(R.id.minutes, CircaTextUtil.KEY_MINUTES_COLOR);
+        setUpColorPickerListener(R.id.seconds, CircaTextUtil.KEY_SECONDS_COLOR);
     }
 
     private void setUpColorPickerSelection(int spinnerId, final String configKey, DataMap config,
@@ -194,7 +188,7 @@ public class CircaTextConfigActivity extends Activity
             DataMap config = new DataMap();
             config.putInt(configKey, color);
             byte[] rawData = config.toByteArray();
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, PATH_WITH_FEATURE, rawData);
+            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CircaTextUtil.PATH_WITH_FEATURE, rawData);
         }
     }
 }
