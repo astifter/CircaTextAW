@@ -228,18 +228,21 @@ public class CircaTextService extends CanvasWatchFaceService {
                     this.drawnsize = this.maxWidht;
                 }
                 canvas.drawText(text, x, y, paint);
-                // if (this.paint.getTextAlign() == Paint.Align.RIGHT)
-                //     this.drawnsize = -this.drawnsize;
-                // canvas.drawLine(x, y, x + this.drawnsize, y, this.paint);
-                // float a = this.paint.ascent();
-                // canvas.drawLine(x, y+a, x + this.drawnsize, y+a, this.paint);
-                // float d = this.paint.descent();
-                // canvas.drawLine(x, y+d, x + this.drawnsize, y+d, this.paint);
-                // canvas.drawLine(x, y+a, x, y+d, this.paint);
                 /** In case the state was saved for clipping text, restore state. */
                 if (hasSavedState) {
                     canvas.restore();
                 }
+                //{
+                //    float ds = this.drawnsize;
+                //    if (this.paint.getTextAlign() == Paint.Align.RIGHT)
+                //        ds = -ds;
+                //    canvas.drawLine(x, y, x + ds, y, this.paint);
+                //    float a = this.paint.ascent();
+                //    canvas.drawLine(x, y + a, x + ds, y + a, this.paint);
+                //    float d = this.paint.descent();
+                //    canvas.drawLine(x, y + d, x + ds, y + d, this.paint);
+                //    canvas.drawLine(x, y + a, x, y + d, this.paint);
+                //}
             }
 
             private float getRight() {
@@ -497,7 +500,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private void initFormats() {
-            mDayFormat = new SimpleDateFormat("EEE,", Locale.getDefault());
+            mDayFormat = new SimpleDateFormat("EEE", Locale.getDefault());
             mDayFormat.setCalendar(mCalendar);
             mDateFormat = new SimpleDateFormat("MMM d yyyy", Locale.getDefault());
             mDateFormat.setCalendar(mCalendar);
