@@ -18,6 +18,7 @@ package com.astifter.circatextutils;
 
 import android.graphics.Color;
 import android.net.Uri;
+import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -30,140 +31,91 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
 public final class CircaTextUtil {
-    /**
-     * The {@link DataMap} key for {@link CircaTextService} background color name.
-     * The color name must be a {@link String} recognized by {@link Color#parseColor}.
-     */
-    public static final String KEY_BACKGROUND_COLOR = "BACKGROUND_COLOR";
-    /**
-     * The {@link DataMap} key for {@link CircaTextService} hour digits color name.
-     * The color name must be a {@link String} recognized by {@link Color#parseColor}.
-     */
-    public static final String KEY_HOURS_COLOR = "HOURS_COLOR";
-    /**
-     * The {@link DataMap} key for {@link CircaTextService} minute digits color name.
-     * The color name must be a {@link String} recognized by {@link Color#parseColor}.
-     */
-    public static final String KEY_MINUTES_COLOR = "MINUTES_COLOR";
-    /**
-     * The {@link DataMap} key for {@link CircaTextService} second digits color name.
-     * The color name must be a {@link String} recognized by {@link Color#parseColor}.
-     */
-    public static final String KEY_SECONDS_COLOR = "SECONDS_COLOR";
-    /**
-     * The path for the {@link DataItem} containing {@link CircaTextService} configuration.
-     */
-    public static final String PATH_WITH_FEATURE = "/watch_face_config/Digital";
-    /**
-     * Name of the default interactive mode background color and the ambient mode background color.
-     */
+    private static final String TAG = "CircaTextUtil";
+
     private static final String COLOR_NAME_DEFAULT_AND_AMBIENT_BACKGROUND = "Black";
     public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND =
             parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_BACKGROUND);
-    /**
-     * Name of the default interactive mode hour digits color and the ambient mode hour digits
-     * color.
-     */
+
     private static final String COLOR_NAME_DEFAULT_AND_AMBIENT_HOUR_DIGITS = "White";
     public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS =
             parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
-    /**
-     * Name of the default interactive mode minute digits color and the ambient mode minute digits
-     * color.
-     */
+
     private static final String COLOR_NAME_DEFAULT_AND_AMBIENT_MINUTE_DIGITS = "White";
     public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS =
             parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-    /**
-     * Name of the default interactive mode second digits color and the ambient mode second digits
-     * color.
-     */
+
     private static final String COLOR_NAME_DEFAULT_AND_AMBIENT_SECOND_DIGITS = "Gray";
     public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS =
             parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
 
     private CircaTextUtil() {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CircaTextUtil()");
     }
 
     private static int parseColor(String colorName) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "parseColor()");
         return Color.parseColor(colorName.toLowerCase());
     }
 
-    /**
-     * Asynchronously fetches the current config {@link DataMap} for {@link CircaTextService}
-     * and passes it to the given callback.
-     * <p>
-     * If the current config {@link DataItem} doesn't exist, it isn't created and the callback
-     * receives an empty DataMap.
-     */
     public static void fetchConfigDataMap(final GoogleApiClient client,
                                           final FetchConfigDataMapCallback callback) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "fetchConfigDataMap()");
+
         Wearable.NodeApi.getLocalNode(client).setResultCallback(
-                new ResultCallback<NodeApi.GetLocalNodeResult>() {
-                    @Override
-                    public void onResult(NodeApi.GetLocalNodeResult getLocalNodeResult) {
-                        String localNode = getLocalNodeResult.getNode().getId();
-                        Uri uri = new Uri.Builder()
-                                         .scheme("wear")
-                                         .path(CircaTextUtil.PATH_WITH_FEATURE)
-                                         .authority(localNode)
-                                         .build();
-                        Wearable.DataApi.getDataItem(client, uri)
-                                        .setResultCallback(new DataItemResultCallback(callback));
-                    }
+            new ResultCallback<NodeApi.GetLocalNodeResult>() {
+                @Override
+                public void onResult(NodeApi.GetLocalNodeResult getLocalNodeResult) {
+                    if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "fetchConfigDataMap().onResult()");
+
+                    String localNode = getLocalNodeResult.getNode().getId();
+                    Uri uri = new Uri.Builder()
+                                     .scheme("wear")
+                                     .path(CircaTextConsts.PATH_WITH_FEATURE)
+                                     .authority(localNode)
+                                     .build();
+                    Wearable.DataApi.getDataItem(client, uri)
+                                    .setResultCallback(new DataItemResultCallback(callback));
                 }
+            }
         );
     }
 
-    /**
-     * Overwrites (or sets, if not present) the keys in the current config {@link DataItem} with
-     * the ones appearing in the given {@link DataMap}. If the config DataItem doesn't exist,
-     * it's created.
-     * <p>
-     * It is allowed that only some of the keys used in the config DataItem appear in
-     * {@code configKeysToOverwrite}. The rest of the keys remains unmodified in this case.
-     */
     public static void overwriteKeysInConfigDataMap(final GoogleApiClient googleApiClient,
                                                     final DataMap configKeysToOverwrite) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteKeysInConfigDataMap()");
 
         CircaTextUtil.fetchConfigDataMap(googleApiClient,
-                new FetchConfigDataMapCallback() {
-                    @Override
-                    public void onConfigDataMapFetched(DataMap currentConfig) {
-                        DataMap overwrittenConfig = new DataMap();
-                        overwrittenConfig.putAll(currentConfig);
-                        overwrittenConfig.putAll(configKeysToOverwrite);
-                        CircaTextUtil.putConfigDataItem(googleApiClient, overwrittenConfig);
-                    }
+            new FetchConfigDataMapCallback() {
+                @Override
+                public void onConfigDataMapFetched(DataMap currentConfig) {
+                    if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteKeysInConfigDataMap().onConfigDataMapFetched()");
+
+                    DataMap overwrittenConfig = new DataMap();
+                    overwrittenConfig.putAll(currentConfig);
+                    overwrittenConfig.putAll(configKeysToOverwrite);
+                    CircaTextUtil.putConfigDataItem(googleApiClient, overwrittenConfig);
                 }
+            }
         );
     }
 
-    /**
-     * Overwrites the current config {@link DataItem}'s {@link DataMap} with {@code newConfig}.
-     * If the config DataItem doesn't exist, it's created.
-     */
     public static void putConfigDataItem(GoogleApiClient googleApiClient, DataMap newConfig) {
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(PATH_WITH_FEATURE);
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "putConfigDataItem()");
+
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(CircaTextConsts.PATH_WITH_FEATURE);
         DataMap configToPut = putDataMapRequest.getDataMap();
         configToPut.putAll(newConfig);
         Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest())
-                .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-                    @Override
-                    public void onResult(DataApi.DataItemResult dataItemResult) {
-                    }
-                });
+            .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                @Override
+                public void onResult(DataApi.DataItemResult dataItemResult) {
+                    if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "putConfigDataItem().onResult()");
+                }
+            });
     }
 
-    /**
-     * Callback interface to perform an action with the current config {@link DataMap} for
-     * {@link CircaTextService}.
-     */
     public interface FetchConfigDataMapCallback {
-        /**
-         * Callback invoked with the current config {@link DataMap} for
-         * {@link CircaTextService}.
-         */
         void onConfigDataMapFetched(DataMap config);
     }
 
@@ -172,11 +124,15 @@ public final class CircaTextUtil {
         private final FetchConfigDataMapCallback mCallback;
 
         public DataItemResultCallback(FetchConfigDataMapCallback callback) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "DataItemResultCallback()");
+
             mCallback = callback;
         }
 
         @Override
         public void onResult(DataApi.DataItemResult dataItemResult) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onResult()");
+
             if (dataItemResult.getStatus().isSuccess()) {
                 if (dataItemResult.getDataItem() != null) {
                     DataItem configDataItem = dataItemResult.getDataItem();

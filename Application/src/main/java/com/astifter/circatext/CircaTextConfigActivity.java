@@ -24,12 +24,13 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.wearable.companion.WatchFaceCompanion;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.astifter.circatextutils.CircaTextUtil;
+import com.astifter.circatextutils.CircaTextConsts;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -39,24 +40,24 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
-/**
- * The phone-side config activity for {@code DigitalWatchFaceService}. Allows for setting the
- * background color. Additionally, enables setting the color for hour, minute and second digits.
- */
 public class CircaTextConfigActivity extends Activity
         implements GoogleApiClient.ConnectionCallbacks,
-                   GoogleApiClient.OnConnectionFailedListener,
-                   ResultCallback<DataApi.DataItemResult> {
+        GoogleApiClient.OnConnectionFailedListener,
+        ResultCallback<DataApi.DataItemResult> {
+    private static final String TAG = "CircaTextConfigActivity";
 
     private GoogleApiClient mGoogleApiClient;
     private String mPeerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate()");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_circa_text_config);
 
         mPeerId = getIntent().getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): mPeerId=" + mPeerId);
 
         mGoogleApiClient =
                 new GoogleApiClient.Builder(this)
@@ -67,6 +68,7 @@ public class CircaTextConfigActivity extends Activity
 
         ComponentName name =
                 getIntent().getParcelableExtra(WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): name=" + name);
 
         TextView label = (TextView) findViewById(R.id.label);
         label.setText(label.getText() + " (" + name.getClassName() + ")");
@@ -74,23 +76,36 @@ public class CircaTextConfigActivity extends Activity
 
     @Override
     protected void onStart() {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onStart()");
+
         super.onStart();
+
         mGoogleApiClient.connect();
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): mGoogleApiClient.connect()");
     }
 
     @Override
     protected void onStop() {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onStop()");
+
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "onStop(): mGoogleApiClient.disconnect()");
         }
+
         super.onStop();
     }
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected()");
+
         if (mPeerId != null) {
             Uri.Builder builder = new Uri.Builder();
-            Uri uri = builder.scheme("wear").path(CircaTextUtil.PATH_WITH_FEATURE).authority(mPeerId).build();
+            Uri uri = builder.scheme("wear").path(CircaTextConsts.PATH_WITH_FEATURE).authority(mPeerId).build();
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected(): uri=" + uri.toString());
+
             Wearable.DataApi.getDataItem(mGoogleApiClient, uri).setResultCallback(this);
         } else {
             displayNoConnectedDeviceDialog();
@@ -99,6 +114,8 @@ public class CircaTextConfigActivity extends Activity
 
     @Override
     public void onResult(DataApi.DataItemResult dataItemResult) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onResult()");
+
         if (dataItemResult.getStatus().isSuccess() && dataItemResult.getDataItem() != null) {
             DataItem configDataItem = dataItemResult.getDataItem();
             DataMapItem dataMapItem = DataMapItem.fromDataItem(configDataItem);
@@ -111,10 +128,12 @@ public class CircaTextConfigActivity extends Activity
 
     @Override
     public void onConnectionSuspended(int cause) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionSuspended()");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
     }
 
     private void displayNoConnectedDeviceDialog() {
@@ -123,30 +142,34 @@ public class CircaTextConfigActivity extends Activity
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(messageText)
-               .setCancelable(false)
-               .setPositiveButton(okText, new DialogInterface.OnClickListener() {
+                .setCancelable(false)
+                .setPositiveButton(okText, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                     }
-               });
+                });
 
         AlertDialog alert = builder.create();
         alert.show();
     }
 
     private void setUpAllPickers(DataMap config) {
-        setUpColorPickerSelection(R.id.background, CircaTextUtil.KEY_BACKGROUND_COLOR, config, R.string.color_black);
-        setUpColorPickerSelection(R.id.hours, CircaTextUtil.KEY_HOURS_COLOR, config, R.string.color_white);
-        setUpColorPickerSelection(R.id.minutes, CircaTextUtil.KEY_MINUTES_COLOR, config, R.string.color_white);
-        setUpColorPickerSelection(R.id.seconds, CircaTextUtil.KEY_SECONDS_COLOR, config, R.string.color_gray);
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpAllPickers()");
 
-        setUpColorPickerListener(R.id.background, CircaTextUtil.KEY_BACKGROUND_COLOR);
-        setUpColorPickerListener(R.id.hours, CircaTextUtil.KEY_HOURS_COLOR);
-        setUpColorPickerListener(R.id.minutes, CircaTextUtil.KEY_MINUTES_COLOR);
-        setUpColorPickerListener(R.id.seconds, CircaTextUtil.KEY_SECONDS_COLOR);
+        setUpColorPickerSelection(R.id.background, CircaTextConsts.KEY_BACKGROUND_COLOR, config, R.string.color_black);
+        setUpColorPickerSelection(R.id.hours, CircaTextConsts.KEY_HOURS_COLOR, config, R.string.color_white);
+        setUpColorPickerSelection(R.id.minutes, CircaTextConsts.KEY_MINUTES_COLOR, config, R.string.color_white);
+        setUpColorPickerSelection(R.id.seconds, CircaTextConsts.KEY_SECONDS_COLOR, config, R.string.color_gray);
+
+        setUpColorPickerListener(R.id.background, CircaTextConsts.KEY_BACKGROUND_COLOR);
+        setUpColorPickerListener(R.id.hours, CircaTextConsts.KEY_HOURS_COLOR);
+        setUpColorPickerListener(R.id.minutes, CircaTextConsts.KEY_MINUTES_COLOR);
+        setUpColorPickerListener(R.id.seconds, CircaTextConsts.KEY_SECONDS_COLOR);
     }
 
     private void setUpColorPickerSelection(int spinnerId, final String configKey, DataMap config,
                                            int defaultColorNameResId) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpColorPickerSelection()");
+
         String defaultColorName = getString(defaultColorNameResId);
         int defaultColor = Color.parseColor(defaultColorName);
         int color;
@@ -157,7 +180,7 @@ public class CircaTextConfigActivity extends Activity
             color = defaultColor;
         }
 
-        Spinner spinner = (Spinner)findViewById(spinnerId);
+        Spinner spinner = (Spinner) findViewById(spinnerId);
         String[] colorNames = getResources().getStringArray(R.array.color_array);
         for (int i = 0; i < colorNames.length; i++) {
             if (Color.parseColor(colorNames[i]) == color) {
@@ -168,26 +191,37 @@ public class CircaTextConfigActivity extends Activity
     }
 
     private void setUpColorPickerListener(int spinnerId, final String configKey) {
-        Spinner spinner = (Spinner)findViewById(spinnerId);
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpColorPickerListener()");
+
+        Spinner spinner = (Spinner) findViewById(spinnerId);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                final String colorName = (String)adapterView.getItemAtPosition(pos);
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "setUpColorPickerListener().onItemSelected()");
+                final String colorName = (String) adapterView.getItemAtPosition(pos);
                 sendConfigUpdateMessage(configKey, Color.parseColor(colorName));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "setUpColorPickerListener().onNothingSelected()");
             }
         });
     }
 
     private void sendConfigUpdateMessage(String configKey, int color) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage()");
+
         if (mPeerId != null) {
             DataMap config = new DataMap();
             config.putInt(configKey, color);
             byte[] rawData = config.toByteArray();
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CircaTextUtil.PATH_WITH_FEATURE, rawData);
+
+            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CircaTextConsts.PATH_WITH_FEATURE, rawData);
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "sendConfigUpdateMessage(): Wearable.MessageApi.sendMessage()");
         }
     }
 }
