@@ -775,10 +775,12 @@ public class CircaTextService extends CanvasWatchFaceService {
                         if (mMeetings.length == 0) {
                             mTextFields[eTF_CALENDAR_1].draw(canvas, "no meetings");
                         } else {
+                            int i = 0;
+                            while (mMeetings[i].DtStart.getTime() < now) i++;
                             @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                            mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(mMeetings[0].DtStart) + " " + mMeetings[0].Title);
+                            mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
 
-                            int additionalEvents = mMeetings.length-1;
+                            int additionalEvents = mMeetings.length-1-i;
                             if (additionalEvents == 1)
                                 mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional event");
                             if (additionalEvents > 1)
