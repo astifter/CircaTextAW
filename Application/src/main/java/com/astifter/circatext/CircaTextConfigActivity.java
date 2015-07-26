@@ -41,15 +41,15 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
 public class CircaTextConfigActivity extends Activity
-        implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        ResultCallback<DataApi.DataItemResult> {
+                                  implements GoogleApiClient.ConnectionCallbacks,
+                                             GoogleApiClient.OnConnectionFailedListener,
+                                             ResultCallback<DataApi.DataItemResult> {
     private static final String TAG = "CircaTextConfigActivity";
 
     private GoogleApiClient mGoogleApiClient;
     private String mPeerId;
 
-    @Override
+    @Override // Activity
     protected void onCreate(Bundle savedInstanceState) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate()");
 
@@ -74,7 +74,7 @@ public class CircaTextConfigActivity extends Activity
         label.setText(label.getText() + " (" + name.getClassName() + ")");
     }
 
-    @Override
+    @Override // Activity
     protected void onStart() {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onStart()");
 
@@ -84,7 +84,7 @@ public class CircaTextConfigActivity extends Activity
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): mGoogleApiClient.connect()");
     }
 
-    @Override
+    @Override // Activity
     protected void onStop() {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onStop()");
 
@@ -97,7 +97,7 @@ public class CircaTextConfigActivity extends Activity
         super.onStop();
     }
 
-    @Override
+    @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnected(Bundle connectionHint) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected()");
 
@@ -110,30 +110,6 @@ public class CircaTextConfigActivity extends Activity
         } else {
             displayNoConnectedDeviceDialog();
         }
-    }
-
-    @Override
-    public void onResult(DataApi.DataItemResult dataItemResult) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onResult()");
-
-        if (dataItemResult.getStatus().isSuccess() && dataItemResult.getDataItem() != null) {
-            DataItem configDataItem = dataItemResult.getDataItem();
-            DataMapItem dataMapItem = DataMapItem.fromDataItem(configDataItem);
-            DataMap config = dataMapItem.getDataMap();
-            setUpAllPickers(config);
-        } else {
-            setUpAllPickers(null);
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionSuspended()");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
     }
 
     private void displayNoConnectedDeviceDialog() {
@@ -150,6 +126,30 @@ public class CircaTextConfigActivity extends Activity
 
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    @Override // GoogleApiClient.ConnectionCallbacks
+    public void onConnectionSuspended(int cause) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionSuspended()");
+    }
+
+    @Override // GoogleApiClient.ConnectionCallbacks
+    public void onConnectionFailed(ConnectionResult result) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
+    }
+
+    @Override // ResultCallback<DataApi.DataItemResult>
+    public void onResult(DataApi.DataItemResult dataItemResult) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onResult()");
+
+        if (dataItemResult.getStatus().isSuccess() && dataItemResult.getDataItem() != null) {
+            DataItem configDataItem = dataItemResult.getDataItem();
+            DataMapItem dataMapItem = DataMapItem.fromDataItem(configDataItem);
+            DataMap config = dataMapItem.getDataMap();
+            setUpAllPickers(config);
+        } else {
+            setUpAllPickers(null);
+        }
     }
 
     private void setUpAllPickers(DataMap config) {
