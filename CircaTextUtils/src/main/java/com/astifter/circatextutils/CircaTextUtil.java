@@ -55,6 +55,7 @@ public final class CircaTextUtil {
 
     private static int parseColor(String colorName) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "parseColor()");
+
         return Color.parseColor(colorName.toLowerCase());
     }
 
@@ -115,6 +116,7 @@ public final class CircaTextUtil {
             });
     }
 
+    /// Interface FetchConfigDataMapCallback
     public interface FetchConfigDataMapCallback {
         void onConfigDataMapFetched(DataMap config);
     }

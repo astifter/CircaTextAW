@@ -17,7 +17,9 @@
 package com.astifter.circatext;
 
 import android.os.Bundle;
+import android.util.Log;
 
+import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.CircaTextUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -35,12 +37,15 @@ import java.util.concurrent.TimeUnit;
 public class CircaTextConfigListenerService extends WearableListenerService
         implements GoogleApiClient.ConnectionCallbacks,
                    GoogleApiClient.OnConnectionFailedListener {
+    private static final String TAG = "CircaTextConfigLS";
 
     private GoogleApiClient mGoogleApiClient;
 
     @Override // WearableListenerService
     public void onMessageReceived(MessageEvent messageEvent) {
-        if (!messageEvent.getPath().equals(CircaTextUtil.PATH_WITH_FEATURE)) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived()");
+
+        if (!messageEvent.getPath().equals(CircaTextConsts.PATH_WITH_FEATURE)) {
             return;
         }
         byte[] rawData = messageEvent.getData();
@@ -55,13 +60,16 @@ public class CircaTextConfigListenerService extends WearableListenerService
                     .addOnConnectionFailedListener(this)
                     .addApi(Wearable.API)
                     .build();
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): built mGoogleApiClient");
         }
         if (!mGoogleApiClient.isConnected()) {
-            ConnectionResult connectionResult =
-                    mGoogleApiClient.blockingConnect(30, TimeUnit.SECONDS);
+            ConnectionResult connectionResult = mGoogleApiClient.blockingConnect(30, TimeUnit.SECONDS);
 
             if (!connectionResult.isSuccess()) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): connection failed");
                 return;
+            } else {
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): connection sucessful");
             }
         }
 
@@ -70,13 +78,16 @@ public class CircaTextConfigListenerService extends WearableListenerService
 
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnected(Bundle connectionHint) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected()");
     }
 
     @Override  // GoogleApiClient.ConnectionCallbacks
     public void onConnectionSuspended(int cause) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionSuspended()");
     }
 
     @Override  // GoogleApiClient.OnConnectionFailedListener
     public void onConnectionFailed(ConnectionResult result) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
     }
 }

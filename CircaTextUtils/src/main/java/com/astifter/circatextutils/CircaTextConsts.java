@@ -10,5 +10,5 @@ public class CircaTextConsts {
     public static final String KEY_HOURS_COLOR = "HOURS_COLOR";
     public static final String KEY_MINUTES_COLOR = "MINUTES_COLOR";
     public static final String KEY_SECONDS_COLOR = "SECONDS_COLOR";
-    public static final String PATH_WITH_FEATURE = "/watch_face_config/Digital";
+    public static final String PATH_WITH_FEATURE = "/com.astifter.circatext/config";
 }

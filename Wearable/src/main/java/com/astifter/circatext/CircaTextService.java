@@ -46,9 +46,11 @@ import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.TextPaint;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.CircaTextUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -81,11 +83,10 @@ import java.util.concurrent.TimeUnit;
  * mode.
  */
 public class CircaTextService extends CanvasWatchFaceService {
+    private static final String TAG = "CircaTextService";
 
-    private static final Typeface BOLD_TYPEFACE =
-            Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
-    private static final Typeface NORMAL_TYPEFACE =
-            Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
+    private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
+    private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
     /**
      * Update rate in milliseconds for normal (not ambient and not mute) mode. We update twice
@@ -100,6 +101,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
     @Override
     public Engine onCreateEngine() {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreateEngine()");
         return new Engine();
     }
 
@@ -107,6 +109,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
         Engine() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
+
             for (int i = 0; i < eTF_SIZE; i++) {
                 mTextFields[i] = new DrawableText();
             }
@@ -353,14 +357,10 @@ public class CircaTextService extends CanvasWatchFaceService {
         SimpleDateFormat mDayFormat;
         SimpleDateFormat mDateFormat;
 
-        int mInteractiveBackgroundColor =
-                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
-        int mInteractiveHourDigitsColor =
-                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS;
-        int mInteractiveMinuteDigitsColor =
-                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS;
-        int mInteractiveSecondDigitsColor =
-                CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS;
+        int mInteractiveBackgroundColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
+        int mInteractiveHourDigitsColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS;
+        int mInteractiveMinuteDigitsColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS;
+        int mInteractiveSecondDigitsColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS;
 
         private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
 
@@ -375,6 +375,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mUpdateHandler.handleMessage()");
                 switch (message.what) {
                     case MSG_UPDATE_TIME:
                         invalidate();
@@ -397,6 +398,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         final BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mPowerReceiver.onReceive()");
+
                 int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
                 int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
                 int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
@@ -405,10 +408,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
                 float pct = level / (float) scale;
-                mBatteryInfo = new BatteryInfo(status,
-                        plugged,
-                        pct,
-                        temp);
+                mBatteryInfo = new BatteryInfo(status, plugged, pct, temp);
 
                 invalidate();
             }
@@ -417,13 +417,15 @@ public class CircaTextService extends CanvasWatchFaceService {
         final BroadcastReceiver mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mReceiver.onReceive()");
+
                 if (Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()) ||
-                        Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())) {
+                    Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())      ) {
                     mCalendar.setTimeZone(TimeZone.getDefault());
                     initFormats();
                 }
-                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction()) &&
-                        WearableCalendarContract.CONTENT_URI.equals(intent.getData())) {
+                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction())     &&
+                    WearableCalendarContract.CONTENT_URI.equals(intent.getData())    ) {
                     mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
                 }
                 invalidate();
@@ -432,6 +434,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public void onCreate(SurfaceHolder holder) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate()");
             super.onCreate(holder);
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(CircaTextService.this)
@@ -474,6 +477,8 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public void onDestroy() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDestroy()");
+
             mUpdateHandler.removeMessages(MSG_UPDATE_TIME);
             mUpdateHandler.removeMessages(MSG_LOAD_MEETINGS);
             cancelLoadMeetingTask();
@@ -482,6 +487,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public void onVisibilityChanged(boolean visible) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onVisibilityChanged()");
             super.onVisibilityChanged(visible);
 
             if (visible) {
@@ -524,6 +530,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         boolean mRegisteredReceiver = false;
 
         private void registerReceiver() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "registerReceiver()");
+
             if (mRegisteredReceiver) {
                 return;
             }
@@ -551,6 +559,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private void unregisterReceiver() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "unregisterReceiver()");
+
             if (!mRegisteredReceiver) {
                 return;
             }
@@ -561,15 +571,15 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public void onApplyWindowInsets(WindowInsets insets) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onApplyWindowInsets()");
+
             super.onApplyWindowInsets(insets);
 
             // Load resources that have alternate values for round watches.
             Resources resources = CircaTextService.this.getResources();
             boolean isRound = insets.isRound();
-            mXOffset = resources.getDimension(isRound
-                    ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-            float textSize = resources.getDimension(isRound
-                    ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
+            mXOffset = resources.getDimension(isRound ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
+            float textSize = resources.getDimension(isRound ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
 
             for (DrawableText t : mTextFields) {
                 t.setTextSize(textSize);
@@ -597,6 +607,8 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public void onPropertiesChanged(Bundle properties) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onPropertiesChanged()");
+
             super.onPropertiesChanged(properties);
 
             boolean burnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
@@ -607,12 +619,16 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public void onTimeTick() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick()");
+
             super.onTimeTick();
             invalidate();
         }
 
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onAmbientModeChanged()");
+
             super.onAmbientModeChanged(inAmbientMode);
 
             mBackgroundPaint.setColor(isInAmbientMode() ? mInteractiveBackgroundColor :
@@ -649,6 +665,8 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public void onInterruptionFilterChanged(int interruptionFilter) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onInterruptionFilterChanged()");
+
             super.onInterruptionFilterChanged(interruptionFilter);
 
             boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
@@ -701,6 +719,8 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDraw()");
+
             long now = System.currentTimeMillis();
             mCalendar.setTimeInMillis(now);
             mDate.setTime(now);
@@ -774,6 +794,8 @@ public class CircaTextService extends CanvasWatchFaceService {
          * or stops it if it shouldn't be running but currently is.
          */
         private void updateTimer() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateTimer()");
+
             mUpdateHandler.removeMessages(MSG_UPDATE_TIME);
             if (shouldTimerBeRunning()) {
                 mUpdateHandler.sendEmptyMessage(MSG_UPDATE_TIME);
@@ -789,10 +811,14 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private void updateConfigDataItemAndUiOnStartup() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateConfigDataItemAndUiOnStartup()");
+
             CircaTextUtil.fetchConfigDataMap(mGoogleApiClient,
                     new CircaTextUtil.FetchConfigDataMapCallback() {
                         @Override
                         public void onConfigDataMapFetched(DataMap startupConfig) {
+                            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateConfigDataItemAndUiOnStartup().onConfigDataMapFetched()");
+
                             // If the DataItem hasn't been created yet or some keys are missing,
                             // use the default values.
                             setDefaultValuesForMissingConfigKeys(startupConfig);
@@ -805,13 +831,13 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private void setDefaultValuesForMissingConfigKeys(DataMap config) {
-            addIntKeyIfMissing(config, CircaTextUtil.KEY_BACKGROUND_COLOR,
+            addIntKeyIfMissing(config, CircaTextConsts.KEY_BACKGROUND_COLOR,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
-            addIntKeyIfMissing(config, CircaTextUtil.KEY_HOURS_COLOR,
+            addIntKeyIfMissing(config, CircaTextConsts.KEY_HOURS_COLOR,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
-            addIntKeyIfMissing(config, CircaTextUtil.KEY_MINUTES_COLOR,
+            addIntKeyIfMissing(config, CircaTextConsts.KEY_MINUTES_COLOR,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-            addIntKeyIfMissing(config, CircaTextUtil.KEY_SECONDS_COLOR,
+            addIntKeyIfMissing(config, CircaTextConsts.KEY_SECONDS_COLOR,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
         }
 
@@ -823,14 +849,15 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override // DataApi.DataListener
         public void onDataChanged(DataEventBuffer dataEvents) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDataChanged()");
+
             for (DataEvent dataEvent : dataEvents) {
                 if (dataEvent.getType() != DataEvent.TYPE_CHANGED) {
                     continue;
                 }
 
                 DataItem dataItem = dataEvent.getDataItem();
-                if (!dataItem.getUri().getPath().equals(
-                        CircaTextUtil.PATH_WITH_FEATURE)) {
+                if (!dataItem.getUri().getPath().equals(CircaTextConsts.PATH_WITH_FEATURE)) {
                     continue;
                 }
 
@@ -841,6 +868,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private void updateUiForConfigDataMap(final DataMap config) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForConfigDataMap()");
+
             boolean uiUpdated = false;
             for (String configKey : config.keySet()) {
                 if (!config.containsKey(configKey)) {
@@ -863,17 +892,19 @@ public class CircaTextService extends CanvasWatchFaceService {
          * @return whether UI has been updated
          */
         private boolean updateUiForKey(String configKey, int color) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForKey()");
+
             switch (configKey) {
-                case CircaTextUtil.KEY_BACKGROUND_COLOR:
+                case CircaTextConsts.KEY_BACKGROUND_COLOR:
                     setInteractiveBackgroundColor(color);
                     break;
-                case CircaTextUtil.KEY_HOURS_COLOR:
+                case CircaTextConsts.KEY_HOURS_COLOR:
                     setInteractiveHourDigitsColor(color);
                     break;
-                case CircaTextUtil.KEY_MINUTES_COLOR:
+                case CircaTextConsts.KEY_MINUTES_COLOR:
                     setInteractiveMinuteDigitsColor(color);
                     break;
-                case CircaTextUtil.KEY_SECONDS_COLOR:
+                case CircaTextConsts.KEY_SECONDS_COLOR:
                     setInteractiveSecondDigitsColor(color);
                     break;
                 default:
@@ -884,16 +915,20 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override  // GoogleApiClient.ConnectionCallbacks
         public void onConnected(Bundle connectionHint) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected()");
+
             Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
             updateConfigDataItemAndUiOnStartup();
         }
 
         @Override  // GoogleApiClient.ConnectionCallbacks
         public void onConnectionSuspended(int cause) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionSuspended()");
         }
 
         @Override  // GoogleApiClient.OnConnectionFailedListener
         public void onConnectionFailed(ConnectionResult result) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
         }
 
         private void onMeetingsLoaded(Set<EventInfo> result) {
