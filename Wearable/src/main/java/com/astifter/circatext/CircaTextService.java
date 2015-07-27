@@ -105,8 +105,10 @@ public class CircaTextService extends CanvasWatchFaceService {
         return new Engine();
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener,
-            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    private class Engine extends CanvasWatchFaceService.Engine
+                      implements DataApi.DataListener,
+                                 GoogleApiClient.ConnectionCallbacks,
+                                 GoogleApiClient.OnConnectionFailedListener {
 
         Engine() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
@@ -116,18 +118,67 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
 
-        static final String COLON_STRING = ":";
-
-        final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(CircaTextService.this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Wearable.API)
-                .build();
+        private static final String COLON_STRING = ":";
 
         Calendar mCalendar;
         Date mDate;
+        SimpleDateFormat mDayFormat;
+        SimpleDateFormat mDateFormat;
+
+        class EventInfo implements Comparable<EventInfo> {
+            public final String Title;
+            private final Date DtStart;
+
+            EventInfo(String title, Date c) {
+                Title = title;
+                DtStart = c;
+            }
+
+            @Override
+            public int compareTo(@NonNull EventInfo another) {
+                long thistime = this.DtStart.getTime();
+                long othertime = another.DtStart.getTime();
+
+                if (othertime < thistime)
+                    return 1;
+                if (thistime < othertime)
+                    return -1;
+                return 0;
+            }
+        }
         EventInfo mMeetings[];
-        private BatteryInfo mBatteryInfo;
+
+        class BatteryInfo {
+            private final int mStatus;
+            private final int mPlugged;
+            private final float mPercent;
+            private final int mTemperature;
+
+            BatteryInfo(int status, int plugged, float pct, int temp) {
+                mStatus = status;
+                mPlugged = plugged;
+                mPercent = pct;
+                mTemperature = temp;
+            }
+
+            boolean isCharging() {
+                return mStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
+                        mStatus == BatteryManager.BATTERY_STATUS_FULL;
+            }
+
+            boolean isPlugged() {
+                return mPlugged == (BatteryManager.BATTERY_PLUGGED_AC | BatteryManager.BATTERY_PLUGGED_USB | BatteryManager.BATTERY_PLUGGED_WIRELESS);
+            }
+
+            public float getPercent() {
+                return mPercent;
+            }
+
+            public int getTemperature() {
+                return mTemperature;
+            }
+        }
+        BatteryInfo mBatteryInfo;
 
         boolean mMute;
         boolean mShouldDrawColons;
@@ -332,7 +383,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 this.maxWidht = maxWidht;
             }
         }
-
         private static final int eTF_DAY_OF_WEEK = 0;
         private static final int eTF_DATE = eTF_DAY_OF_WEEK + 1;
         private static final int eTF_CALENDAR_1 = eTF_DATE + 1;
@@ -347,6 +397,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
         ArrayList<DrawableText> mTextFieldsAnimated = new ArrayList<>();
 
+        int mInteractiveBackgroundColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
         Paint mBackgroundPaint;
 
         float mXOffset;
@@ -354,24 +405,11 @@ public class CircaTextService extends CanvasWatchFaceService {
         float mCalendarOffset;
         float mLineHeight;
 
-        SimpleDateFormat mDayFormat;
-        SimpleDateFormat mDateFormat;
-
-        int mInteractiveBackgroundColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
-        int mInteractiveHourDigitsColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS;
-        int mInteractiveMinuteDigitsColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS;
-        int mInteractiveSecondDigitsColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS;
-
         private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
-
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
         long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
 
-        /**
-         * Handler to update the time periodically in interactive mode.
-         */
-        @SuppressLint("HandlerLeak")
         final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
@@ -432,7 +470,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         };
 
-        @Override
+        @Override // WatchFaceService.Engine
         public void onCreate(SurfaceHolder holder) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate()");
             super.onCreate(holder);
@@ -457,11 +495,11 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_1] = new DrawableText(resources.getColor(R.color.digital_date));
             mTextFields[eTF_CALENDAR_2] = new DrawableText(resources.getColor(R.color.digital_date));
             mTextFields[eTF_BATTERY] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
-            mTextFields[eTF_HOUR] = new DrawableText(mInteractiveHourDigitsColor, BOLD_TYPEFACE);
+            mTextFields[eTF_HOUR] = new DrawableText(CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, BOLD_TYPEFACE);
             mTextFields[eTF_COLON_1] = new DrawableText(resources.getColor(R.color.digital_colons));
-            mTextFields[eTF_MINUTE] = new DrawableText(mInteractiveMinuteDigitsColor);
+            mTextFields[eTF_MINUTE] = new DrawableText(CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
             mTextFields[eTF_COLON_2] = new DrawableText(resources.getColor(R.color.digital_colons));
-            mTextFields[eTF_SECOND] = new DrawableText(mInteractiveSecondDigitsColor);
+            mTextFields[eTF_SECOND] = new DrawableText(CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
             mTextFieldsAnimated.add(mTextFields[eTF_CALENDAR_1]);
             mTextFieldsAnimated.add(mTextFields[eTF_CALENDAR_2]);
             mTextFieldsAnimated.add(mTextFields[eTF_COLON_2]);
@@ -475,7 +513,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
         }
 
-        @Override
+        @Override // WatchFaceService.Engine
         public void onDestroy() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDestroy()");
 
@@ -485,7 +523,13 @@ public class CircaTextService extends CanvasWatchFaceService {
             super.onDestroy();
         }
 
-        @Override
+        final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(CircaTextService.this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Wearable.API)
+                .build();
+
+        @Override // WatchFaceService.Engine
         public void onVisibilityChanged(boolean visible) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onVisibilityChanged()");
             super.onVisibilityChanged(visible);
@@ -501,14 +545,14 @@ public class CircaTextService extends CanvasWatchFaceService {
 
                 mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
             } else {
+                mUpdateHandler.removeMessages(MSG_LOAD_MEETINGS);
+
                 unregisterReceiver();
 
                 if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
                     Wearable.DataApi.removeListener(mGoogleApiClient, this);
                     mGoogleApiClient.disconnect();
                 }
-
-                mUpdateHandler.removeMessages(MSG_LOAD_MEETINGS);
             }
 
             // Whether the timer should be running depends on whether we're visible (as well as
@@ -569,7 +613,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             CircaTextService.this.unregisterReceiver(mPowerReceiver);
         }
 
-        @Override
+        @Override // WatchFaceService.Engine
         public void onApplyWindowInsets(WindowInsets insets) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onApplyWindowInsets()");
 
@@ -605,7 +649,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_SECOND].setCoord(mTextFields[eTF_COLON_2], mYOffset);
         }
 
-        @Override
+        @Override // WatchFaceService.Engine
         public void onPropertiesChanged(Bundle properties) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onPropertiesChanged()");
 
@@ -617,7 +661,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mLowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
         }
 
-        @Override
+        @Override // WatchFaceService.Engine
         public void onTimeTick() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick()");
 
@@ -625,7 +669,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             invalidate();
         }
 
-        @Override
+        @Override // WatchFaceService.Engine
         public void onAmbientModeChanged(boolean inAmbientMode) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onAmbientModeChanged()");
 
@@ -663,7 +707,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             anim.start();
         }
 
-        @Override
+        @Override // WatchFaceService.Engine
         public void onInterruptionFilterChanged(int interruptionFilter) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onInterruptionFilterChanged()");
 
@@ -690,34 +734,20 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
 
-        private void setInteractiveBackgroundColor(int color) {
-            mInteractiveBackgroundColor = color;
-            if (!isInAmbientMode() && mBackgroundPaint != null) {
-                mBackgroundPaint.setColor(color);
+        private void updateTimer() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateTimer()");
+
+            mUpdateHandler.removeMessages(MSG_UPDATE_TIME);
+            if (shouldTimerBeRunning()) {
+                mUpdateHandler.sendEmptyMessage(MSG_UPDATE_TIME);
             }
         }
 
-        private void setInteractiveHourDigitsColor(int color) {
-            mInteractiveHourDigitsColor = color;
-            mTextFields[eTF_HOUR].setColor(color);
-
+        private boolean shouldTimerBeRunning() {
+            return isVisible() && !isInAmbientMode();
         }
 
-        private void setInteractiveMinuteDigitsColor(int color) {
-            mInteractiveMinuteDigitsColor = color;
-            mTextFields[eTF_MINUTE].setColor(color);
-        }
-
-        private void setInteractiveSecondDigitsColor(int color) {
-            mInteractiveSecondDigitsColor = color;
-            mTextFields[eTF_SECOND].setColor(color);
-        }
-
-        private String formatTwoDigitNumber(int hour) {
-            return String.format("%02d", hour);
-        }
-
-        @Override
+        @Override // WatchFaceService.Engine
         public void onDraw(Canvas canvas, Rect bounds) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDraw()");
 
@@ -791,62 +821,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
 
-        /**
-         * Starts the {@link #mUpdateHandler} timer if it should be running and isn't currently
-         * or stops it if it shouldn't be running but currently is.
-         */
-        private void updateTimer() {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateTimer()");
-
-            mUpdateHandler.removeMessages(MSG_UPDATE_TIME);
-            if (shouldTimerBeRunning()) {
-                mUpdateHandler.sendEmptyMessage(MSG_UPDATE_TIME);
-            }
-        }
-
-        /**
-         * Returns whether the {@link #mUpdateHandler} timer should be running. The timer should
-         * only run when we're visible and in interactive mode.
-         */
-        private boolean shouldTimerBeRunning() {
-            return isVisible() && !isInAmbientMode();
-        }
-
-        private void updateConfigDataItemAndUiOnStartup() {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateConfigDataItemAndUiOnStartup()");
-
-            CircaTextUtil.fetchConfigDataMap(mGoogleApiClient,
-                    new CircaTextUtil.FetchConfigDataMapCallback() {
-                        @Override
-                        public void onConfigDataMapFetched(DataMap startupConfig) {
-                            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateConfigDataItemAndUiOnStartup().onConfigDataMapFetched()");
-
-                            // If the DataItem hasn't been created yet or some keys are missing,
-                            // use the default values.
-                            setDefaultValuesForMissingConfigKeys(startupConfig);
-                            CircaTextUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
-
-                            updateUiForConfigDataMap(startupConfig);
-                        }
-                    }
-            );
-        }
-
-        private void setDefaultValuesForMissingConfigKeys(DataMap config) {
-            addIntKeyIfMissing(config, CircaTextConsts.KEY_BACKGROUND_COLOR,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
-            addIntKeyIfMissing(config, CircaTextConsts.KEY_HOURS_COLOR,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
-            addIntKeyIfMissing(config, CircaTextConsts.KEY_MINUTES_COLOR,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-            addIntKeyIfMissing(config, CircaTextConsts.KEY_SECONDS_COLOR,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
-        }
-
-        private void addIntKeyIfMissing(DataMap config, String key, int color) {
-            if (!config.containsKey(key)) {
-                config.putInt(key, color);
-            }
+        private String formatTwoDigitNumber(int hour) {
+            return String.format("%02d", hour);
         }
 
         @Override // DataApi.DataListener
@@ -869,6 +845,29 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
 
+        @Override  // GoogleApiClient.ConnectionCallbacks
+        public void onConnected(Bundle connectionHint) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected()");
+
+            Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
+
+            CircaTextUtil.fetchConfigDataMap(mGoogleApiClient,
+                new CircaTextUtil.FetchConfigDataMapCallback() {
+                    @Override
+                    public void onConfigDataMapFetched(DataMap startupConfig) {
+                        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected().onConfigDataMapFetched()");
+
+                        // If the DataItem hasn't been created yet or some keys are missing,
+                        // use the default values.
+                        setDefaultValuesForMissingConfigKeys(startupConfig);
+                        CircaTextUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
+
+                        updateUiForConfigDataMap(startupConfig);
+                    }
+                }
+            );
+        }
+
         private void updateUiForConfigDataMap(final DataMap config) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForConfigDataMap()");
 
@@ -887,27 +886,24 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
 
-        /**
-         * Updates the color of a UI item according to the given {@code configKey}. Does nothing if
-         * {@code configKey} isn't recognized.
-         *
-         * @return whether UI has been updated
-         */
         private boolean updateUiForKey(String configKey, int color) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForKey()");
 
             switch (configKey) {
                 case CircaTextConsts.KEY_BACKGROUND_COLOR:
-                    setInteractiveBackgroundColor(color);
+                    mInteractiveBackgroundColor = color;
+                    if (!isInAmbientMode() && mBackgroundPaint != null) {
+                        mBackgroundPaint.setColor(color);
+                    }
                     break;
                 case CircaTextConsts.KEY_HOURS_COLOR:
-                    setInteractiveHourDigitsColor(color);
+                    mTextFields[eTF_HOUR].setColor(color);
                     break;
                 case CircaTextConsts.KEY_MINUTES_COLOR:
-                    setInteractiveMinuteDigitsColor(color);
+                    mTextFields[eTF_MINUTE].setColor(color);
                     break;
                 case CircaTextConsts.KEY_SECONDS_COLOR:
-                    setInteractiveSecondDigitsColor(color);
+                    mTextFields[eTF_SECOND].setColor(color);
                     break;
                 default:
                     return false;
@@ -915,12 +911,21 @@ public class CircaTextService extends CanvasWatchFaceService {
             return true;
         }
 
-        @Override  // GoogleApiClient.ConnectionCallbacks
-        public void onConnected(Bundle connectionHint) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected()");
+        private void setDefaultValuesForMissingConfigKeys(DataMap config) {
+            addIntKeyIfMissing(config, CircaTextConsts.KEY_BACKGROUND_COLOR,
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
+            addIntKeyIfMissing(config, CircaTextConsts.KEY_HOURS_COLOR,
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
+            addIntKeyIfMissing(config, CircaTextConsts.KEY_MINUTES_COLOR,
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
+            addIntKeyIfMissing(config, CircaTextConsts.KEY_SECONDS_COLOR,
+                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
+        }
 
-            Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
-            updateConfigDataItemAndUiOnStartup();
+        private void addIntKeyIfMissing(DataMap config, String key, int color) {
+            if (!config.containsKey(key)) {
+                config.putInt(key, color);
+            }
         }
 
         @Override  // GoogleApiClient.ConnectionCallbacks
@@ -933,6 +938,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
         }
 
+        // Meeting Loader Module
         private void onMeetingsLoaded(Set<EventInfo> result) {
             if (result != null) {
                 mMeetings = result.toArray(new EventInfo[result.size()]);
@@ -944,59 +950,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         private void cancelLoadMeetingTask() {
             if (mLoadMeetingsTask != null) {
                 mLoadMeetingsTask.cancel(true);
-            }
-        }
-
-        class BatteryInfo {
-            private final int mStatus;
-            private final int mPlugged;
-            private final float mPercent;
-            private final int mTemperature;
-
-            BatteryInfo(int status, int plugged, float pct, int temp) {
-                mStatus = status;
-                mPlugged = plugged;
-                mPercent = pct;
-                mTemperature = temp;
-            }
-
-            boolean isCharging() {
-                return mStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
-                        mStatus == BatteryManager.BATTERY_STATUS_FULL;
-            }
-
-            boolean isPlugged() {
-                return mPlugged == (BatteryManager.BATTERY_PLUGGED_AC | BatteryManager.BATTERY_PLUGGED_USB | BatteryManager.BATTERY_PLUGGED_WIRELESS);
-            }
-
-            public float getPercent() {
-                return mPercent;
-            }
-
-            public int getTemperature() {
-                return mTemperature;
-            }
-        }
-
-        public class EventInfo implements Comparable<EventInfo> {
-            public final String Title;
-            private final Date DtStart;
-
-            EventInfo(String title, Date c) {
-                Title = title;
-                DtStart = c;
-            }
-
-            @Override
-            public int compareTo(@NonNull EventInfo another) {
-                long thistime = this.DtStart.getTime();
-                long othertime = another.DtStart.getTime();
-
-                if (othertime < thistime)
-                    return 1;
-                if (thistime < othertime)
-                    return -1;
-                return 0;
             }
         }
 

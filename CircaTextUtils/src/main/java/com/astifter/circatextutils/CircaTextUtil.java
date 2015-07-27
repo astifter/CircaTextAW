@@ -59,6 +59,11 @@ public final class CircaTextUtil {
         return Color.parseColor(colorName.toLowerCase());
     }
 
+    /// Interface FetchConfigDataMapCallback
+    public interface FetchConfigDataMapCallback {
+        void onConfigDataMapFetched(DataMap config);
+    }
+
     public static void fetchConfigDataMap(final GoogleApiClient client,
                                           final FetchConfigDataMapCallback callback) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "fetchConfigDataMap()");
@@ -116,11 +121,6 @@ public final class CircaTextUtil {
             });
     }
 
-    /// Interface FetchConfigDataMapCallback
-    public interface FetchConfigDataMapCallback {
-        void onConfigDataMapFetched(DataMap config);
-    }
-
     private static class DataItemResultCallback implements ResultCallback<DataApi.DataItemResult> {
 
         private final FetchConfigDataMapCallback mCallback;
@@ -131,7 +131,7 @@ public final class CircaTextUtil {
             mCallback = callback;
         }
 
-        @Override
+        @Override // ResultCallback<DataApi.DataItemResult>
         public void onResult(DataApi.DataItemResult dataItemResult) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onResult()");
 

@@ -35,8 +35,8 @@ import java.util.concurrent.TimeUnit;
  * and updating the config {@link com.google.android.gms.wearable.DataItem} accordingly.
  */
 public class CircaTextConfigListenerService extends WearableListenerService
-        implements GoogleApiClient.ConnectionCallbacks,
-                   GoogleApiClient.OnConnectionFailedListener {
+                                         implements GoogleApiClient.ConnectionCallbacks,
+                                                    GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "CircaTextConfigLS";
 
     private GoogleApiClient mGoogleApiClient;
