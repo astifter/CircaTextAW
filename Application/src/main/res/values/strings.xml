@@ -22,6 +22,7 @@
     <string name="digital_config_hours">Hours</string>
     <string name="digital_config_minutes">Minutes</string>
     <string name="digital_config_seconds">Seconds</string>
+    <string name="digital_config_calendars">Exclude Calendars</string>
 
     <string name="title_no_device_connected">No wearable device is currently connected.</string>
     <string name="ok_no_device_connected">Connected.</string>

@@ -24,9 +24,13 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.wearable.companion.WatchFaceCompanion;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -40,6 +44,9 @@ import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class CircaTextConfigActivity extends Activity
                                   implements GoogleApiClient.ConnectionCallbacks,
@@ -156,10 +163,14 @@ public class CircaTextConfigActivity extends Activity
         setUpColorPickerSelection(R.id.minutes, CircaTextConsts.KEY_MINUTES_COLOR, config, R.string.color_white);
         setUpColorPickerSelection(R.id.seconds, CircaTextConsts.KEY_SECONDS_COLOR, config, R.string.color_gray);
 
+        setUpEditTextContent(R.id.exclude_calendars, CircaTextConsts.KEY_EXCLUDED_CALENDARS, config, "");
+
         setUpColorPickerListener(R.id.background, CircaTextConsts.KEY_BACKGROUND_COLOR);
         setUpColorPickerListener(R.id.hours, CircaTextConsts.KEY_HOURS_COLOR);
         setUpColorPickerListener(R.id.minutes, CircaTextConsts.KEY_MINUTES_COLOR);
         setUpColorPickerListener(R.id.seconds, CircaTextConsts.KEY_SECONDS_COLOR);
+
+        setUpEditTextListener(R.id.exclude_calendars, CircaTextConsts.KEY_EXCLUDED_CALENDARS);
     }
 
     private void setUpColorPickerSelection(int spinnerId, final String configKey, DataMap config,
@@ -186,6 +197,21 @@ public class CircaTextConfigActivity extends Activity
         }
     }
 
+    private void setUpEditTextContent(int editTextId, final String configKey, DataMap config,
+                                      String defaultContent) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpEditTextContent()");
+
+        String content;
+        if (config != null) {
+            content = config.getString(configKey, defaultContent);
+        } else {
+            content = defaultContent;
+        }
+
+        EditText editText = (EditText) findViewById(editTextId);
+        editText.setText(content);
+    }
+
     private void setUpColorPickerListener(int spinnerId, final String configKey) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpColorPickerListener()");
 
@@ -207,17 +233,71 @@ public class CircaTextConfigActivity extends Activity
         });
     }
 
-    private void sendConfigUpdateMessage(String configKey, int color) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage()");
+    private void setUpEditTextListener(final int editTextId, final String configKey) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpEditTextListener()");
+
+        final EditText editText = (EditText) findViewById(editTextId);
+        editText.addTextChangedListener(new DelayedTextWatcher() {
+            @Override
+            void onResult() {
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpEditTextListener().onResult()");
+                sendConfigUpdateMessage(configKey, editText.getText().toString());
+            }
+        });
+    }
+
+    abstract class DelayedTextWatcher implements TextWatcher {
+        private Timer timer = new Timer();
+        private final long DELAY_MS = 1000;
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(final CharSequence s, int start, int before, int count) {
+            if(timer != null)
+                timer.cancel();
+        }
+
+        @Override
+        public void afterTextChanged(final Editable s) {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    onResult();
+                }
+            }, DELAY_MS);
+        }
+
+        abstract void onResult();
+    }
+
+    private void sendConfigUpdateMessage(String configKey, int value) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage(int)");
+
+        DataMap config = new DataMap();
+        config.putInt(configKey, value);
+        sendGenericConfigUpdateMessage(config);
+    }
+
+    private void sendConfigUpdateMessage(String configKey, String content) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage(String)");
+
+        DataMap config = new DataMap();
+        config.putString(configKey, content);
+        sendGenericConfigUpdateMessage(config);
+    }
+
+    private void sendGenericConfigUpdateMessage(DataMap config) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendGenericConfigUpdateMessage()");
+        byte[] rawData = config.toByteArray();
 
         if (mPeerId != null) {
-            DataMap config = new DataMap();
-            config.putInt(configKey, color);
-            byte[] rawData = config.toByteArray();
-
             Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CircaTextConsts.PATH_WITH_FEATURE, rawData);
             if (Log.isLoggable(TAG, Log.DEBUG))
-                Log.d(TAG, "sendConfigUpdateMessage(): Wearable.MessageApi.sendMessage()");
+                Log.d(TAG, "sendGenericConfigUpdateMessage(): Wearable.MessageApi.sendMessage()");
         }
     }
 }

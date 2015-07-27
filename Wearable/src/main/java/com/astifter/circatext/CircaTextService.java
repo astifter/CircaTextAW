@@ -116,6 +116,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             for (int i = 0; i < eTF_SIZE; i++) {
                 mTextFields[i] = new DrawableText();
             }
+            mExcludedCalendars = new HashSet<>();
         }
 
         private static final String COLON_STRING = ":";
@@ -147,6 +148,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
         EventInfo mMeetings[];
+        private Set<String> mExcludedCalendars;
 
         class BatteryInfo {
             private final int mStatus;
@@ -425,9 +427,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                         break;
 
                     case MSG_LOAD_MEETINGS:
-                        cancelLoadMeetingTask();
-                        mLoadMeetingsTask = new LoadMeetingsTask();
-                        mLoadMeetingsTask.execute();
+                        restartLoadMeetingTask();
                         break;
                 }
             }
@@ -872,9 +872,19 @@ public class CircaTextService extends CanvasWatchFaceService {
                 if (!config.containsKey(configKey)) {
                     continue;
                 }
-                int color = config.getInt(configKey);
-                if (updateUiForKey(configKey, color)) {
+                if (configKey.equals(CircaTextConsts.KEY_EXCLUDED_CALENDARS)) {
+                    mExcludedCalendars = new HashSet<>();
+                    String s[] = config.getString(CircaTextConsts.KEY_EXCLUDED_CALENDARS).split(",");
+                    for (int i = 0; i < s.length; i++) {
+                        mExcludedCalendars.add(s[i].trim());
+                    }
+                    restartLoadMeetingTask();
                     uiUpdated = true;
+                } else {
+                    int color = config.getInt(configKey);
+                    if (updateUiForKey(configKey, color)) {
+                        uiUpdated = true;
+                    }
                 }
             }
             if (uiUpdated) {
@@ -908,19 +918,26 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         private void setDefaultValuesForMissingConfigKeys(DataMap config) {
-            addIntKeyIfMissing(config, CircaTextConsts.KEY_BACKGROUND_COLOR,
+            addConfigKeyIfMissing(config, CircaTextConsts.KEY_BACKGROUND_COLOR,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
-            addIntKeyIfMissing(config, CircaTextConsts.KEY_HOURS_COLOR,
+            addConfigKeyIfMissing(config, CircaTextConsts.KEY_HOURS_COLOR,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
-            addIntKeyIfMissing(config, CircaTextConsts.KEY_MINUTES_COLOR,
+            addConfigKeyIfMissing(config, CircaTextConsts.KEY_MINUTES_COLOR,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-            addIntKeyIfMissing(config, CircaTextConsts.KEY_SECONDS_COLOR,
+            addConfigKeyIfMissing(config, CircaTextConsts.KEY_SECONDS_COLOR,
                     CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
+            addConfigKeyIfMissing(config, CircaTextConsts.KEY_EXCLUDED_CALENDARS, "");
         }
 
-        private void addIntKeyIfMissing(DataMap config, String key, int color) {
+        private void addConfigKeyIfMissing(DataMap config, String key, int value) {
             if (!config.containsKey(key)) {
-                config.putInt(key, color);
+                config.putInt(key, value);
+            }
+        }
+
+        private void addConfigKeyIfMissing(DataMap config, String key, String value) {
+            if (!config.containsKey(key)) {
+                config.putString(key, value);
             }
         }
 
@@ -949,6 +966,13 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
 
+        private void restartLoadMeetingTask() {
+            cancelLoadMeetingTask();
+            mLoadMeetingsTask = new LoadMeetingsTask();
+            mLoadMeetingsTask.execute();
+        }
+
+
         /**
          * Asynchronous task to load the meetings from the content provider and report the number of
          * meetings back via {@link #onMeetingsLoaded}.
@@ -958,6 +982,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                     CalendarContract.Instances.TITLE,
                     CalendarContract.Instances.BEGIN,
                     CalendarContract.Instances.CALENDAR_ID,
+                    CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
             };
             private PowerManager.WakeLock mWakeLock;
 
@@ -978,8 +1003,13 @@ public class CircaTextService extends CanvasWatchFaceService {
 
                 Set<EventInfo> eis = new HashSet<>();
                 while (cursor.moveToNext()) {
+                    String cal_name = cursor.getString(3);
+                    if (mExcludedCalendars.contains(cal_name))
+                        continue;
+
                     String title = cursor.getString(0);
                     Date d = new Date(cursor.getLong(1));
+                    String cal_id = cursor.getString(2);
                     EventInfo ei = new EventInfo(title, d);
                     eis.add(ei);
                 }
