@@ -16,6 +16,7 @@
 
 package com.astifter.circatextutils;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
@@ -32,6 +33,17 @@ import com.google.android.gms.wearable.Wearable;
 
 public final class CircaTextUtil {
     private static final String TAG = "CircaTextUtil";
+
+    public static GoogleApiClient buildGoogleApiClient(
+            Context c,
+            GoogleApiClient.ConnectionCallbacks cl,
+            GoogleApiClient.OnConnectionFailedListener cfl) {
+        return new GoogleApiClient.Builder(c)
+                .addConnectionCallbacks(cl)
+                .addOnConnectionFailedListener(cfl)
+                .addApi(Wearable.API)
+                .build();
+    }
 
     private static final String COLOR_NAME_DEFAULT_AND_AMBIENT_BACKGROUND = "Black";
     public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND =

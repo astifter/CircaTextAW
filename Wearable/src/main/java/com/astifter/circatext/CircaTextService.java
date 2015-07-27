@@ -523,11 +523,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             super.onDestroy();
         }
 
-        final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(CircaTextService.this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Wearable.API)
-                .build();
+        final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
 
         @Override // WatchFaceService.Engine
         public void onVisibilityChanged(boolean visible) {

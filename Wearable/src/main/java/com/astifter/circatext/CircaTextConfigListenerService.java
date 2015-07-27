@@ -54,12 +54,7 @@ public class CircaTextConfigListenerService extends WearableListenerService
         DataMap configKeysToOverwrite = DataMap.fromByteArray(rawData);
 
         if (mGoogleApiClient == null) {
-            mGoogleApiClient = new
-                    GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(Wearable.API)
-                    .build();
+            mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this, this, this);
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): built mGoogleApiClient");
         }
         if (!mGoogleApiClient.isConnected()) {

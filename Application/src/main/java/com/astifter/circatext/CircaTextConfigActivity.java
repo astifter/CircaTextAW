@@ -31,6 +31,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.astifter.circatextutils.CircaTextConsts;
+import com.astifter.circatextutils.CircaTextUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -59,12 +60,7 @@ public class CircaTextConfigActivity extends Activity
         mPeerId = getIntent().getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): mPeerId=" + mPeerId);
 
-        mGoogleApiClient =
-                new GoogleApiClient.Builder(this)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(Wearable.API)
-                        .build();
+        mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this,this,this);
 
         ComponentName name =
                 getIntent().getParcelableExtra(WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
