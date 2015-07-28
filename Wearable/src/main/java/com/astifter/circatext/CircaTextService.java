@@ -74,6 +74,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Sample digital watch face with blinking colons and seconds. In ambient mode, the seconds not
@@ -147,7 +149,9 @@ public class CircaTextService extends CanvasWatchFaceService {
                 return 0;
             }
         }
+        ReadWriteLock mMeetingsLock = new ReentrantReadWriteLock();
         EventInfo mMeetings[];
+        ReadWriteLock mExcludedCalendarsLock = new ReentrantReadWriteLock();
         private Set<String> mExcludedCalendars;
 
         class BatteryInfo {
@@ -180,6 +184,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 return mTemperature;
             }
         }
+        ReadWriteLock mBatteryInfoLock = new ReentrantReadWriteLock();
         BatteryInfo mBatteryInfo;
 
         boolean mMute;
@@ -446,7 +451,12 @@ public class CircaTextService extends CanvasWatchFaceService {
                 int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
                 float pct = level / (float) scale;
-                mBatteryInfo = new BatteryInfo(status, plugged, pct, temp);
+                mBatteryInfoLock.writeLock().lock();
+                try {
+                    mBatteryInfo = new BatteryInfo(status, plugged, pct, temp);
+                } finally {
+                    mBatteryInfoLock.writeLock().unlock();
+                }
 
                 invalidate();
             }
@@ -781,9 +791,14 @@ public class CircaTextService extends CanvasWatchFaceService {
                 String secondString = formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
                 mTextFields[eTF_SECOND].draw(canvas, secondString);
 
-                if (mBatteryInfo != null) {
-                    String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
-                    mTextFields[eTF_BATTERY].draw(canvas, pctText);
+                mBatteryInfoLock.readLock().lock();
+                try {
+                    if (mBatteryInfo != null) {
+                        String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
+                        mTextFields[eTF_BATTERY].draw(canvas, pctText);
+                    }
+                } finally {
+                    mBatteryInfoLock.readLock().unlock();
                 }
             }
 
@@ -797,21 +812,26 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
 
                 if (!isInAmbientMode() && !mMute) {
-                    if (mMeetings != null) {
-                        if (mMeetings.length == 0) {
-                            mTextFields[eTF_CALENDAR_1].draw(canvas, "no meetings");
-                        } else {
-                            int i = 0;
-                            while (mMeetings[i].DtStart.getTime() < now) i++;
-                            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                            mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
+                    mMeetingsLock.readLock().lock();
+                    try {
+                        if (mMeetings != null) {
+                            if (mMeetings.length == 0) {
+                                mTextFields[eTF_CALENDAR_1].draw(canvas, "no meetings");
+                            } else {
+                                int i = 0;
+                                while (mMeetings[i].DtStart.getTime() < now) i++;
+                                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+                                mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
 
-                            int additionalEvents = mMeetings.length-1-i;
-                            if (additionalEvents == 1)
-                                mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional event");
-                            if (additionalEvents > 1)
-                                mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional events");
+                                int additionalEvents = mMeetings.length - 1 - i;
+                                if (additionalEvents == 1)
+                                    mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional event");
+                                if (additionalEvents > 1)
+                                    mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional events");
+                            }
                         }
+                    } finally {
+                        mMeetingsLock.readLock().unlock();
                     }
                 }
             }
@@ -873,10 +893,15 @@ public class CircaTextService extends CanvasWatchFaceService {
                     continue;
                 }
                 if (configKey.equals(CircaTextConsts.KEY_EXCLUDED_CALENDARS)) {
-                    mExcludedCalendars = new HashSet<>();
-                    String s[] = config.getString(CircaTextConsts.KEY_EXCLUDED_CALENDARS).split(",");
-                    for (int i = 0; i < s.length; i++) {
-                        mExcludedCalendars.add(s[i].trim());
+                    mExcludedCalendarsLock.writeLock().lock();
+                    try {
+                        mExcludedCalendars.clear();
+                        String s[] = config.getString(CircaTextConsts.KEY_EXCLUDED_CALENDARS).split(",");
+                        for (int i = 0; i < s.length; i++) {
+                            mExcludedCalendars.add(s[i].trim());
+                        }
+                    } finally {
+                        mExcludedCalendarsLock.writeLock().unlock();
                     }
                     restartLoadMeetingTask();
                     uiUpdated = true;
@@ -954,9 +979,14 @@ public class CircaTextService extends CanvasWatchFaceService {
         // Meeting Loader Module
         private void onMeetingsLoaded(Set<EventInfo> result) {
             if (result != null) {
-                mMeetings = result.toArray(new EventInfo[result.size()]);
-                Arrays.sort(mMeetings);
-                invalidate();
+                mMeetingsLock.writeLock().lock();
+                try {
+                    mMeetings = result.toArray(new EventInfo[result.size()]);
+                    Arrays.sort(mMeetings);
+                    invalidate();
+                } finally {
+                    mMeetingsLock.writeLock().unlock();
+                }
             }
         }
 
@@ -1004,7 +1034,16 @@ public class CircaTextService extends CanvasWatchFaceService {
                 Set<EventInfo> eis = new HashSet<>();
                 while (cursor.moveToNext()) {
                     String cal_name = cursor.getString(3);
-                    if (mExcludedCalendars.contains(cal_name))
+
+                    boolean useThisCalendar = true;
+                    mExcludedCalendarsLock.readLock().lock();
+                    try {
+                        if (mExcludedCalendars.contains(cal_name))
+                            useThisCalendar = false;
+                    } finally {
+                        mExcludedCalendarsLock.readLock().unlock();
+                    }
+                    if (!useThisCalendar)
                         continue;
 
                     String title = cursor.getString(0);
