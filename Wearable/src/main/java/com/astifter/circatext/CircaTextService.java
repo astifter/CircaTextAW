@@ -43,6 +43,7 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
+import com.astifter.circatext.graphicshelpers.DrawableText;
 import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.CircaTextUtil;
 import com.google.android.gms.common.ConnectionResult;
@@ -74,9 +75,6 @@ import java.util.concurrent.TimeUnit;
 public class CircaTextService extends CanvasWatchFaceService {
     private static final String TAG = "CircaTextService";
 
-    private static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
-    private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
-
     /**
      * Update rate in milliseconds for normal (not ambient and not mute) mode. We update twice
      * a second to blink the colons.
@@ -103,7 +101,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
 
             for (int i = 0; i < eTF_SIZE; i++) {
-                mTextFields[i] = new DrawableText();
+                mTextFields[i] = new DrawableText(this);
             }
         }
 
@@ -113,10 +111,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         Date mDate;
         SimpleDateFormat mDayFormat;
         SimpleDateFormat mDateFormat;
-
-        private final CalendarHelper mCalendarHelper = new CalendarHelper(this, getApplicationContext());
-        private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
-
         boolean mMute;
         boolean mShouldDrawColons;
         /**
@@ -125,199 +119,9 @@ public class CircaTextService extends CanvasWatchFaceService {
          */
         boolean mLowBitAmbient;
 
-        class DrawableText {
-            class StackDirection {
-                static final int NONE = -1;
-                static final int HORIZONTAL = 0;
-                static final int ABOVE = 1;
-                static final int BELOW = 2;
-                private final int dir;
+        private final CalendarHelper mCalendarHelper = new CalendarHelper(this, getApplicationContext());
+        private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
 
-                public StackDirection(int dir) {
-                    this.dir = dir;
-                }
-
-                public int direction() {
-                    return dir;
-                }
-            }
-
-            private TextPaint createTextPaint(Typeface t, Paint.Align a) {
-                TextPaint paint = new TextPaint();
-                paint.setColor(this.color);
-                paint.setTypeface(t);
-                paint.setAntiAlias(true);
-                paint.setTextAlign(a);
-                return paint;
-            }
-
-            private float x;
-            private float y;
-            private float maxWidth = -1;
-            private final Paint paint;
-            private int   color;
-            WeakReference<DrawableText> stack;
-            StackDirection stackDirection;
-            private float drawnSize;
-
-            public DrawableText() {
-                this.paint = new Paint();
-                this.stackDirection = new StackDirection(StackDirection.NONE);
-            }
-
-            public DrawableText(int c) {
-                this.color = c;
-                this.paint = createTextPaint(NORMAL_TYPEFACE, Paint.Align.LEFT);
-            }
-
-            public DrawableText(int c, Paint.Align a) {
-                this.color = c;
-                this.paint = createTextPaint(NORMAL_TYPEFACE, a);
-            }
-
-            public DrawableText(int c, Typeface t) {
-                this.color = c;
-                this.paint = createTextPaint(t, Paint.Align.LEFT);
-            }
-
-            public void draw(Canvas canvas, String text) {
-                float x = this.x;
-                float y = this.y;
-                if (this.stack != null && this.stack.get() != null) {
-                    switch (this.stackDirection.direction()) {
-                        case StackDirection.HORIZONTAL:
-                            x = this.stack.get().getRight();
-                            break;
-                        case StackDirection.BELOW:
-                            y = this.stack.get().getBottom() + -this.paint.ascent();
-                            break;
-                        case StackDirection.ABOVE:
-                            y = this.stack.get().getTop() - this.paint.descent();
-                            break;
-                    }
-                }
-
-                /**
-                 * Some comments are in order:
-                 * We first measure the text to be drawn. In case the maximum width is set and the
-                 * text will exceed it do:
-                 * - Get the font metrics and measure the overflow text "..." (ellipsis).
-                 * - Draw the ellpsis right at the end of the allowed area (defined by x, y and
-                 *   maxWidth).
-                 * - Save the canvas and set a clipping rectangle for the text minus the width of
-                 *   the ellipsis.
-                 * - Adjust the actually used size (drawnSize) to the maxWidth.
-                 */
-                boolean hasSavedState = false;
-                this.drawnSize = paint.measureText(text);
-                if (this.maxWidth != -1 && this.drawnSize > this.maxWidth) {
-                    Paint.FontMetrics fm = this.paint.getFontMetrics();
-                    float ellipsisSize = paint.measureText("...");
-
-                    canvas.drawText("...", x+this.maxWidth -ellipsisSize, y, paint);
-
-                    canvas.save();
-                    hasSavedState = true;
-                    canvas.clipRect(x,y+fm.ascent,x+this.maxWidth -ellipsisSize,y+fm.descent);
-
-                    this.drawnSize = this.maxWidth;
-                }
-                canvas.drawText(text, x, y, paint);
-                /** In case the state was saved for clipping text, restore state. */
-                if (hasSavedState) {
-                    canvas.restore();
-                }
-                //{
-                //    float ds = this.drawnSize;
-                //    if (this.paint.getTextAlign() == Paint.Align.RIGHT)
-                //        ds = -ds;
-                //    canvas.drawLine(x, y, x + ds, y, this.paint);
-                //    float a = this.paint.ascent();
-                //    canvas.drawLine(x, y + a, x + ds, y + a, this.paint);
-                //    float d = this.paint.descent();
-                //    canvas.drawLine(x, y + d, x + ds, y + d, this.paint);
-                //    canvas.drawLine(x, y + a, x, y + d, this.paint);
-                //}
-            }
-
-            private float getRight() {
-                if (this.stack != null && this.stack.get() != null) {
-                    return this.stack.get().getRight() + this.drawnSize;
-                } else {
-                    return this.x + this.drawnSize;
-                }
-            }
-
-            private float getHeigth() {
-                Paint.FontMetrics fm = this.paint.getFontMetrics();
-                return -fm.ascent + fm.descent;
-            }
-
-            private float getBottom() {
-                if (this.stack != null && this.stack.get() != null) {
-                    return this.stack.get().getBottom() + this.getHeigth();
-                } else {
-                    return this.y + this.paint.descent();
-                }
-            }
-
-            private float getTop() {
-                if (this.stack != null && this.stack.get() != null) {
-                    return this.stack.get().getTop() - this.getHeigth();
-                } else {
-                    return this.y + this.paint.ascent();
-                }
-            }
-
-            public void setCoord(float x, float y) {
-                this.x = x;
-                this.y = y;
-            }
-
-            public void setCoord(DrawableText t, float y) {
-                this.y = y;
-                this.stack = new WeakReference<>(t);
-                this.stackDirection = new StackDirection(StackDirection.HORIZONTAL);
-            }
-
-            public void setCoord(float x, DrawableText t, int d) {
-                this.x = x;
-                this.stack = new WeakReference<>(t);
-                this.stackDirection = new StackDirection(d);
-            }
-
-            public void setTextSize(float s) {
-                this.paint.setTextSize(s);
-            }
-
-            public void setAmbientMode(boolean inAmbientMode) {
-                this.paint.setAntiAlias(!inAmbientMode);
-                if (inAmbientMode) {
-                    this.paint.setColor(Color.WHITE);
-                } else {
-                    this.paint.setColor(this.color);
-                }
-            }
-
-            public void setTypeface(Typeface t) {
-                this.paint.setTypeface(t);
-            }
-
-            public void setColor(int c) {
-                this.color = c;
-                if (!isInAmbientMode()) {
-                    this.paint.setColor(c);
-                }
-            }
-
-            public void setAlpha(int a) {
-                this.paint.setAlpha(a);
-            }
-
-            public void setMaxWidth(float maxWidth) {
-                this.maxWidth = maxWidth;
-            }
-        }
         private static final int eTF_DAY_OF_WEEK = 0;
         private static final int eTF_DATE = eTF_DAY_OF_WEEK + 1;
         private static final int eTF_CALENDAR_1 = eTF_DATE + 1;
@@ -399,16 +203,16 @@ public class CircaTextService extends CanvasWatchFaceService {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
 
-            mTextFields[eTF_DAY_OF_WEEK] = new DrawableText(resources.getColor(R.color.digital_date));
-            mTextFields[eTF_DATE] = new DrawableText(resources.getColor(R.color.digital_date), Paint.Align.RIGHT);
-            mTextFields[eTF_CALENDAR_1] = new DrawableText(resources.getColor(R.color.digital_date));
-            mTextFields[eTF_CALENDAR_2] = new DrawableText(resources.getColor(R.color.digital_date));
-            mTextFields[eTF_BATTERY] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
-            mTextFields[eTF_HOUR] = new DrawableText(CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, BOLD_TYPEFACE);
-            mTextFields[eTF_COLON_1] = new DrawableText(resources.getColor(R.color.digital_colons));
-            mTextFields[eTF_MINUTE] = new DrawableText(CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-            mTextFields[eTF_COLON_2] = new DrawableText(resources.getColor(R.color.digital_colons));
-            mTextFields[eTF_SECOND] = new DrawableText(CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
+            mTextFields[eTF_DAY_OF_WEEK] = new DrawableText(this, resources.getColor(R.color.digital_date));
+            mTextFields[eTF_DATE] = new DrawableText(this, resources.getColor(R.color.digital_date), Paint.Align.RIGHT);
+            mTextFields[eTF_CALENDAR_1] = new DrawableText(this, resources.getColor(R.color.digital_date));
+            mTextFields[eTF_CALENDAR_2] = new DrawableText(this, resources.getColor(R.color.digital_date));
+            mTextFields[eTF_BATTERY] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
+            mTextFields[eTF_HOUR] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, DrawableText.BOLD_TYPEFACE);
+            mTextFields[eTF_COLON_1] = new DrawableText(this, resources.getColor(R.color.digital_colons));
+            mTextFields[eTF_MINUTE] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
+            mTextFields[eTF_COLON_2] = new DrawableText(this, resources.getColor(R.color.digital_colons));
+            mTextFields[eTF_SECOND] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
             mTextFieldsAnimated.add(mTextFields[eTF_CALENDAR_1]);
             mTextFieldsAnimated.add(mTextFields[eTF_CALENDAR_2]);
             mTextFieldsAnimated.add(mTextFields[eTF_COLON_2]);
@@ -561,7 +365,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             super.onPropertiesChanged(properties);
 
             boolean burnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
-            mTextFields[eTF_HOUR].setTypeface(burnInProtection ? NORMAL_TYPEFACE : BOLD_TYPEFACE);
+            mTextFields[eTF_HOUR].setTypeface(burnInProtection ? DrawableText.NORMAL_TYPEFACE : DrawableText.BOLD_TYPEFACE);
 
             mLowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
         }
