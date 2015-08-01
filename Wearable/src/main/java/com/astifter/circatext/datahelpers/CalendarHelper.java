@@ -1,6 +1,5 @@
 package com.astifter.circatext.datahelpers;
 
-import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -13,9 +12,6 @@ import android.support.wearable.provider.WearableCalendarContract;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.text.format.DateUtils;
 
-import com.astifter.circatext.CircaTextService;
-
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -46,9 +42,8 @@ public class CalendarHelper {
         mExcludedCalendarsLock.writeLock().lock();
         try {
             mExcludedCalendars.clear();
-            String s[] = configString.split(",");
-            for (int i = 0; i < s.length; i++) {
-                mExcludedCalendars.add(s[i].trim());
+            for (String s : configString.split(",")) {
+                mExcludedCalendars.add(s.trim());
             }
         } finally {
             mExcludedCalendarsLock.writeLock().unlock();
@@ -93,9 +88,9 @@ public class CalendarHelper {
     private final CanvasWatchFaceService.Engine engine;
     private final Context context;
 
-    private ReadWriteLock mMeetingsLock = new ReentrantReadWriteLock();
-    private ReadWriteLock mExcludedCalendarsLock = new ReentrantReadWriteLock();
-    private Set<String> mExcludedCalendars = new HashSet<>();
+    private final ReadWriteLock mMeetingsLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock mExcludedCalendarsLock = new ReentrantReadWriteLock();
+    private final Set<String> mExcludedCalendars = new HashSet<>();
     private EventInfo mMeetings[];
 
     private void onMeetingsLoaded(Set<EventInfo> result) {
@@ -152,7 +147,7 @@ public class CalendarHelper {
 
                 String title = cursor.getString(0);
                 Date d = new Date(cursor.getLong(1));
-                String cal_id = cursor.getString(2);
+                //String cal_id = cursor.getString(2);
                 EventInfo ei = new EventInfo(title, d);
                 eis.add(ei);
             }

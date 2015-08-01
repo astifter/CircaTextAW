@@ -1,10 +1,5 @@
 package com.astifter.circatextutils;
 
-import android.graphics.Color;
-
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataMap;
-
 public class CircaTextConsts {
     public static final String KEY_BACKGROUND_COLOR = "BACKGROUND_COLOR";
     public static final String KEY_HOURS_COLOR = "HOURS_COLOR";

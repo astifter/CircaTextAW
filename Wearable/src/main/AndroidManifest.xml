@@ -17,10 +17,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.astifter.circatext">
 
-    <uses-sdk
-        android:minSdkVersion="21"
-        android:targetSdkVersion="22" />
-
     <uses-feature android:name="android.hardware.type.watch" />
 
     <!-- Required to act as a custom watch face. -->

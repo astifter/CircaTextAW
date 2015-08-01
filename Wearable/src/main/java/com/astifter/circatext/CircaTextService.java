@@ -60,7 +60,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -117,7 +116,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         SimpleDateFormat mDayFormat;
         SimpleDateFormat mDateFormat;
 
-        CalendarHelper mCalendarHelper = new CalendarHelper(this, getApplicationContext());
+        private final CalendarHelper mCalendarHelper = new CalendarHelper(this, getApplicationContext());
 
         class BatteryInfo {
             private final int mStatus;
@@ -132,25 +131,12 @@ public class CircaTextService extends CanvasWatchFaceService {
                 mTemperature = temp;
             }
 
-            boolean isCharging() {
-                return mStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
-                        mStatus == BatteryManager.BATTERY_STATUS_FULL;
-            }
-
-            boolean isPlugged() {
-                return mPlugged == (BatteryManager.BATTERY_PLUGGED_AC | BatteryManager.BATTERY_PLUGGED_USB | BatteryManager.BATTERY_PLUGGED_WIRELESS);
-            }
-
             public float getPercent() {
                 return mPercent;
             }
-
-            public int getTemperature() {
-                return mTemperature;
-            }
         }
-        ReadWriteLock mBatteryInfoLock = new ReentrantReadWriteLock();
-        BatteryInfo mBatteryInfo;
+        private final ReadWriteLock mBatteryInfoLock = new ReentrantReadWriteLock();
+        private BatteryInfo mBatteryInfo;
 
         boolean mMute;
         boolean mShouldDrawColons;
@@ -175,7 +161,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 public int direction() {
                     return dir;
                 }
-            };
+            }
 
             private TextPaint createTextPaint(Typeface t, Paint.Align a) {
                 TextPaint paint = new TextPaint();
@@ -188,14 +174,12 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             private float x;
             private float y;
-            private float maxWidht = -1;
-            private Paint paint;
+            private float maxWidth = -1;
+            private final Paint paint;
             private int   color;
-            private float textSize;
-            private int alpha;
             WeakReference<DrawableText> stack;
             StackDirection stackDirection;
-            private float drawnsize;
+            private float drawnSize;
 
             public DrawableText() {
                 this.paint = new Paint();
@@ -240,24 +224,24 @@ public class CircaTextService extends CanvasWatchFaceService {
                  * text will exceed it do:
                  * - Get the font metrics and measure the overflow text "..." (ellipsis).
                  * - Draw the ellpsis right at the end of the allowed area (defined by x, y and
-                 *   maxWidht).
+                 *   maxWidth).
                  * - Save the canvas and set a clipping rectangle for the text minus the width of
                  *   the ellipsis.
-                 * - Adjust the actually used size (drawnSize) to the maxWidht.
+                 * - Adjust the actually used size (drawnSize) to the maxWidth.
                  */
                 boolean hasSavedState = false;
-                this.drawnsize = paint.measureText(text);
-                if (this.maxWidht != -1 && this.drawnsize > this.maxWidht) {
+                this.drawnSize = paint.measureText(text);
+                if (this.maxWidth != -1 && this.drawnSize > this.maxWidth) {
                     Paint.FontMetrics fm = this.paint.getFontMetrics();
                     float ellipsisSize = paint.measureText("...");
 
-                    canvas.drawText("...", x+this.maxWidht-ellipsisSize, y, paint);
+                    canvas.drawText("...", x+this.maxWidth -ellipsisSize, y, paint);
 
                     canvas.save();
                     hasSavedState = true;
-                    canvas.clipRect(x,y+fm.ascent,x+this.maxWidht-ellipsisSize,y+fm.descent);
+                    canvas.clipRect(x,y+fm.ascent,x+this.maxWidth -ellipsisSize,y+fm.descent);
 
-                    this.drawnsize = this.maxWidht;
+                    this.drawnSize = this.maxWidth;
                 }
                 canvas.drawText(text, x, y, paint);
                 /** In case the state was saved for clipping text, restore state. */
@@ -265,7 +249,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                     canvas.restore();
                 }
                 //{
-                //    float ds = this.drawnsize;
+                //    float ds = this.drawnSize;
                 //    if (this.paint.getTextAlign() == Paint.Align.RIGHT)
                 //        ds = -ds;
                 //    canvas.drawLine(x, y, x + ds, y, this.paint);
@@ -279,9 +263,9 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             private float getRight() {
                 if (this.stack != null && this.stack.get() != null) {
-                    return this.stack.get().getRight() + this.drawnsize;
+                    return this.stack.get().getRight() + this.drawnSize;
                 } else {
-                    return this.x + this.drawnsize;
+                    return this.x + this.drawnSize;
                 }
             }
 
@@ -351,8 +335,8 @@ public class CircaTextService extends CanvasWatchFaceService {
                 this.paint.setAlpha(a);
             }
 
-            public void setMaxWidht(float maxWidht) {
-                this.maxWidht = maxWidht;
+            public void setMaxWidth(float maxWidth) {
+                this.maxWidth = maxWidth;
             }
         }
         private static final int eTF_DAY_OF_WEEK = 0;
@@ -366,16 +350,14 @@ public class CircaTextService extends CanvasWatchFaceService {
         private static final int eTF_COLON_2 = eTF_MINUTE  + 1;
         private static final int eTF_SECOND = eTF_COLON_2  + 1;
         private static final int eTF_SIZE = eTF_SECOND  + 1;
-        DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
-        ArrayList<DrawableText> mTextFieldsAnimated = new ArrayList<>();
+        private final DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
+        private final ArrayList<DrawableText> mTextFieldsAnimated = new ArrayList<>();
 
         int mInteractiveBackgroundColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
         Paint mBackgroundPaint;
 
         float mXOffset;
         float mYOffset;
-        float mCalendarOffset;
-        float mLineHeight;
 
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
@@ -458,8 +440,6 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             Resources resources = CircaTextService.this.getResources();
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
-            mCalendarOffset = resources.getDimension(R.dimen.digital_calendar_offset);
-            mLineHeight = resources.getDimension(R.dimen.digital_line_height);
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
@@ -608,9 +588,9 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_DATE].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_DAY_OF_WEEK].setCoord(mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_CALENDAR_1].setCoord(mXOffset, mTextFields[eTF_DAY_OF_WEEK], DrawableText.StackDirection.BELOW);
-            mTextFields[eTF_CALENDAR_1].setMaxWidht(width - 2 * mXOffset);
+            mTextFields[eTF_CALENDAR_1].setMaxWidth(width - 2 * mXOffset);
             mTextFields[eTF_CALENDAR_2].setCoord(mXOffset, mTextFields[eTF_CALENDAR_1], DrawableText.StackDirection.BELOW);
-            mTextFields[eTF_CALENDAR_2].setMaxWidht(width - 2*mXOffset);
+            mTextFields[eTF_CALENDAR_2].setMaxWidth(width - 2 * mXOffset);
             mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.ABOVE);
             mTextFields[eTF_HOUR].setCoord(mXOffset, mYOffset);
             mTextFields[eTF_COLON_1].setCoord(mTextFields[eTF_HOUR], mYOffset);
@@ -654,9 +634,8 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
             }
             if (!inAmbientMode) {
-                Iterator<DrawableText> it = mTextFieldsAnimated.iterator();
-                while (it.hasNext()) {
-                    createAnimation(it.next());
+                for (DrawableText dt : mTextFieldsAnimated) {
+                    createAnimation(dt);
                 }
             }
 
