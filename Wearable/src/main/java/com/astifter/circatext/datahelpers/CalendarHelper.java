@@ -20,6 +20,13 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class CalendarHelper {
+    private final CanvasWatchFaceService.Engine engine;
+    private final Context context;
+    private final ReadWriteLock mMeetingsLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock mExcludedCalendarsLock = new ReentrantReadWriteLock();
+    private final Set<String> mExcludedCalendars = new HashSet<>();
+    private EventInfo mMeetings[];
+    private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
     public CalendarHelper(CanvasWatchFaceService.Engine engine, Context applicationContext) {
         this.engine = engine;
         this.context = applicationContext;
@@ -51,6 +58,31 @@ public class CalendarHelper {
         restartLoadMeetingTask();
     }
 
+    public void cancelLoadMeetingTask() {
+        if (mLoadMeetingsTask != null) {
+            mLoadMeetingsTask.cancel(true);
+        }
+    }
+
+    public void restartLoadMeetingTask() {
+        cancelLoadMeetingTask();
+        mLoadMeetingsTask = new LoadMeetingsTask();
+        mLoadMeetingsTask.execute();
+    }
+
+    private void onMeetingsLoaded(Set<EventInfo> result) {
+        if (result != null) {
+            mMeetingsLock.writeLock().lock();
+            try {
+                mMeetings = result.toArray(new EventInfo[result.size()]);
+                Arrays.sort(mMeetings);
+                engine.invalidate();
+            } finally {
+                mMeetingsLock.writeLock().unlock();
+            }
+        }
+    }
+
     public class EventInfo implements Comparable<EventInfo> {
         public final String Title;
         public final Date DtStart;
@@ -73,40 +105,6 @@ public class CalendarHelper {
         }
     }
 
-    public void cancelLoadMeetingTask() {
-        if (mLoadMeetingsTask != null) {
-            mLoadMeetingsTask.cancel(true);
-        }
-    }
-
-    public void restartLoadMeetingTask() {
-        cancelLoadMeetingTask();
-        mLoadMeetingsTask = new LoadMeetingsTask();
-        mLoadMeetingsTask.execute();
-    }
-
-    private final CanvasWatchFaceService.Engine engine;
-    private final Context context;
-
-    private final ReadWriteLock mMeetingsLock = new ReentrantReadWriteLock();
-    private final ReadWriteLock mExcludedCalendarsLock = new ReentrantReadWriteLock();
-    private final Set<String> mExcludedCalendars = new HashSet<>();
-    private EventInfo mMeetings[];
-
-    private void onMeetingsLoaded(Set<EventInfo> result) {
-        if (result != null) {
-            mMeetingsLock.writeLock().lock();
-            try {
-                mMeetings = result.toArray(new EventInfo[result.size()]);
-                Arrays.sort(mMeetings);
-                engine.invalidate();
-            } finally {
-                mMeetingsLock.writeLock().unlock();
-            }
-        }
-    }
-
-    private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
     private class LoadMeetingsTask extends AsyncTask<Void, Void, Set<EventInfo>> {
         private final String[] EVENT_FIELDS = {
                 CalendarContract.Instances.TITLE,

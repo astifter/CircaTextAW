@@ -16,6 +16,31 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class BatteryHelper {
     private static final String TAG = "CircaTextService";
     private final CanvasWatchFaceService.Engine engine;
+    private final ReadWriteLock mBatteryInfoLock = new ReentrantReadWriteLock();
+    private BatteryInfo mBatteryInfo;
+    public final BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mPowerReceiver.onReceive()");
+
+            int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+            int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+            int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
+
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+            float pct = level / (float) scale;
+            mBatteryInfoLock.writeLock().lock();
+            try {
+                mBatteryInfo = new BatteryInfo(status, plugged, pct, temp);
+            } finally {
+                mBatteryInfoLock.writeLock().unlock();
+            }
+
+            engine.invalidate();
+        }
+    };
 
     public BatteryHelper(CanvasWatchFaceService.Engine engine) {
         this.engine = engine;
@@ -51,31 +76,4 @@ public class BatteryHelper {
             return mPercent;
         }
     }
-
-    public final BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mPowerReceiver.onReceive()");
-
-            int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-            int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-            int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
-
-            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-            float pct = level / (float) scale;
-            mBatteryInfoLock.writeLock().lock();
-            try {
-                mBatteryInfo = new BatteryInfo(status, plugged, pct, temp);
-            } finally {
-                mBatteryInfoLock.writeLock().unlock();
-            }
-
-            engine.invalidate();
-        }
-    };
-
-    private final ReadWriteLock mBatteryInfoLock = new ReentrantReadWriteLock();
-    private BatteryInfo mBatteryInfo;
 }

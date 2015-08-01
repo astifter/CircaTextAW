@@ -66,7 +66,7 @@ public class CircaTextConfigActivity extends Activity
         mPeerId = getIntent().getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): mPeerId=" + mPeerId);
 
-        mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this,this,this);
+        mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this, this, this);
 
         ComponentName name =
                 getIntent().getParcelableExtra(WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
@@ -239,38 +239,11 @@ public class CircaTextConfigActivity extends Activity
         editText.addTextChangedListener(new DelayedTextWatcher() {
             @Override
             void onResult() {
-                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpEditTextListener().onResult()");
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "setUpEditTextListener().onResult()");
                 sendConfigUpdateMessage(configKey, editText.getText().toString());
             }
         });
-    }
-
-    abstract class DelayedTextWatcher implements TextWatcher {
-        private Timer timer = new Timer();
-        private final long DELAY_MS = 1000;
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(final CharSequence s, int start, int before, int count) {
-            if(timer != null)
-                timer.cancel();
-        }
-
-        @Override
-        public void afterTextChanged(final Editable s) {
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    onResult();
-                }
-            }, DELAY_MS);
-        }
-
-        abstract void onResult();
     }
 
     private void sendConfigUpdateMessage(String configKey, int value) {
@@ -298,5 +271,33 @@ public class CircaTextConfigActivity extends Activity
             if (Log.isLoggable(TAG, Log.DEBUG))
                 Log.d(TAG, "sendGenericConfigUpdateMessage(): Wearable.MessageApi.sendMessage()");
         }
+    }
+
+    abstract class DelayedTextWatcher implements TextWatcher {
+        private final long DELAY_MS = 1000;
+        private Timer timer = new Timer();
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(final CharSequence s, int start, int before, int count) {
+            if (timer != null)
+                timer.cancel();
+        }
+
+        @Override
+        public void afterTextChanged(final Editable s) {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    onResult();
+                }
+            }, DELAY_MS);
+        }
+
+        abstract void onResult();
     }
 }

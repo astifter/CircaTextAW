@@ -25,10 +25,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -36,7 +34,6 @@ import android.support.wearable.provider.WearableCalendarContract;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
-import android.text.TextPaint;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
@@ -56,7 +53,6 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -97,20 +93,46 @@ public class CircaTextService extends CanvasWatchFaceService {
                                  GoogleApiClient.ConnectionCallbacks,
                                  GoogleApiClient.OnConnectionFailedListener {
 
-        Engine() {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
-
-            for (int i = 0; i < eTF_SIZE; i++) {
-                mTextFields[i] = new DrawableText(this);
-            }
-        }
-
+        static final int MSG_UPDATE_TIME = 0;
+        static final int MSG_LOAD_MEETINGS = 1;
         private static final String COLON_STRING = ":";
-
+        private static final int eTF_DAY_OF_WEEK = 0;
+        private static final int eTF_DATE = eTF_DAY_OF_WEEK + 1;
+        private static final int eTF_CALENDAR_1 = eTF_DATE + 1;
+        private static final int eTF_CALENDAR_2 = eTF_CALENDAR_1 + 1;
+        private static final int eTF_BATTERY = eTF_CALENDAR_2 + 1;
+        private static final int eTF_HOUR = eTF_BATTERY + 1;
+        private static final int eTF_COLON_1 = eTF_HOUR + 1;
+        private static final int eTF_MINUTE = eTF_COLON_1 + 1;
+        private static final int eTF_COLON_2 = eTF_MINUTE + 1;
+        private static final int eTF_SECOND = eTF_COLON_2 + 1;
+        private static final int eTF_SIZE = eTF_SECOND + 1;
+        final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
+        private final CalendarHelper mCalendarHelper = new CalendarHelper(this, getApplicationContext());
+        private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
+        private final DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
+        private final ArrayList<DrawableText> mTextFieldsAnimated = new ArrayList<>();
         Calendar mCalendar;
         Date mDate;
         SimpleDateFormat mDayFormat;
         SimpleDateFormat mDateFormat;
+        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mReceiver.onReceive()");
+
+                if (Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()) ||
+                        Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())) {
+                    mCalendar.setTimeZone(TimeZone.getDefault());
+                    initFormats();
+                }
+                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction()) &&
+                        WearableCalendarContract.CONTENT_URI.equals(intent.getData())) {
+                    mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
+                }
+                invalidate();
+            }
+        };
         boolean mMute;
         boolean mShouldDrawColons;
         /**
@@ -118,34 +140,11 @@ public class CircaTextService extends CanvasWatchFaceService {
          * disable anti-aliasing in ambient mode.
          */
         boolean mLowBitAmbient;
-
-        private final CalendarHelper mCalendarHelper = new CalendarHelper(this, getApplicationContext());
-        private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
-
-        private static final int eTF_DAY_OF_WEEK = 0;
-        private static final int eTF_DATE = eTF_DAY_OF_WEEK + 1;
-        private static final int eTF_CALENDAR_1 = eTF_DATE + 1;
-        private static final int eTF_CALENDAR_2 = eTF_CALENDAR_1  + 1;
-        private static final int eTF_BATTERY = eTF_CALENDAR_2  + 1;
-        private static final int eTF_HOUR = eTF_BATTERY  + 1;
-        private static final int eTF_COLON_1 = eTF_HOUR  + 1;
-        private static final int eTF_MINUTE = eTF_COLON_1  + 1;
-        private static final int eTF_COLON_2 = eTF_MINUTE  + 1;
-        private static final int eTF_SECOND = eTF_COLON_2  + 1;
-        private static final int eTF_SIZE = eTF_SECOND  + 1;
-        private final DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
-        private final ArrayList<DrawableText> mTextFieldsAnimated = new ArrayList<>();
-
         int mInteractiveBackgroundColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
         Paint mBackgroundPaint;
-
         float mXOffset;
         float mYOffset;
-
-        static final int MSG_UPDATE_TIME = 0;
-        static final int MSG_LOAD_MEETINGS = 1;
         long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
-
         final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
@@ -166,24 +165,19 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
             }
         };
+        /**
+         * Unregistering an unregistered receiver throws an exception. Keep track of the
+         * registration state to prevent that.
+         */
+        boolean mRegisteredReceiver = false;
 
-        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mReceiver.onReceive()");
+        Engine() {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
 
-                if (Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()) ||
-                    Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())      ) {
-                    mCalendar.setTimeZone(TimeZone.getDefault());
-                    initFormats();
-                }
-                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction())     &&
-                    WearableCalendarContract.CONTENT_URI.equals(intent.getData())    ) {
-                    mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
-                }
-                invalidate();
+            for (int i = 0; i < eTF_SIZE; i++) {
+                mTextFields[i] = new DrawableText(this);
             }
-        };
+        }
 
         @Override // WatchFaceService.Engine
         public void onCreate(SurfaceHolder holder) {
@@ -236,8 +230,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             super.onDestroy();
         }
 
-        final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
-
         @Override // WatchFaceService.Engine
         public void onVisibilityChanged(boolean visible) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onVisibilityChanged()");
@@ -275,12 +267,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             mDateFormat = new SimpleDateFormat("MMM d yyyy", Locale.getDefault());
             mDateFormat.setCalendar(mCalendar);
         }
-
-        /**
-         * Unregistering an unregistered receiver throws an exception. Keep track of the
-         * registration state to prevent that.
-         */
-        boolean mRegisteredReceiver = false;
 
         private void registerReceiver() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "registerReceiver()");
@@ -564,19 +550,20 @@ public class CircaTextService extends CanvasWatchFaceService {
             Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
 
             CircaTextUtil.fetchConfigDataMap(mGoogleApiClient,
-                new CircaTextUtil.FetchConfigDataMapCallback() {
-                    @Override
-                    public void onConfigDataMapFetched(DataMap startupConfig) {
-                        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected().onConfigDataMapFetched()");
+                    new CircaTextUtil.FetchConfigDataMapCallback() {
+                        @Override
+                        public void onConfigDataMapFetched(DataMap startupConfig) {
+                            if (Log.isLoggable(TAG, Log.DEBUG))
+                                Log.d(TAG, "onConnected().onConfigDataMapFetched()");
 
-                        // If the DataItem hasn't been created yet or some keys are missing,
-                        // use the default values.
-                        setDefaultValuesForMissingConfigKeys(startupConfig);
-                        CircaTextUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
+                            // If the DataItem hasn't been created yet or some keys are missing,
+                            // use the default values.
+                            setDefaultValuesForMissingConfigKeys(startupConfig);
+                            CircaTextUtil.putConfigDataItem(mGoogleApiClient, startupConfig);
 
-                        updateUiForConfigDataMap(startupConfig);
+                            updateUiForConfigDataMap(startupConfig);
+                        }
                     }
-                }
             );
         }
 

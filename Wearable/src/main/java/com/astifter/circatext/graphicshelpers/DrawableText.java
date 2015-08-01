@@ -7,54 +7,39 @@ import android.graphics.Typeface;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.text.TextPaint;
 
-import com.astifter.circatext.CircaTextService;
-
 import java.lang.ref.WeakReference;
 
 public class DrawableText {
     public static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
     public static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
     private final CanvasWatchFaceService.Engine engine;
-
+    private final Paint paint;
+    WeakReference<DrawableText> stack;
+    StackDirection stackDirection;
+    private float x;
+    private float y;
+    private float maxWidth = -1;
+    private int color;
+    private float drawnSize;
     public DrawableText(CanvasWatchFaceService.Engine engine) {
         this.engine = engine;
         this.paint = new Paint();
         this.stackDirection = new StackDirection(StackDirection.NONE);
     }
-
     public DrawableText(CanvasWatchFaceService.Engine engine, int c) {
         this.engine = engine;
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, Paint.Align.LEFT);
     }
-
     public DrawableText(CanvasWatchFaceService.Engine engine, int c, Paint.Align a) {
         this.engine = engine;
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, a);
     }
-
     public DrawableText(CanvasWatchFaceService.Engine engine, int c, Typeface t) {
         this.engine = engine;
         this.color = c;
         this.paint = createTextPaint(t, Paint.Align.LEFT);
-    }
-
-    public class StackDirection {
-        public static final int NONE = -1;
-        public static final int HORIZONTAL = 0;
-        public static final int ABOVE = 1;
-        public static final int BELOW = 2;
-
-        private final int dir;
-
-        protected StackDirection(int dir) {
-            this.dir = dir;
-        }
-
-        protected int direction() {
-            return dir;
-        }
     }
 
     private TextPaint createTextPaint(Typeface t, Paint.Align a) {
@@ -65,15 +50,6 @@ public class DrawableText {
         paint.setTextAlign(a);
         return paint;
     }
-
-    private float x;
-    private float y;
-    private float maxWidth = -1;
-    private final Paint paint;
-    private int   color;
-    WeakReference<DrawableText> stack;
-    StackDirection stackDirection;
-    private float drawnSize;
 
     public void draw(Canvas canvas, String text) {
         float x = this.x;
@@ -109,11 +85,11 @@ public class DrawableText {
             Paint.FontMetrics fm = this.paint.getFontMetrics();
             float ellipsisSize = paint.measureText("...");
 
-            canvas.drawText("...", x+this.maxWidth -ellipsisSize, y, paint);
+            canvas.drawText("...", x + this.maxWidth - ellipsisSize, y, paint);
 
             canvas.save();
             hasSavedState = true;
-            canvas.clipRect(x,y+fm.ascent,x+this.maxWidth -ellipsisSize,y+fm.descent);
+            canvas.clipRect(x, y + fm.ascent, x + this.maxWidth - ellipsisSize, y + fm.descent);
 
             this.drawnSize = this.maxWidth;
         }
@@ -211,5 +187,22 @@ public class DrawableText {
 
     public void setMaxWidth(float maxWidth) {
         this.maxWidth = maxWidth;
+    }
+
+    public class StackDirection {
+        public static final int NONE = -1;
+        public static final int HORIZONTAL = 0;
+        public static final int ABOVE = 1;
+        public static final int BELOW = 2;
+
+        private final int dir;
+
+        protected StackDirection(int dir) {
+            this.dir = dir;
+        }
+
+        protected int direction() {
+            return dir;
+        }
     }
 }
