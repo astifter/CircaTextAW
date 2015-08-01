@@ -29,7 +29,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -42,6 +41,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.CircaTextUtil;
@@ -63,8 +63,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Sample digital watch face with blinking colons and seconds. In ambient mode, the seconds not
@@ -117,26 +115,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         SimpleDateFormat mDateFormat;
 
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, getApplicationContext());
-
-        class BatteryInfo {
-            private final int mStatus;
-            private final int mPlugged;
-            private final float mPercent;
-            private final int mTemperature;
-
-            BatteryInfo(int status, int plugged, float pct, int temp) {
-                mStatus = status;
-                mPlugged = plugged;
-                mPercent = pct;
-                mTemperature = temp;
-            }
-
-            public float getPercent() {
-                return mPercent;
-            }
-        }
-        private final ReadWriteLock mBatteryInfoLock = new ReentrantReadWriteLock();
-        private BatteryInfo mBatteryInfo;
+        private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
 
         boolean mMute;
         boolean mShouldDrawColons;
@@ -384,30 +363,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         };
 
-        final BroadcastReceiver mPowerReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mPowerReceiver.onReceive()");
-
-                int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-                int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-                int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
-
-                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-                float pct = level / (float) scale;
-                mBatteryInfoLock.writeLock().lock();
-                try {
-                    mBatteryInfo = new BatteryInfo(status, plugged, pct, temp);
-                } finally {
-                    mBatteryInfoLock.writeLock().unlock();
-                }
-
-                invalidate();
-            }
-        };
-
         final BroadcastReceiver mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -548,7 +503,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 filter.addAction(Intent.ACTION_BATTERY_CHANGED);
                 filter.addAction(Intent.ACTION_BATTERY_LOW);
                 filter.addAction(Intent.ACTION_BATTERY_OKAY);
-                CircaTextService.this.registerReceiver(mPowerReceiver, filter);
+                CircaTextService.this.registerReceiver(mBatteryHelper.mPowerReceiver, filter);
             }
         }
 
@@ -560,7 +515,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
             mRegisteredReceiver = false;
             CircaTextService.this.unregisterReceiver(mReceiver);
-            CircaTextService.this.unregisterReceiver(mPowerReceiver);
+            CircaTextService.this.unregisterReceiver(mBatteryHelper.mPowerReceiver);
         }
 
         @Override // WatchFaceService.Engine
@@ -734,14 +689,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                 String secondString = formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
                 mTextFields[eTF_SECOND].draw(canvas, secondString);
 
-                mBatteryInfoLock.readLock().lock();
-                try {
-                    if (mBatteryInfo != null) {
-                        String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
-                        mTextFields[eTF_BATTERY].draw(canvas, pctText);
-                    }
-                } finally {
-                    mBatteryInfoLock.readLock().unlock();
+                BatteryHelper.BatteryInfo mBatteryInfo = mBatteryHelper.getBatteryInfo();
+                if (mBatteryInfo != null) {
+                    String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
+                    mTextFields[eTF_BATTERY].draw(canvas, pctText);
                 }
             }
 
