@@ -20,36 +20,29 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PowerManager;
-import android.provider.CalendarContract;
-import android.support.annotation.NonNull;
 import android.support.wearable.provider.WearableCalendarContract;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.TextPaint;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.CircaTextUtil;
 import com.google.android.gms.common.ConnectionResult;
@@ -65,13 +58,10 @@ import com.google.android.gms.wearable.Wearable;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -118,7 +108,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             for (int i = 0; i < eTF_SIZE; i++) {
                 mTextFields[i] = new DrawableText();
             }
-            mExcludedCalendars = new HashSet<>();
         }
 
         private static final String COLON_STRING = ":";
@@ -128,31 +117,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         SimpleDateFormat mDayFormat;
         SimpleDateFormat mDateFormat;
 
-        class EventInfo implements Comparable<EventInfo> {
-            public final String Title;
-            private final Date DtStart;
-
-            EventInfo(String title, Date c) {
-                Title = title;
-                DtStart = c;
-            }
-
-            @Override
-            public int compareTo(@NonNull EventInfo another) {
-                long thistime = this.DtStart.getTime();
-                long othertime = another.DtStart.getTime();
-
-                if (othertime < thistime)
-                    return 1;
-                if (thistime < othertime)
-                    return -1;
-                return 0;
-            }
-        }
-        ReadWriteLock mMeetingsLock = new ReentrantReadWriteLock();
-        EventInfo mMeetings[];
-        ReadWriteLock mExcludedCalendarsLock = new ReentrantReadWriteLock();
-        private Set<String> mExcludedCalendars;
+        CalendarHelper mCalendarHelper = new CalendarHelper(this, getApplicationContext());
 
         class BatteryInfo {
             private final int mStatus;
@@ -412,7 +377,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         float mCalendarOffset;
         float mLineHeight;
 
-        private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
         long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
@@ -432,7 +396,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                         break;
 
                     case MSG_LOAD_MEETINGS:
-                        restartLoadMeetingTask();
+                        mCalendarHelper.restartLoadMeetingTask();
                         break;
                 }
             }
@@ -529,7 +493,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             mUpdateHandler.removeMessages(MSG_UPDATE_TIME);
             mUpdateHandler.removeMessages(MSG_LOAD_MEETINGS);
-            cancelLoadMeetingTask();
+            mCalendarHelper.cancelLoadMeetingTask();
             super.onDestroy();
         }
 
@@ -812,29 +776,24 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
 
                 if (!isInAmbientMode() && !mMute) {
-                    mMeetingsLock.readLock().lock();
-                    try {
-                        if (mMeetings != null) {
-                            // do not show events that have already started, those are still in
-                            // the mMeetings list.
-                            int i = 0;
-                            while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
+                    CalendarHelper.EventInfo[] mMeetings = mCalendarHelper.getMeetings();
 
-                            if (i >= mMeetings.length) {
-                                mTextFields[eTF_CALENDAR_1].draw(canvas, "no meetings");
-                            } else {
-                                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                                mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
+                    // do not show events that have already started, those are still in
+                    // the mMeetings list.
+                    int i = 0;
+                    while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
 
-                                int additionalEvents = mMeetings.length - 1 - i;
-                                if (additionalEvents == 1)
-                                    mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional event");
-                                if (additionalEvents > 1)
-                                    mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional events");
-                            }
-                        }
-                    } finally {
-                        mMeetingsLock.readLock().unlock();
+                    if (i >= mMeetings.length) {
+                        mTextFields[eTF_CALENDAR_1].draw(canvas, "no meetings");
+                    } else {
+                        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+                        mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
+
+                        int additionalEvents = mMeetings.length - 1 - i;
+                        if (additionalEvents == 1)
+                            mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional event");
+                        if (additionalEvents > 1)
+                            mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional events");
                     }
                 }
             }
@@ -896,17 +855,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                     continue;
                 }
                 if (configKey.equals(CircaTextConsts.KEY_EXCLUDED_CALENDARS)) {
-                    mExcludedCalendarsLock.writeLock().lock();
-                    try {
-                        mExcludedCalendars.clear();
-                        String s[] = config.getString(CircaTextConsts.KEY_EXCLUDED_CALENDARS).split(",");
-                        for (int i = 0; i < s.length; i++) {
-                            mExcludedCalendars.add(s[i].trim());
-                        }
-                    } finally {
-                        mExcludedCalendarsLock.writeLock().unlock();
-                    }
-                    restartLoadMeetingTask();
+                    mCalendarHelper.setExcludedCalendars(config.getString(CircaTextConsts.KEY_EXCLUDED_CALENDARS));
                     uiUpdated = true;
                 } else {
                     int color = config.getInt(configKey);
@@ -979,104 +928,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
         }
 
-        // Meeting Loader Module
-        private void onMeetingsLoaded(Set<EventInfo> result) {
-            if (result != null) {
-                mMeetingsLock.writeLock().lock();
-                try {
-                    mMeetings = result.toArray(new EventInfo[result.size()]);
-                    Arrays.sort(mMeetings);
-                    invalidate();
-                } finally {
-                    mMeetingsLock.writeLock().unlock();
-                }
-            }
-        }
 
-        private void cancelLoadMeetingTask() {
-            if (mLoadMeetingsTask != null) {
-                mLoadMeetingsTask.cancel(true);
-            }
-        }
-
-        private void restartLoadMeetingTask() {
-            cancelLoadMeetingTask();
-            mLoadMeetingsTask = new LoadMeetingsTask();
-            mLoadMeetingsTask.execute();
-        }
-
-
-        /**
-         * Asynchronous task to load the meetings from the content provider and report the number of
-         * meetings back via {@link #onMeetingsLoaded}.
-         */
-        private class LoadMeetingsTask extends AsyncTask<Void, Void, Set<EventInfo>> {
-            public final String[] EVENT_FIELDS = {
-                    CalendarContract.Instances.TITLE,
-                    CalendarContract.Instances.BEGIN,
-                    CalendarContract.Instances.CALENDAR_ID,
-                    CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
-            };
-            private PowerManager.WakeLock mWakeLock;
-
-            @Override
-            protected Set<EventInfo> doInBackground(Void... voids) {
-                PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-                mWakeLock = powerManager.newWakeLock(
-                        PowerManager.PARTIAL_WAKE_LOCK, "CalendarWatchFaceWakeLock");
-                mWakeLock.acquire();
-
-                long begin = System.currentTimeMillis();
-                Uri.Builder builder =
-                        WearableCalendarContract.Instances.CONTENT_URI.buildUpon();
-                ContentUris.appendId(builder, begin);
-                ContentUris.appendId(builder, begin + DateUtils.DAY_IN_MILLIS);
-                final Cursor cursor = getContentResolver().query(builder.build(),
-                        EVENT_FIELDS, null, null, null);
-
-                Set<EventInfo> eis = new HashSet<>();
-                while (cursor.moveToNext()) {
-                    String cal_name = cursor.getString(3);
-
-                    boolean useThisCalendar = true;
-                    mExcludedCalendarsLock.readLock().lock();
-                    try {
-                        if (mExcludedCalendars.contains(cal_name))
-                            useThisCalendar = false;
-                    } finally {
-                        mExcludedCalendarsLock.readLock().unlock();
-                    }
-                    if (!useThisCalendar)
-                        continue;
-
-                    String title = cursor.getString(0);
-                    Date d = new Date(cursor.getLong(1));
-                    String cal_id = cursor.getString(2);
-                    EventInfo ei = new EventInfo(title, d);
-                    eis.add(ei);
-                }
-
-                cursor.close();
-                return eis;
-            }
-
-            @Override
-            protected void onPostExecute(Set<EventInfo> result) {
-                releaseWakeLock();
-                onMeetingsLoaded(result);
-            }
-
-            @Override
-            protected void onCancelled() {
-                releaseWakeLock();
-            }
-
-            private void releaseWakeLock() {
-                if (mWakeLock != null) {
-                    mWakeLock.release();
-                    mWakeLock = null;
-                }
-            }
-        }
     }
 }
