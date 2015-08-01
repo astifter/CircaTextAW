@@ -815,11 +815,14 @@ public class CircaTextService extends CanvasWatchFaceService {
                     mMeetingsLock.readLock().lock();
                     try {
                         if (mMeetings != null) {
-                            if (mMeetings.length == 0) {
+                            // do not show events that have already started, those are still in
+                            // the mMeetings list.
+                            int i = 0;
+                            while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
+
+                            if (i >= mMeetings.length) {
                                 mTextFields[eTF_CALENDAR_1].draw(canvas, "no meetings");
                             } else {
-                                int i = 0;
-                                while (mMeetings[i].DtStart.getTime() < now) i++;
                                 @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
                                 mTextFields[eTF_CALENDAR_1].draw(canvas, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
 
