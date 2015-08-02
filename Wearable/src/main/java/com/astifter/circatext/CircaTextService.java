@@ -108,7 +108,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         private static final int eTF_SECOND = eTF_COLON_2 + 1;
         private static final int eTF_SIZE = eTF_SECOND + 1;
         final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
-        private final CalendarHelper mCalendarHelper = new CalendarHelper(this, getApplicationContext());
+        private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
         private final DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
         private final ArrayList<DrawableText> mTextFieldsAnimated = new ArrayList<>();
@@ -329,7 +329,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_BATTERY].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
 
-            int width = getApplicationContext().getResources().getDisplayMetrics().widthPixels;
+            int width = resources.getDisplayMetrics().widthPixels;
             mTextFields[eTF_DATE].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_DAY_OF_WEEK].setCoord(mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_CALENDAR_1].setCoord(mXOffset, mTextFields[eTF_DAY_OF_WEEK], DrawableText.StackDirection.BELOW);
