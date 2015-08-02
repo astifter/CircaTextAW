@@ -44,30 +44,38 @@ public class CircaTextConfigListenerService extends WearableListenerService
     public void onMessageReceived(MessageEvent messageEvent) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived()");
 
-        if (!messageEvent.getPath().equals(CircaTextConsts.PATH_WITH_FEATURE)) {
-            return;
+        if (messageEvent.getPath().equals(CircaTextConsts.SEND_WEATHER_MESSAGE)) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): weather");
         }
-        byte[] rawData = messageEvent.getData();
-        // It's allowed that the message carries only some of the keys used in the config DataItem
-        // and skips the ones that we don't want to change.
-        DataMap configKeysToOverwrite = DataMap.fromByteArray(rawData);
 
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this, this, this);
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): built mGoogleApiClient");
-        }
-        if (!mGoogleApiClient.isConnected()) {
-            ConnectionResult connectionResult = mGoogleApiClient.blockingConnect(30, TimeUnit.SECONDS);
+        if (messageEvent.getPath().equals(CircaTextConsts.PATH_WITH_FEATURE)) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): config");
 
-            if (!connectionResult.isSuccess()) {
-                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): connection failed");
-                return;
-            } else {
-                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): connection sucessful");
+            byte[] rawData = messageEvent.getData();
+            // It's allowed that the message carries only some of the keys used in the config DataItem
+            // and skips the ones that we don't want to change.
+            DataMap configKeysToOverwrite = DataMap.fromByteArray(rawData);
+
+            if (mGoogleApiClient == null) {
+                mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this, this, this);
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "onMessageReceived(): built mGoogleApiClient");
             }
-        }
+            if (!mGoogleApiClient.isConnected()) {
+                ConnectionResult connectionResult = mGoogleApiClient.blockingConnect(30, TimeUnit.SECONDS);
 
-        CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
+                if (!connectionResult.isSuccess()) {
+                    if (Log.isLoggable(TAG, Log.DEBUG))
+                        Log.d(TAG, "onMessageReceived(): connection failed");
+                    return;
+                } else {
+                    if (Log.isLoggable(TAG, Log.DEBUG))
+                        Log.d(TAG, "onMessageReceived(): connection sucessful");
+                }
+            }
+
+            CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
+        }
     }
 
     @Override // GoogleApiClient.ConnectionCallbacks

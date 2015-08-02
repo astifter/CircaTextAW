@@ -116,23 +116,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         Date mDate;
         SimpleDateFormat mDayFormat;
         SimpleDateFormat mDateFormat;
-        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mReceiver.onReceive()");
-
-                if (Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()) ||
-                        Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())) {
-                    mCalendar.setTimeZone(TimeZone.getDefault());
-                    initFormats();
-                }
-                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction()) &&
-                        WearableCalendarContract.CONTENT_URI.equals(intent.getData())) {
-                    mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
-                }
-                invalidate();
-            }
-        };
         boolean mMute;
         boolean mShouldDrawColons;
         /**
@@ -163,6 +146,23 @@ public class CircaTextService extends CanvasWatchFaceService {
                         mCalendarHelper.restartLoadMeetingTask();
                         break;
                 }
+            }
+        };
+        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mReceiver.onReceive()");
+
+                if (Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()) ||
+                        Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())) {
+                    mCalendar.setTimeZone(TimeZone.getDefault());
+                    initFormats();
+                }
+                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction()) &&
+                        WearableCalendarContract.CONTENT_URI.equals(intent.getData())) {
+                    mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
+                }
+                invalidate();
             }
         };
         /**
@@ -359,6 +359,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         @Override // WatchFaceService.Engine
         public void onTimeTick() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick()");
+
+            Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
 
             super.onTimeTick();
             invalidate();
