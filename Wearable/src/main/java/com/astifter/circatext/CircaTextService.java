@@ -360,7 +360,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         public void onTimeTick() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick()");
 
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
+            //Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
 
             super.onTimeTick();
             invalidate();
