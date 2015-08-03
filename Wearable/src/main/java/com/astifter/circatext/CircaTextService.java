@@ -114,6 +114,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
         private Weather mWeather = null;
+        private Date    mWeatherRequested = null;
         private final DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
         private final ArrayList<DrawableText> mTextFieldsAnimated = new ArrayList<>();
         Calendar mCalendar;
@@ -206,7 +207,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_1] = new DrawableText(this, resources.getColor(R.color.digital_date));
             mTextFields[eTF_CALENDAR_2] = new DrawableText(this, resources.getColor(R.color.digital_date));
             mTextFields[eTF_BATTERY] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
-            mTextFields[eTF_WEATHER] = new DrawableText(this, resources.getColor(R.color.digital_colons));
+            mTextFields[eTF_WEATHER] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
             mTextFields[eTF_HOUR] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, DrawableText.BOLD_TYPEFACE);
             mTextFields[eTF_COLON_1] = new DrawableText(this, resources.getColor(R.color.digital_colons));
             mTextFields[eTF_MINUTE] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
@@ -344,7 +345,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2].setCoord(mXOffset, mTextFields[eTF_CALENDAR_1], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_CALENDAR_2].setMaxWidth(width - 2 * mXOffset);
             mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.ABOVE);
-            mTextFields[eTF_WEATHER].setCoord(mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.ABOVE);
+            mTextFields[eTF_WEATHER].setCoord(width - mXOffset, mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_HOUR].setCoord(mXOffset, mYOffset);
             mTextFields[eTF_COLON_1].setCoord(mTextFields[eTF_HOUR], mYOffset);
             mTextFields[eTF_MINUTE].setCoord(mTextFields[eTF_COLON_1], mYOffset);
@@ -368,7 +369,11 @@ public class CircaTextService extends CanvasWatchFaceService {
         public void onTimeTick() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick()");
 
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
+            long now = System.currentTimeMillis();
+            if (mWeatherRequested == null || (now - mWeatherRequested.getTime() > 2*60*60*1000)) {
+                mWeatherRequested = new Date(now);
+                Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
+            }
 
             super.onTimeTick();
             invalidate();
@@ -495,7 +500,11 @@ public class CircaTextService extends CanvasWatchFaceService {
                     mTextFields[eTF_BATTERY].draw(canvas, pctText);
                 }
                 if (mWeather != null) {
-                    String pctText = String.format("%2.1f (%s)", mWeather.temperature.getTemp(), mWeather.currentCondition.getCondition());
+                    long age = now - mWeather.time.getTime();
+                    float ageFloat = age / (60*1000);
+                    long last = now - mWeatherRequested.getTime();
+                    float lastFloat = last / (60*1000);
+                    String pctText = String.format("%2.1f|%s|a:%.0fm|u:%.0fm", mWeather.temperature.getTemp(), mWeather.currentCondition.getCondition(), ageFloat, lastFloat);
                     mTextFields[eTF_WEATHER].draw(canvas, pctText);
                 }
             }
