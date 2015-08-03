@@ -8,7 +8,7 @@
  * or write an email to
  * survivingwithandroid@gmail.com
  */
-package com.astifter.circatext;
+package com.astifter.circatextutils;
 
 import java.io.Serializable;
 

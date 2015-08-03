@@ -1,18 +1,23 @@
 /**
  * This is a tutorial source code
  * provided "as is" and without warranties.
- * <p>
+ * <p/>
  * For any question please visit the web site
  * http://www.survivingwithandroid.com
- * <p>
+ * <p/>
  * or write an email to
  * survivingwithandroid@gmail.com
  */
 package com.astifter.circatext;
 
+import com.astifter.circatextutils.Location;
+import com.astifter.circatextutils.Weather;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Date;
 
 /*
  * Copyright (C) 2013 Surviving with Android (http://www.survivingwithandroid.com)
@@ -68,13 +73,21 @@ public class JSONWeatherParser {
         weather.temperature.setTemp(getFloat("temp", mainObj));
 
         // Wind
-        JSONObject wObj = getObject("wind", jObj);
-        weather.wind.setSpeed(getFloat("speed", wObj));
-        weather.wind.setDeg(getFloat("deg", wObj));
+        try {
+            JSONObject wObj = getObject("wind", jObj);
+            weather.wind.setSpeed(getFloat("speed", wObj));
+            weather.wind.setDeg(getFloat("deg", wObj));
+        } catch (Exception e) {
+            weather.wind.setSpeed(0f);
+            weather.wind.setDeg(0f);
+        }
 
         // Clouds
         JSONObject cObj = getObject("clouds", jObj);
         weather.clouds.setPerc(getInt("all", cObj));
+
+        long dt = getLong("dt", jObj);
+        weather.time = new Date(dt*1000);
 
         return weather;
     }
@@ -94,5 +107,9 @@ public class JSONWeatherParser {
 
     private static int getInt(String tagName, JSONObject jObj) throws JSONException {
         return jObj.getInt(tagName);
+    }
+
+    private static long getLong(String tagName, JSONObject jObj) throws JSONException {
+        return jObj.getLong(tagName);
     }
 }

@@ -44,37 +44,39 @@ public class CircaTextConfigListenerService extends WearableListenerService
     public void onMessageReceived(MessageEvent messageEvent) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived()");
 
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this, this, this);
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "onMessageReceived(): built mGoogleApiClient");
+        }
+        if (!mGoogleApiClient.isConnected()) {
+            ConnectionResult connectionResult = mGoogleApiClient.blockingConnect(30, TimeUnit.SECONDS);
+
+            if (!connectionResult.isSuccess()) {
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "onMessageReceived(): connection failed");
+                return;
+            } else {
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "onMessageReceived(): connection sucessful");
+            }
+        }
+
+        byte[] rawData = messageEvent.getData();
+        // It's allowed that the message carries only some of the keys used in the config DataItem
+        // and skips the ones that we don't want to change.
+        DataMap configKeys = DataMap.fromByteArray(rawData);
+
         if (messageEvent.getPath().equals(CircaTextConsts.SEND_WEATHER_MESSAGE)) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): weather");
+
+            CircaTextUtil.putConfigDataItem(mGoogleApiClient, CircaTextConsts.SEND_WEATHER_MESSAGE, configKeys);
         }
 
         if (messageEvent.getPath().equals(CircaTextConsts.PATH_WITH_FEATURE)) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): config");
 
-            byte[] rawData = messageEvent.getData();
-            // It's allowed that the message carries only some of the keys used in the config DataItem
-            // and skips the ones that we don't want to change.
-            DataMap configKeysToOverwrite = DataMap.fromByteArray(rawData);
-
-            if (mGoogleApiClient == null) {
-                mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this, this, this);
-                if (Log.isLoggable(TAG, Log.DEBUG))
-                    Log.d(TAG, "onMessageReceived(): built mGoogleApiClient");
-            }
-            if (!mGoogleApiClient.isConnected()) {
-                ConnectionResult connectionResult = mGoogleApiClient.blockingConnect(30, TimeUnit.SECONDS);
-
-                if (!connectionResult.isSuccess()) {
-                    if (Log.isLoggable(TAG, Log.DEBUG))
-                        Log.d(TAG, "onMessageReceived(): connection failed");
-                    return;
-                } else {
-                    if (Log.isLoggable(TAG, Log.DEBUG))
-                        Log.d(TAG, "onMessageReceived(): connection sucessful");
-                }
-            }
-
-            CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
+            CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeys);
         }
     }
 

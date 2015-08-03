@@ -11,6 +11,8 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.astifter.circatextutils.CircaTextConsts;
+import com.astifter.circatextutils.Serializer;
+import com.astifter.circatextutils.Weather;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataMap;
@@ -23,6 +25,7 @@ import org.json.JSONException;
 
 public class CircaTextWeatherService extends WearableListenerService {
     private static final String TAG = "CircaTextWeatherService";
+
     private String mPeerId;
     private GoogleApiClient mGoogleApiClient;
     private Location city;
@@ -90,8 +93,8 @@ public class CircaTextWeatherService extends WearableListenerService {
         @Override
         protected Weather doInBackground(android.location.Location... params) {
             Weather weather = new Weather();
-            String data = ((new WeatherHttpClient()).getWeatherData(params[0]));
-
+            String data = (new WeatherHttpClient()).getWeatherData(params[0]);
+            if (data == null) return null;
             try {
                 weather = JSONWeatherParser.getWeather(data);
             } catch (JSONException e) {
@@ -103,33 +106,36 @@ public class CircaTextWeatherService extends WearableListenerService {
         @Override
         protected void onPostExecute(Weather weather) {
             super.onPostExecute(weather);
+            if (weather == null) return;
+
+            DataMap weatherData = new DataMap();
+            if (weather.location != null) {
+                weatherData.putString("city", weather.location.getCity() + "," + weather.location.getCountry());
+            }
+            weatherData.putFloat("temperature", weather.temperature.getTemp() - 273.15f);
+            weatherData.putString("condition", weather.currentCondition.getCondition());
+            weatherData.putString("detailedCondition", weather.currentCondition.getCondition());
+            try {
+                byte[] data = Serializer.serialize(weather);
+                weatherData.putByteArray("weather", data);
+            } catch (Exception e) {
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "onPostExecute(): " + e.toString());
+            }
 
             if (mGoogleApiClient == null)
                 mGoogleApiClient = new GoogleApiClient.Builder(this.context).addApi(Wearable.API).build();
             if (!mGoogleApiClient.isConnected())
                 mGoogleApiClient.connect();
 
-            DataMap weatherData = new DataMap();
-            weatherData.putString("city", weather.location.getCity() + "," + weather.location.getCountry());
-            weatherData.putFloat("temperature", weather.temperature.getTemp() - 273.15f);
-            weatherData.putString("condition", weather.currentCondition.getCondition());
-            weatherData.putString("detailedCondition", weather.currentCondition.getCondition());
-
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CircaTextConsts.SEND_WEATHER_MESSAGE, weatherData.toByteArray()).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
-                @Override
-                public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                    if (Log.isLoggable(TAG, Log.DEBUG))
-                        Log.d(TAG, "onMessageReceived(): " + sendMessageResult.toString());
-
-                    mGoogleApiClient.disconnect();
-                    mGoogleApiClient = null;
-                }
-            });
-
-            // hum.setText("" + weather.currentCondition.getHumidity() + "%");
-            // press.setText("" + weather.currentCondition.getPressure() + " hPa");
-            // windSpeed.setText("" + weather.wind.getSpeed() + " m/s");
-            // windDeg.setText("" + weather.wind.getDeg() + "°");
+            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CircaTextConsts.SEND_WEATHER_MESSAGE, weatherData.toByteArray())
+                    .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                        @Override
+                        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                            if (Log.isLoggable(TAG, Log.DEBUG))
+                                Log.d(TAG, "onMessageReceived(): " + sendMessageResult.toString());
+                        }
+                    });
         }
     }
 }

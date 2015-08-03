@@ -1,10 +1,10 @@
 /**
  * This is a tutorial source code
  * provided "as is" and without warranties.
- * <p>
+ * <p/>
  * For any question please visit the web site
  * http://www.survivingwithandroid.com
- * <p>
+ * <p/>
  * or write an email to
  * survivingwithandroid@gmail.com
  */
@@ -34,8 +34,7 @@ import java.net.URL;
 public class WeatherHttpClient {
 
     // api.openweathermap.org/data/2.5/weather?lat=35&lon=139
-    private static String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";
-    private static String IMG_URL = "http://api.openweathermap.org/img/w/";
+    private static String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?units=metric&";
 
     public String getWeatherData(android.location.Location location) {
         HttpURLConnection con = null;
@@ -49,6 +48,8 @@ public class WeatherHttpClient {
             con.setRequestMethod("GET");
             con.setDoInput(true);
             con.setDoOutput(true);
+            con.setUseCaches(false);
+            con.setConnectTimeout(30*1000);
             con.connect();
 
             // Let's read the response

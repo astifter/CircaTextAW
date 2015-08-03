@@ -112,16 +112,16 @@ public final class CircaTextUtil {
                     DataMap overwrittenConfig = new DataMap();
                     overwrittenConfig.putAll(currentConfig);
                     overwrittenConfig.putAll(configKeysToOverwrite);
-                    CircaTextUtil.putConfigDataItem(googleApiClient, overwrittenConfig);
+                    CircaTextUtil.putConfigDataItem(googleApiClient, CircaTextConsts.PATH_WITH_FEATURE, overwrittenConfig);
                 }
             }
         );
     }
 
-    public static void putConfigDataItem(GoogleApiClient googleApiClient, DataMap newConfig) {
+    public static void putConfigDataItem(GoogleApiClient googleApiClient, String path, DataMap newConfig) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "putConfigDataItem()");
 
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(CircaTextConsts.PATH_WITH_FEATURE);
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(path);
         DataMap configToPut = putDataMapRequest.getDataMap();
         configToPut.putAll(newConfig);
         Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest())
