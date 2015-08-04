@@ -108,8 +108,9 @@ public class CircaTextService extends CanvasWatchFaceService {
         private static final int eTF_MINUTE = eTF_COLON_1 + 1;
         private static final int eTF_COLON_2 = eTF_MINUTE + 1;
         private static final int eTF_SECOND = eTF_COLON_2 + 1;
-        private static final int eTF_WEATHER = eTF_SECOND + 1;
-        private static final int eTF_SIZE = eTF_WEATHER + 1;
+        private static final int eTF_WEATHER_TEMP = eTF_SECOND + 1;
+        private static final int eTF_WEATHER_DESC = eTF_WEATHER_TEMP + 1;
+        private static final int eTF_SIZE = eTF_WEATHER_DESC + 1;
         final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
@@ -207,7 +208,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_1] = new DrawableText(this, resources.getColor(R.color.digital_date));
             mTextFields[eTF_CALENDAR_2] = new DrawableText(this, resources.getColor(R.color.digital_date));
             mTextFields[eTF_BATTERY] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
-            mTextFields[eTF_WEATHER] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
+            mTextFields[eTF_WEATHER_TEMP] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.LEFT);
+            mTextFields[eTF_WEATHER_DESC] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
             mTextFields[eTF_HOUR] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, DrawableText.BOLD_TYPEFACE);
             mTextFields[eTF_COLON_1] = new DrawableText(this, resources.getColor(R.color.digital_colons));
             mTextFields[eTF_MINUTE] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
@@ -218,7 +220,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFieldsAnimated.add(mTextFields[eTF_COLON_2]);
             mTextFieldsAnimated.add(mTextFields[eTF_SECOND]);
             mTextFieldsAnimated.add(mTextFields[eTF_BATTERY]);
-            mTextFieldsAnimated.add(mTextFields[eTF_WEATHER]);
+            mTextFieldsAnimated.add(mTextFields[eTF_WEATHER_TEMP]);
+            mTextFieldsAnimated.add(mTextFields[eTF_WEATHER_DESC]);
 
             mCalendar = Calendar.getInstance();
             mDate = new Date();
@@ -335,7 +338,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_1].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_CALENDAR_2].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_BATTERY].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-            mTextFields[eTF_WEATHER].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
+            mTextFields[eTF_WEATHER_TEMP].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
+            mTextFields[eTF_WEATHER_DESC].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
 
             int width = resources.getDisplayMetrics().widthPixels;
             mTextFields[eTF_DATE].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.BELOW);
@@ -345,7 +349,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2].setCoord(mXOffset, mTextFields[eTF_CALENDAR_1], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_CALENDAR_2].setMaxWidth(width - 2 * mXOffset);
             mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.ABOVE);
-            mTextFields[eTF_WEATHER].setCoord(width - mXOffset, mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_WEATHER_TEMP].setCoord(mXOffset, mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_WEATHER_DESC].setCoord(width - mXOffset, mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_HOUR].setCoord(mXOffset, mYOffset);
             mTextFields[eTF_COLON_1].setCoord(mTextFields[eTF_HOUR], mYOffset);
             mTextFields[eTF_MINUTE].setCoord(mTextFields[eTF_COLON_1], mYOffset);
@@ -531,20 +536,13 @@ public class CircaTextService extends CanvasWatchFaceService {
                             mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional events");
                     }
 
-                    StringBuilder weatherString = new StringBuilder();
                     if (mWeather != null) {
-                        long age = now - mWeather.time.getTime();
+                        long age = now - mWeather.lastupdate.getTime();
                         float ageFloat = age / (60*1000);
-                        String pctText = String.format("%2.1f|%s|a:%.0fm", mWeather.temperature.getTemp(), mWeather.currentCondition.getCondition(), ageFloat);
-                        weatherString.append(pctText);
+                        String tempText = String.format("%2.1f(%.0fm)", mWeather.temperature.getTemp(), ageFloat);
+                        mTextFields[eTF_WEATHER_TEMP].draw(canvas, tempText);
+                        mTextFields[eTF_WEATHER_DESC].draw(canvas, mWeather.currentCondition.getCondition());
                     }
-                    if (mWeatherRequested != null) {
-                        long last = now - mWeatherRequested.getTime();
-                        float lastFloat = last / (60*1000);
-                        String pctText = String.format("|u:%.0fm", lastFloat);
-                        weatherString.append(pctText);
-                    }
-                    mTextFields[eTF_WEATHER].draw(canvas, weatherString.toString());
                 }
             }
         }
