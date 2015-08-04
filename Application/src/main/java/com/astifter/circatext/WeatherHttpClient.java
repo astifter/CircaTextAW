@@ -33,23 +33,16 @@ import java.net.URL;
  */
 public class WeatherHttpClient {
 
-    // api.openweathermap.org/data/2.5/weather?lat=35&lon=139
-    private static String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?units=metric&";
-
-    public String getWeatherData(android.location.Location location) {
+    public String getWeatherData(URL url) {
         HttpURLConnection con = null;
         InputStream is = null;
 
         try {
-            String lat = "lat=" + Double.toString(location.getLatitude());
-            String lon = "lon=" + Double.toString(location.getLongitude());
-
-            con = (HttpURLConnection) (new URL(BASE_URL + lat + "&" + lon)).openConnection();
+            con = (HttpURLConnection) (url).openConnection();
             con.setRequestMethod("GET");
             con.setDoInput(true);
             con.setDoOutput(true);
-            con.setUseCaches(false);
-            con.setConnectTimeout(30*1000);
+            con.setConnectTimeout(10*1000);
             con.connect();
 
             // Let's read the response

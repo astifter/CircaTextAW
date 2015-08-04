@@ -26,6 +26,8 @@ import com.google.android.gms.wearable.WearableListenerService;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,6 +36,10 @@ public class CircaTextWeatherService extends WearableListenerService {
 
     private String mPeerId;
     private GoogleApiClient mGoogleApiClient;
+
+    //private JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
+    private JSONWeatherParser weatherParser = new YahooJSONParser();
+
     private Location city;
     private String cityName;
 
@@ -103,11 +109,11 @@ public class CircaTextWeatherService extends WearableListenerService {
         if (messageEvent.getPath().equals(CircaTextConsts.REQUIRE_WEATHER_MESSAGE)) {
             getCity();
             JSONWeatherTask t = new JSONWeatherTask(this);
-            t.execute(city);
+            t.execute();
         }
     }
 
-    private class JSONWeatherTask extends AsyncTask<Location, Void, Weather> {
+    private class JSONWeatherTask extends AsyncTask<Void, Void, Weather> {
         private final Context context;
 
         public JSONWeatherTask(Context c) {
@@ -115,12 +121,16 @@ public class CircaTextWeatherService extends WearableListenerService {
         }
 
         @Override
-        protected Weather doInBackground(android.location.Location... params) {
-            Weather weather = new Weather();
-            String data = (new WeatherHttpClient()).getWeatherData(params[0]);
+        protected Weather doInBackground(Void... params) {
+            URL url = weatherParser.getURL(city, cityName);
+            if (url == null) return null;
+
+            String data = (new WeatherHttpClient()).getWeatherData(url);
             if (data == null) return null;
+
+            Weather weather = null;
             try {
-                weather = JSONWeatherParser.getWeather(data);
+                weather = weatherParser.getWeather(data);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -136,9 +146,9 @@ public class CircaTextWeatherService extends WearableListenerService {
             if (weather.location != null) {
                 weatherData.putString("city", weather.location.getCity() + "," + weather.location.getCountry());
             }
-            weatherData.putFloat("temperature", weather.temperature.getTemp() - 273.15f);
+            weatherData.putFloat("temperature", weather.temperature.getTemp());
             weatherData.putString("condition", weather.currentCondition.getCondition());
-            weatherData.putString("detailedCondition", weather.currentCondition.getCondition());
+            weatherData.putString("detailedCondition", weather.currentCondition.getDescr());
             try {
                 byte[] data = Serializer.serialize(weather);
                 weatherData.putByteArray("weather", data);
