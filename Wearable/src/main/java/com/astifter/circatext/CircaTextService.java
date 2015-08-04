@@ -531,7 +531,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                             mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional events");
                     }
 
-                    if (mWeather != null) {
+                    if (mWeather != null && mWeatherRequested != null) {
                         long age = now - mWeather.time.getTime();
                         float ageFloat = age / (60*1000);
                         long last = now - mWeatherRequested.getTime();

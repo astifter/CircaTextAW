@@ -126,31 +126,39 @@ public class CalendarHelper {
                     WearableCalendarContract.Instances.CONTENT_URI.buildUpon();
             ContentUris.appendId(builder, begin);
             ContentUris.appendId(builder, begin + DateUtils.DAY_IN_MILLIS);
-            final Cursor cursor = context.getContentResolver().query(builder.build(), EVENT_FIELDS, null, null, null);
 
+            Cursor cursor = null;
             Set<EventInfo> eis = new HashSet<>();
-            while (cursor.moveToNext()) {
-                String cal_name = cursor.getString(3);
+            try {
+                cursor = context.getContentResolver().query(builder.build(), EVENT_FIELDS, null, null, null);
 
-                boolean useThisCalendar = true;
-                mExcludedCalendarsLock.readLock().lock();
-                try {
-                    if (mExcludedCalendars.contains(cal_name))
-                        useThisCalendar = false;
-                } finally {
-                    mExcludedCalendarsLock.readLock().unlock();
+                while (cursor.moveToNext()) {
+                    String cal_name = cursor.getString(3);
+
+                    boolean useThisCalendar = true;
+                    mExcludedCalendarsLock.readLock().lock();
+                    try {
+                        if (mExcludedCalendars.contains(cal_name))
+                            useThisCalendar = false;
+                    } finally {
+                        mExcludedCalendarsLock.readLock().unlock();
+                    }
+                    if (!useThisCalendar)
+                        continue;
+
+                    String title = cursor.getString(0);
+                    Date d = new Date(cursor.getLong(1));
+                    //String cal_id = cursor.getString(2);
+                    EventInfo ei = new EventInfo(title, d);
+                    eis.add(ei);
                 }
-                if (!useThisCalendar)
-                    continue;
-
-                String title = cursor.getString(0);
-                Date d = new Date(cursor.getLong(1));
-                //String cal_id = cursor.getString(2);
-                EventInfo ei = new EventInfo(title, d);
-                eis.add(ei);
+            } catch (Throwable t) {
+                // log
+            } finally {
+                if (cursor != null)
+                    cursor.close();
             }
 
-            cursor.close();
             return eis;
         }
 
