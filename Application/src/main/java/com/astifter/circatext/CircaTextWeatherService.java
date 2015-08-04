@@ -1,7 +1,9 @@
 package com.astifter.circatext;
 
 import android.content.Context;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -23,12 +25,32 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import org.json.JSONException;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 public class CircaTextWeatherService extends WearableListenerService {
     private static final String TAG = "CircaTextWeatherService";
 
     private String mPeerId;
     private GoogleApiClient mGoogleApiClient;
     private Location city;
+    private String cityName;
+
+    private String getCityName(Location loc) {
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> listAddresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+            if (null != listAddresses && listAddresses.size() > 0) {
+                Address address = listAddresses.get(0);
+                String returnValue = address.getLocality() + "," + address.getCountryCode();
+                return returnValue;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     private LocationListener locListener = new LocationListener() {
         @Override
@@ -46,6 +68,7 @@ public class CircaTextWeatherService extends WearableListenerService {
         @Override
         public void onLocationChanged(android.location.Location location) {
             city = location;
+            cityName = getCityName(city);
 
             LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             locManager.removeUpdates(locListener);
@@ -63,6 +86,7 @@ public class CircaTextWeatherService extends WearableListenerService {
         String provider = locManager.getBestProvider(searchProviderCriteria, true);
 
         city = locManager.getLastKnownLocation(provider);
+        cityName = getCityName(city);
 
         if (city == null || (SystemClock.elapsedRealtime() - city.getTime()) > 10000) {
             locManager.requestSingleUpdate(provider, locListener, null);
