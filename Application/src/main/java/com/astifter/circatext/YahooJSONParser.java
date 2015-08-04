@@ -47,12 +47,10 @@ public class YahooJSONParser implements JSONWeatherParser {
         JSONObject jObj = new JSONObject(data);
 
         JSONObject queryObj = getObject("query", jObj);
-        String dt = getString("created", queryObj);
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date date = sdf.parse(dt);
-            weather.time = date;
+            weather.time = sdf.parse(getString("created", queryObj));
         } catch (Throwable t) {
             weather.time = null;
         }
@@ -65,6 +63,14 @@ public class YahooJSONParser implements JSONWeatherParser {
         float temperatureF = getFloat("temp", condition);
         float temperatureC = (temperatureF - 32f)/1.8f;
         weather.temperature.setTemp(temperatureC);
+        try {
+            // Tue, 04 Aug 2015 10:59 pm CEST
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm a zzz");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            weather.lastupdate = sdf.parse(getString("date", condition));
+        } catch (Throwable t) {
+            weather.lastupdate = null;
+        }
 
         return weather;
     }

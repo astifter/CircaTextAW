@@ -37,6 +37,7 @@ public class Weather implements Serializable {
     public Snow snow = new Snow();
     public Clouds clouds = new Clouds();
     public Date time;
+    public Date lastupdate;
 
     public class CurrentCondition implements Serializable {
         private int weatherId;

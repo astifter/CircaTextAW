@@ -43,6 +43,7 @@ public class WeatherHttpClient {
             con.setDoInput(true);
             con.setDoOutput(true);
             con.setConnectTimeout(10*1000);
+            con.setUseCaches(false);
             con.connect();
 
             // Let's read the response
