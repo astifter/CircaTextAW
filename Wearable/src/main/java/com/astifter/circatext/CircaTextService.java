@@ -230,6 +230,14 @@ public class CircaTextService extends CanvasWatchFaceService {
             mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
         }
 
+        @Override
+        public void onPeekCardPositionUpdate (Rect rect) {
+            // invalidate display in ambient mode when a card shows to hide date
+            if (isInAmbientMode() && !getPeekCardPosition().isEmpty()) {
+                invalidate();
+            }
+        }
+
         @Override // WatchFaceService.Engine
         public void onDestroy() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDestroy()");
