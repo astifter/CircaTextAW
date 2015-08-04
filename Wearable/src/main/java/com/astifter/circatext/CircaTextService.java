@@ -370,7 +370,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick()");
 
             long now = System.currentTimeMillis();
-            if (mWeatherRequested == null || (now - mWeatherRequested.getTime() > 2*60*60*1000)) {
+            if (mWeatherRequested == null || (now - mWeatherRequested.getTime() > 15*60*1000)) {
                 mWeatherRequested = new Date(now);
                 Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
             }
@@ -499,14 +499,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                     String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
                     mTextFields[eTF_BATTERY].draw(canvas, pctText);
                 }
-                if (mWeather != null) {
-                    long age = now - mWeather.time.getTime();
-                    float ageFloat = age / (60*1000);
-                    long last = now - mWeatherRequested.getTime();
-                    float lastFloat = last / (60*1000);
-                    String pctText = String.format("%2.1f|%s|a:%.0fm|u:%.0fm", mWeather.temperature.getTemp(), mWeather.currentCondition.getCondition(), ageFloat, lastFloat);
-                    mTextFields[eTF_WEATHER].draw(canvas, pctText);
-                }
             }
 
             // Only render the day of week and date if there is no peek card, so they do not bleed
@@ -537,6 +529,15 @@ public class CircaTextService extends CanvasWatchFaceService {
                             mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional event");
                         if (additionalEvents > 1)
                             mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional events");
+                    }
+
+                    if (mWeather != null) {
+                        long age = now - mWeather.time.getTime();
+                        float ageFloat = age / (60*1000);
+                        long last = now - mWeatherRequested.getTime();
+                        float lastFloat = last / (60*1000);
+                        String pctText = String.format("%2.1f|%s|a:%.0fm|u:%.0fm", mWeather.temperature.getTemp(), mWeather.currentCondition.getCondition(), ageFloat, lastFloat);
+                        mTextFields[eTF_WEATHER].draw(canvas, pctText);
                     }
                 }
             }
