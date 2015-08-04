@@ -531,14 +531,20 @@ public class CircaTextService extends CanvasWatchFaceService {
                             mTextFields[eTF_CALENDAR_2].draw(canvas, "+" + additionalEvents + " additional events");
                     }
 
-                    if (mWeather != null && mWeatherRequested != null) {
+                    StringBuilder weatherString = new StringBuilder();
+                    if (mWeather != null) {
                         long age = now - mWeather.time.getTime();
                         float ageFloat = age / (60*1000);
+                        String pctText = String.format("%2.1f|%s|a:%.0fm", mWeather.temperature.getTemp(), mWeather.currentCondition.getCondition(), ageFloat);
+                        weatherString.append(pctText);
+                    }
+                    if (mWeatherRequested != null) {
                         long last = now - mWeatherRequested.getTime();
                         float lastFloat = last / (60*1000);
-                        String pctText = String.format("%2.1f|%s|a:%.0fm|u:%.0fm", mWeather.temperature.getTemp(), mWeather.currentCondition.getCondition(), ageFloat, lastFloat);
-                        mTextFields[eTF_WEATHER].draw(canvas, pctText);
+                        String pctText = String.format("|u:%.0fm", lastFloat);
+                        weatherString.append(pctText);
                     }
+                    mTextFields[eTF_WEATHER].draw(canvas, weatherString.toString());
                 }
             }
         }
