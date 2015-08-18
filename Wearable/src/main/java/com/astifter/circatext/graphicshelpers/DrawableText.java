@@ -21,6 +21,7 @@ public class DrawableText {
     private float maxWidth = -1;
     private int color;
     private float drawnSize;
+
     public DrawableText(CanvasWatchFaceService.Engine engine) {
         this.engine = engine;
         this.paint = new Paint();

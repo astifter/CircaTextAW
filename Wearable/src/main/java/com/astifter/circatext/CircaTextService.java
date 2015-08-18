@@ -172,6 +172,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 invalidate();
             }
         };
+
         /**
          * Unregistering an unregistered receiver throws an exception. Keep track of the
          * registration state to prevent that.
@@ -344,6 +345,11 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             for (DrawableText t : mTextFields) {
                 t.setTextSize(textSize);
+            }
+            if (isInAmbientMode()) {
+                for (DrawableText t : mHoursAnimated) {
+                    t.setTextSize(textSize*textScaleFactor);
+                }
             }
             mTextFields[eTF_DAY_OF_WEEK].setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
             mTextFields[eTF_DATE].setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
