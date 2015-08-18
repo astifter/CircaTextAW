@@ -392,6 +392,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             invalidate();
         }
 
+        float textScaleFactor = 1.6f;
+
         @Override // WatchFaceService.Engine
         public void onAmbientModeChanged(boolean inAmbientMode) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onAmbientModeChanged()");
@@ -408,8 +410,15 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
             if (!inAmbientMode) {
                 for (DrawableText dt : mTextFieldsAnimated) {
-                    createAnimation(dt);
+                    createIntAnimation(dt, "alpha", 0, 255);
                 }
+                createTextSizeAnimation(mTextFields[eTF_HOUR], 1/ textScaleFactor);
+                createTextSizeAnimation(mTextFields[eTF_COLON_1], 1/ textScaleFactor);
+                createTextSizeAnimation(mTextFields[eTF_MINUTE], 1/ textScaleFactor);
+            } else {
+                createTextSizeAnimation(mTextFields[eTF_HOUR], textScaleFactor);
+                createTextSizeAnimation(mTextFields[eTF_COLON_1], textScaleFactor);
+                createTextSizeAnimation(mTextFields[eTF_MINUTE], textScaleFactor);
             }
 
             // Whether the timer should be running depends on whether we're in ambient mode (as well
@@ -417,8 +426,23 @@ public class CircaTextService extends CanvasWatchFaceService {
             updateTimer();
         }
 
-        private void createAnimation(DrawableText t) {
-            ValueAnimator anim = ObjectAnimator.ofInt(t, "alpha", 0, 255);
+        private void createIntAnimation(DrawableText t, String attribute, int start, int stop) {
+            ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
+            startAnimation(anim);
+        }
+
+        private void createTextSizeAnimation(DrawableText t, float factor) {
+            float absStart = t.getTextSize();
+            float absStop = absStart * factor;
+            createFloatAnimation(t, "textSize", absStart, absStop);
+        }
+
+        private void createFloatAnimation(DrawableText t, String attribute, float start, float stop) {
+            ValueAnimator anim = ObjectAnimator.ofFloat(t, attribute, start, stop);
+            startAnimation(anim);
+        }
+
+        private void startAnimation(ValueAnimator anim) {
             anim.setDuration(500);
             anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override

@@ -189,6 +189,10 @@ public class DrawableText {
         this.maxWidth = maxWidth;
     }
 
+    public float getTextSize() {
+        return this.paint.getTextSize();
+    }
+
     public class StackDirection {
         public static final int NONE = -1;
         public static final int HORIZONTAL = 0;
