@@ -118,6 +118,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         private Date    mWeatherRequested = null;
         private final DrawableText[] mTextFields = new DrawableText[eTF_SIZE];
         private final ArrayList<DrawableText> mTextFieldsAnimated = new ArrayList<>();
+        private final ArrayList<DrawableText> mHoursAnimated = new ArrayList<>();
         Calendar mCalendar;
         Date mDate;
         SimpleDateFormat mDayFormat;
@@ -222,6 +223,9 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFieldsAnimated.add(mTextFields[eTF_BATTERY]);
             mTextFieldsAnimated.add(mTextFields[eTF_WEATHER_TEMP]);
             mTextFieldsAnimated.add(mTextFields[eTF_WEATHER_DESC]);
+            mHoursAnimated.add(mTextFields[eTF_HOUR]);
+            mHoursAnimated.add(mTextFields[eTF_COLON_1]);
+            mHoursAnimated.add(mTextFields[eTF_MINUTE]);
 
             mCalendar = Calendar.getInstance();
             mDate = new Date();
@@ -412,13 +416,13 @@ public class CircaTextService extends CanvasWatchFaceService {
                 for (DrawableText dt : mTextFieldsAnimated) {
                     createIntAnimation(dt, "alpha", 0, 255);
                 }
-                createTextSizeAnimation(mTextFields[eTF_HOUR], 1/ textScaleFactor);
-                createTextSizeAnimation(mTextFields[eTF_COLON_1], 1/ textScaleFactor);
-                createTextSizeAnimation(mTextFields[eTF_MINUTE], 1/ textScaleFactor);
+                for (DrawableText dt : mHoursAnimated) {
+                    createTextSizeAnimation(dt, 1 / textScaleFactor);
+                }
             } else {
-                createTextSizeAnimation(mTextFields[eTF_HOUR], textScaleFactor);
-                createTextSizeAnimation(mTextFields[eTF_COLON_1], textScaleFactor);
-                createTextSizeAnimation(mTextFields[eTF_MINUTE], textScaleFactor);
+                for (DrawableText dt : mHoursAnimated) {
+                    createTextSizeAnimation(dt, textScaleFactor);
+                }
             }
 
             // Whether the timer should be running depends on whether we're in ambient mode (as well
