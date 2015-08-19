@@ -372,7 +372,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2].setMaxWidth(width - 2 * mXOffset);
             mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.ABOVE);
             mTextFields[eTF_WEATHER_TEMP].setCoord(mXOffset, mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
-            mTextFields[eTF_WEATHER_AGE].setCoord(mTextFields[eTF_WEATHER_TEMP], mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_WEATHER_AGE].setCoord(mTextFields[eTF_WEATHER_TEMP], mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.NEXTTO);
             mTextFields[eTF_WEATHER_DESC].setCoord(width - mXOffset, mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_HOUR].setCoord(mXOffset, mYOffset);
             mTextFields[eTF_COLON_1].setCoord(mTextFields[eTF_HOUR], mYOffset);
@@ -587,7 +587,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                         long age = now - mWeather.lastupdate.getTime();
                         float ageFloat = age / (60*1000);
                         String tempText = String.format("%2.1f", mWeather.temperature.getTemp());
-                        String ageText = String.format("%.0fm", ageFloat);
+                        String ageText = String.format("(%.0fm)", ageFloat);
                         mTextFields[eTF_WEATHER_TEMP].draw(canvas, tempText);
                         mTextFields[eTF_WEATHER_AGE].draw(canvas, ageText);
                         mTextFields[eTF_WEATHER_DESC].draw(canvas, mWeather.currentCondition.getCondition());

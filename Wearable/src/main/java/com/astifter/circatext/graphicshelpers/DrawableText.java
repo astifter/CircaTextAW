@@ -62,6 +62,9 @@ public class DrawableText {
             } else if (this.stackDirection.isRightSet()) {
                 // this is currently not supported
             }
+            if (this.stackDirection.isSet(StackDirection.NEXTTO)) {
+                this.y = this.stackX.get().getY();
+            }
         }
         if (this.stackY != null && this.stackY.get() != null) {
             if (this.stackDirection.isBelowSet()) {
@@ -113,6 +116,10 @@ public class DrawableText {
         //    canvas.drawLine(x, y + d, x + ds, y + d, this.paint);
         //    canvas.drawLine(x, y + a, x, y + d, this.paint);
         //}
+    }
+
+    private float getY() {
+        return this.y;
     }
 
     private float getRight() {
@@ -209,6 +216,7 @@ public class DrawableText {
         public static final int RIGHT = 2;
         public static final int ABOVE = 4;
         public static final int BELOW = 8;
+        public static final int NEXTTO = 16;
 
         private final int dir;
 
@@ -220,7 +228,7 @@ public class DrawableText {
             return dir;
         }
 
-        private boolean isSet(int d) {
+        public boolean isSet(int d) {
             int setDirection = (this.dir & d);
             boolean returnValue = setDirection == d;
             return returnValue;
