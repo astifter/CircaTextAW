@@ -14,7 +14,8 @@ public class DrawableText {
     public static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
     private final CanvasWatchFaceService.Engine engine;
     private final Paint paint;
-    WeakReference<DrawableText> stack;
+    WeakReference<DrawableText> stackX;
+    WeakReference<DrawableText> stackY;
     StackDirection stackDirection;
     private float x;
     private float y;
@@ -53,19 +54,22 @@ public class DrawableText {
     }
 
     public void draw(Canvas canvas, String text) {
+        this.drawnSize = paint.measureText(text);
+
         float x = this.x;
         float y = this.y;
-        if (this.stack != null && this.stack.get() != null) {
-            switch (this.stackDirection.direction()) {
-                case StackDirection.HORIZONTAL:
-                    x = this.stack.get().getRight();
-                    break;
-                case StackDirection.BELOW:
-                    y = this.stack.get().getBottom() + -this.paint.ascent();
-                    break;
-                case StackDirection.ABOVE:
-                    y = this.stack.get().getTop() - this.paint.descent();
-                    break;
+        if (this.stackX != null && this.stackX.get() != null) {
+            if (this.stackDirection.isLeftSet()) {
+                x = this.stackX.get().getRight();
+            } else if (this.stackDirection.isRightSet()) {
+                // this is currently not supported
+            }
+        }
+        if (this.stackY != null && this.stackY.get() != null) {
+            if (this.stackDirection.isBelowSet()) {
+                y = this.stackY.get().getBottom() + -this.paint.ascent();
+            } else if (this.stackDirection.isAboveSet()) {
+                y = this.stackY.get().getTop() - this.paint.descent();
             }
         }
 
@@ -81,7 +85,6 @@ public class DrawableText {
          * - Adjust the actually used size (drawnSize) to the maxWidth.
          */
         boolean hasSavedState = false;
-        this.drawnSize = paint.measureText(text);
         if (this.maxWidth != -1 && this.drawnSize > this.maxWidth) {
             Paint.FontMetrics fm = this.paint.getFontMetrics();
             float ellipsisSize = paint.measureText("...");
@@ -113,8 +116,8 @@ public class DrawableText {
     }
 
     private float getRight() {
-        if (this.stack != null && this.stack.get() != null) {
-            return this.stack.get().getRight() + this.drawnSize;
+        if (this.stackX != null && this.stackX.get() != null) {
+            return this.stackX.get().getRight() + this.drawnSize;
         } else {
             return this.x + this.drawnSize;
         }
@@ -126,16 +129,16 @@ public class DrawableText {
     }
 
     private float getBottom() {
-        if (this.stack != null && this.stack.get() != null) {
-            return this.stack.get().getBottom() + this.getHeigth();
+        if (this.stackY != null && this.stackY.get() != null) {
+            return this.stackY.get().getBottom() + this.getHeigth();
         } else {
             return this.y + this.paint.descent();
         }
     }
 
     private float getTop() {
-        if (this.stack != null && this.stack.get() != null) {
-            return this.stack.get().getTop() - this.getHeigth();
+        if (this.stackY != null && this.stackY.get() != null) {
+            return this.stackY.get().getTop() - this.getHeigth();
         } else {
             return this.y + this.paint.ascent();
         }
@@ -148,13 +151,13 @@ public class DrawableText {
 
     public void setCoord(DrawableText t, float y) {
         this.y = y;
-        this.stack = new WeakReference<>(t);
-        this.stackDirection = new StackDirection(StackDirection.HORIZONTAL);
+        this.stackX = new WeakReference<>(t);
+        this.stackDirection = new StackDirection(StackDirection.LEFT);
     }
 
     public void setCoord(float x, DrawableText t, int d) {
         this.x = x;
-        this.stack = new WeakReference<>(t);
+        this.stackY = new WeakReference<>(t);
         this.stackDirection = new StackDirection(d);
     }
 
@@ -196,9 +199,10 @@ public class DrawableText {
 
     public class StackDirection {
         public static final int NONE = -1;
-        public static final int HORIZONTAL = 0;
-        public static final int ABOVE = 1;
-        public static final int BELOW = 2;
+        public static final int LEFT = 1;
+        public static final int RIGHT = 2;
+        public static final int ABOVE = 4;
+        public static final int BELOW = 8;
 
         private final int dir;
 
@@ -208,6 +212,28 @@ public class DrawableText {
 
         protected int direction() {
             return dir;
+        }
+
+        private boolean isSet(int d) {
+            int setDirection = (this.dir & d);
+            boolean returnValue = setDirection == d;
+            return returnValue;
+        }
+
+        public boolean isLeftSet() {
+            return isSet(LEFT);
+        }
+
+        public boolean isRightSet() {
+            return isSet(RIGHT);
+        }
+
+        public boolean isBelowSet() {
+            return isSet(BELOW);
+        }
+
+        public boolean isAboveSet() {
+            return isSet(ABOVE);
         }
     }
 }
