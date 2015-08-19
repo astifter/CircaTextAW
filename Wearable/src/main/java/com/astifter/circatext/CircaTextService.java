@@ -109,7 +109,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         private static final int eTF_COLON_2 = eTF_MINUTE + 1;
         private static final int eTF_SECOND = eTF_COLON_2 + 1;
         private static final int eTF_WEATHER_TEMP = eTF_SECOND + 1;
-        private static final int eTF_WEATHER_DESC = eTF_WEATHER_TEMP + 1;
+        private static final int eTF_WEATHER_AGE = eTF_WEATHER_TEMP + 1;
+        private static final int eTF_WEATHER_DESC = eTF_WEATHER_AGE + 1;
         private static final int eTF_SIZE = eTF_WEATHER_DESC + 1;
         final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
@@ -211,6 +212,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2] = new DrawableText(this, resources.getColor(R.color.digital_date));
             mTextFields[eTF_BATTERY] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
             mTextFields[eTF_WEATHER_TEMP] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.LEFT);
+            mTextFields[eTF_WEATHER_AGE] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.LEFT);
             mTextFields[eTF_WEATHER_DESC] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
             mTextFields[eTF_HOUR] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, DrawableText.BOLD_TYPEFACE);
             mTextFields[eTF_COLON_1] = new DrawableText(this, resources.getColor(R.color.digital_colons));
@@ -223,6 +225,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFieldsAnimated.add(mTextFields[eTF_SECOND]);
             mTextFieldsAnimated.add(mTextFields[eTF_BATTERY]);
             mTextFieldsAnimated.add(mTextFields[eTF_WEATHER_TEMP]);
+            mTextFieldsAnimated.add(mTextFields[eTF_WEATHER_AGE]);
             mTextFieldsAnimated.add(mTextFields[eTF_WEATHER_DESC]);
             mHoursAnimated.add(mTextFields[eTF_HOUR]);
             mHoursAnimated.add(mTextFields[eTF_COLON_1]);
@@ -357,6 +360,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_BATTERY].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTextFields[eTF_WEATHER_TEMP].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
+            mTextFields[eTF_WEATHER_AGE].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size)/1.5f);
             mTextFields[eTF_WEATHER_DESC].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
 
             int width = resources.getDisplayMetrics().widthPixels;
@@ -368,6 +372,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_CALENDAR_2].setMaxWidth(width - 2 * mXOffset);
             mTextFields[eTF_BATTERY].setCoord(width - mXOffset, mTextFields[eTF_HOUR], DrawableText.StackDirection.ABOVE);
             mTextFields[eTF_WEATHER_TEMP].setCoord(mXOffset, mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
+            mTextFields[eTF_WEATHER_AGE].setCoord(mTextFields[eTF_WEATHER_TEMP], mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_WEATHER_DESC].setCoord(width - mXOffset, mTextFields[eTF_CALENDAR_2], DrawableText.StackDirection.BELOW);
             mTextFields[eTF_HOUR].setCoord(mXOffset, mYOffset);
             mTextFields[eTF_COLON_1].setCoord(mTextFields[eTF_HOUR], mYOffset);
@@ -581,8 +586,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                     if (mWeather != null) {
                         long age = now - mWeather.lastupdate.getTime();
                         float ageFloat = age / (60*1000);
-                        String tempText = String.format("%2.1f(%.0fm)", mWeather.temperature.getTemp(), ageFloat);
+                        String tempText = String.format("%2.1f", mWeather.temperature.getTemp());
+                        String ageText = String.format("%.0fm", ageFloat);
                         mTextFields[eTF_WEATHER_TEMP].draw(canvas, tempText);
+                        mTextFields[eTF_WEATHER_AGE].draw(canvas, ageText);
                         mTextFields[eTF_WEATHER_DESC].draw(canvas, mWeather.currentCondition.getCondition());
                     }
                 }

@@ -56,22 +56,22 @@ public class DrawableText {
     public void draw(Canvas canvas, String text) {
         this.drawnSize = paint.measureText(text);
 
-        float x = this.x;
-        float y = this.y;
         if (this.stackX != null && this.stackX.get() != null) {
             if (this.stackDirection.isLeftSet()) {
-                x = this.stackX.get().getRight();
+                this.x = this.stackX.get().getRight();
             } else if (this.stackDirection.isRightSet()) {
                 // this is currently not supported
             }
         }
         if (this.stackY != null && this.stackY.get() != null) {
             if (this.stackDirection.isBelowSet()) {
-                y = this.stackY.get().getBottom() + -this.paint.ascent();
+                this.y = this.stackY.get().getBottom() + -this.paint.ascent();
             } else if (this.stackDirection.isAboveSet()) {
-                y = this.stackY.get().getTop() - this.paint.descent();
+                this.y = this.stackY.get().getTop() - this.paint.descent();
             }
         }
+        float x = this.x;
+        float y = this.y;
 
         /**
          * Some comments are in order:
@@ -159,6 +159,12 @@ public class DrawableText {
         this.x = x;
         this.stackY = new WeakReference<>(t);
         this.stackDirection = new StackDirection(d);
+    }
+
+    public void setCoord(DrawableText tx, DrawableText ty, int d) {
+        this.stackX = new WeakReference<>(tx);
+        this.stackY = new WeakReference<>(ty);
+        this.stackDirection = new StackDirection(d | StackDirection.LEFT);
     }
 
     public void setTextSize(float s) {
