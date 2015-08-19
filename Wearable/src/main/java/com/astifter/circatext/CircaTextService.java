@@ -402,7 +402,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             invalidate();
         }
 
-        float textScaleFactor = 1.6f;
+        float textScaleFactor = 1.5f;
 
         @Override // WatchFaceService.Engine
         public void onAmbientModeChanged(boolean inAmbientMode) {
