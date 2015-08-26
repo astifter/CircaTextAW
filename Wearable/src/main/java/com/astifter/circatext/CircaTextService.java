@@ -348,6 +348,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             for (DrawableText t : mTextFields) {
                 t.setTextSize(textSize);
+                t.setDefaultTextSize(textSize);
             }
             if (isInAmbientMode()) {
                 for (DrawableText t : mHoursAnimated) {
@@ -428,11 +429,11 @@ public class CircaTextService extends CanvasWatchFaceService {
                     createIntAnimation(dt, "alpha", 0, 255);
                 }
                 for (DrawableText dt : mHoursAnimated) {
-                    createTextSizeAnimation(dt, 1 / textScaleFactor);
+                    createTextSizeAnimation(dt, dt.getDefaultTextSize() * textScaleFactor, dt.getDefaultTextSize());
                 }
             } else {
                 for (DrawableText dt : mHoursAnimated) {
-                    createTextSizeAnimation(dt, textScaleFactor);
+                    createTextSizeAnimation(dt, dt.getDefaultTextSize(), dt.getDefaultTextSize() * textScaleFactor);
                 }
             }
 
@@ -446,10 +447,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             startAnimation(anim);
         }
 
-        private void createTextSizeAnimation(DrawableText t, float factor) {
-            float absStart = t.getTextSize();
-            float absStop = absStart * factor;
-            createFloatAnimation(t, "textSize", absStart, absStop);
+        private void createTextSizeAnimation(DrawableText t, float from, float to) {
+            createFloatAnimation(t, "textSize", from, to);
         }
 
         private void createFloatAnimation(DrawableText t, String attribute, float start, float stop) {

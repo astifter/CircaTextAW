@@ -22,6 +22,7 @@ public class DrawableText {
     private float maxWidth = -1;
     private int color;
     private float drawnSize;
+    private float defaultTextSize;
 
     public DrawableText(CanvasWatchFaceService.Engine engine) {
         this.engine = engine;
@@ -178,6 +179,10 @@ public class DrawableText {
         this.paint.setTextSize(s);
     }
 
+    public void setDefaultTextSize(float s) {
+        this.defaultTextSize = s;
+    }
+
     public void setAmbientMode(boolean inAmbientMode) {
         this.paint.setAntiAlias(!inAmbientMode);
         if (inAmbientMode) {
@@ -208,6 +213,10 @@ public class DrawableText {
 
     public float getTextSize() {
         return this.paint.getTextSize();
+    }
+
+    public float getDefaultTextSize() {
+        return this.defaultTextSize;
     }
 
     public class StackDirection {
