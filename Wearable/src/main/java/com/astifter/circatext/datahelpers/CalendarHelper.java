@@ -111,6 +111,7 @@ public class CalendarHelper {
                 CalendarContract.Instances.BEGIN,
                 CalendarContract.Instances.CALENDAR_ID,
                 CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
+                CalendarContract.Instances.DESCRIPTION,
         };
         private PowerManager.WakeLock mWakeLock;
 
@@ -144,6 +145,10 @@ public class CalendarHelper {
                         mExcludedCalendarsLock.readLock().unlock();
                     }
                     if (!useThisCalendar)
+                        continue;
+
+                    String event_desc = cursor.getString(4);
+                    if (event_desc.contains("#nowatch"))
                         continue;
 
                     String title = cursor.getString(0);
