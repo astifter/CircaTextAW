@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.wearable.companion.WatchFaceCompanion;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -74,6 +75,9 @@ public class CircaTextConfigActivity extends Activity
 
         TextView label = (TextView) findViewById(R.id.label);
         label.setText(label.getText() + " (" + name.getClassName() + ")");
+
+        TextView htmlText = (TextView) findViewById(R.id.attributions);
+        htmlText.setText(Html.fromHtml(getResources().getString(R.string.digital_config_attribution_text)));
     }
 
     @Override // Activity

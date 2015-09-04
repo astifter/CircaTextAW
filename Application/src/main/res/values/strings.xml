@@ -23,6 +23,7 @@
     <string name="digital_config_minutes">Minutes</string>
     <string name="digital_config_seconds">Seconds</string>
     <string name="digital_config_calendars">Exclude Calendars</string>
+    <string name="digital_config_attribution">Attribution</string>
 
     <string name="title_no_device_connected">No wearable device is currently connected.</string>
     <string name="ok_no_device_connected">Connected.</string>
@@ -46,4 +47,7 @@
     </string-array>
 
     <string name="excluded_calendar_hint">Comma separated calendar names.</string>
+    <string name="digital_config_attribution_text">
+        Calendar icon made by SimpleIcon (http://www.simpleicon.com).
+    </string>
 </resources>
