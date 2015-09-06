@@ -37,8 +37,8 @@ public class CircaTextWeatherService extends WearableListenerService {
     private String mPeerId;
     private GoogleApiClient mGoogleApiClient;
 
-    //private JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
-    private JSONWeatherParser weatherParser = new YahooJSONParser();
+    private JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
+    //private JSONWeatherParser weatherParser = new YahooJSONParser();
 
     private Location city;
     private String cityName;

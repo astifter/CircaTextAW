@@ -48,6 +48,6 @@
 
     <string name="excluded_calendar_hint">Comma separated calendar names.</string>
     <string name="digital_config_attribution_text">
-        Calendar icon made by SimpleIcon (http://www.simpleicon.com).
+        Calendar icon made by SimpleIcon (http://www.simpleicon.com). Weather from OpenWeatherMap (http://openweathermap.org).
     </string>
 </resources>

@@ -90,6 +90,7 @@ public class OpenWeatherMapJSONParser implements JSONWeatherParser {
 
         long dt = getLong("dt", jObj);
         weather.time = new Date(dt*1000);
+        weather.lastupdate = weather.time;
 
         return weather;
     }
@@ -97,7 +98,7 @@ public class OpenWeatherMapJSONParser implements JSONWeatherParser {
     @Override
     public URL getURL(android.location.Location location, String cityName) {
         // api.openweathermap.org/data/2.5/weather?lat=35&lon=139
-        String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?units=metric&";
+        String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?units=metric&APPID=d9b53ed2098c82758e054eec0d9112d5&";
         String lat = "lat=" + Double.toString(location.getLatitude());
         String lon = "lon=" + Double.toString(location.getLongitude());
         try {
