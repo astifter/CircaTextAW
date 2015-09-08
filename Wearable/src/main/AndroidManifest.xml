@@ -38,10 +38,10 @@
                 android:resource="@xml/watch_face" />
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview"
-                android:resource="@drawable/preview_digital" />
+                android:resource="@drawable/circa_test_screenshot" />
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview_circular"
-                android:resource="@drawable/preview_digital_circular" />
+                android:resource="@drawable/circa_test_screenshot" />
             <meta-data
                 android:name="com.google.android.wearable.watchface.companionConfigurationAction"
                 android:value="com.astifter.circatext.CONFIG_DIGITAL" />
