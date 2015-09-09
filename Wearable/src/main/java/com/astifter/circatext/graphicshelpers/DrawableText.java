@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference;
 public class DrawableText implements CircaTextDrawable {
     public static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
     public static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
-    private final CanvasWatchFaceService.Engine engine;
+
     private final Paint paint;
     WeakReference<DrawableText> stackX;
     WeakReference<DrawableText> stackY;
@@ -27,24 +27,21 @@ public class DrawableText implements CircaTextDrawable {
 
     private String text = "";
     private boolean hidden = false;
+    private boolean isInAmbientMode;
 
-    public DrawableText(CanvasWatchFaceService.Engine engine) {
-        this.engine = engine;
+    public DrawableText() {
         this.paint = new Paint();
         this.stackDirection = new StackDirection(StackDirection.NONE);
     }
-    public DrawableText(CanvasWatchFaceService.Engine engine, int c) {
-        this.engine = engine;
+    public DrawableText(int c) {
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, Paint.Align.LEFT);
     }
-    public DrawableText(CanvasWatchFaceService.Engine engine, int c, Paint.Align a) {
-        this.engine = engine;
+    public DrawableText(int c, Paint.Align a) {
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, a);
     }
-    public DrawableText(CanvasWatchFaceService.Engine engine, int c, Typeface t) {
-        this.engine = engine;
+    public DrawableText(int c, Typeface t) {
         this.color = c;
         this.paint = createTextPaint(t, Paint.Align.LEFT);
     }
@@ -199,6 +196,7 @@ public class DrawableText implements CircaTextDrawable {
     }
 
     public void setAmbientMode(boolean inAmbientMode) {
+        this.isInAmbientMode = inAmbientMode;
         this.paint.setAntiAlias(!inAmbientMode);
         if (inAmbientMode) {
             this.paint.setColor(Color.WHITE);
@@ -213,7 +211,7 @@ public class DrawableText implements CircaTextDrawable {
 
     public void setColor(int c) {
         this.color = c;
-        if (!engine.isInAmbientMode()) {
+        if (!this.isInAmbientMode) {
             this.paint.setColor(c);
         }
     }
