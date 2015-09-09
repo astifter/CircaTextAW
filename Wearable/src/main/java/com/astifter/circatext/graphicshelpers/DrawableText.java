@@ -3,13 +3,14 @@ package com.astifter.circatext.graphicshelpers;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.text.TextPaint;
 
 import java.lang.ref.WeakReference;
 
-public class DrawableText {
+public class DrawableText implements CircaTextDrawable {
     public static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
     public static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
     private final CanvasWatchFaceService.Engine engine;
@@ -23,6 +24,8 @@ public class DrawableText {
     private int color;
     private float drawnSize;
     private float defaultTextSize;
+
+    private String text;
 
     public DrawableText(CanvasWatchFaceService.Engine engine) {
         this.engine = engine;
@@ -54,7 +57,13 @@ public class DrawableText {
         return paint;
     }
 
-    public void draw(Canvas canvas, String text) {
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void onDraw(Canvas canvas, Rect bounds) {
+        if (text == null) return;
+
         this.drawnSize = paint.measureText(text);
 
         if (this.stackX != null && this.stackX.get() != null) {
@@ -209,10 +218,6 @@ public class DrawableText {
 
     public void setMaxWidth(float maxWidth) {
         this.maxWidth = maxWidth;
-    }
-
-    public float getTextSize() {
-        return this.paint.getTextSize();
     }
 
     public float getDefaultTextSize() {
