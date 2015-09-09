@@ -714,27 +714,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             return true;
         }
 
-        private void setDefaultValuesForMissingConfigKeys(DataMap config) {
-            addConfigKeyIfMissing(config, CircaTextConsts.KEY_BACKGROUND_COLOR,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
-            addConfigKeyIfMissing(config, CircaTextConsts.KEY_HOURS_COLOR,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
-            addConfigKeyIfMissing(config, CircaTextConsts.KEY_MINUTES_COLOR,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-            addConfigKeyIfMissing(config, CircaTextConsts.KEY_SECONDS_COLOR,
-                    CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
-            addConfigKeyIfMissing(config, CircaTextConsts.KEY_EXCLUDED_CALENDARS, "");
-        }
-
-        private void addConfigKeyIfMissing(DataMap config, String key, int value) {
-            if (!config.containsKey(key)) {
-                config.putInt(key, value);
-            }
-        }
-
-        private void addConfigKeyIfMissing(DataMap config, String key, String value) {
-            if (!config.containsKey(key)) {
-                config.putString(key, value);
             }
         }
 

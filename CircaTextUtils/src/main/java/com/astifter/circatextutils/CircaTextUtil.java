@@ -45,30 +45,8 @@ public final class CircaTextUtil {
                 .build();
     }
 
-    private static final String COLOR_NAME_DEFAULT_AND_AMBIENT_BACKGROUND = "Black";
-    public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND =
-            parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_BACKGROUND);
-
-    private static final String COLOR_NAME_DEFAULT_AND_AMBIENT_HOUR_DIGITS = "White";
-    public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS =
-            parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
-
-    private static final String COLOR_NAME_DEFAULT_AND_AMBIENT_MINUTE_DIGITS = "White";
-    public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS =
-            parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
-
-    private static final String COLOR_NAME_DEFAULT_AND_AMBIENT_SECOND_DIGITS = "Gray";
-    public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS =
-            parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
-
     private CircaTextUtil() {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CircaTextUtil()");
-    }
-
-    private static int parseColor(String colorName) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "parseColor()");
-
-        return Color.parseColor(colorName.toLowerCase());
     }
 
     /// Interface FetchConfigDataMapCallback
