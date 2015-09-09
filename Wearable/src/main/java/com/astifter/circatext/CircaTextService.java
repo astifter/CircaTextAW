@@ -120,7 +120,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         SimpleDateFormat mDayFormat;
         SimpleDateFormat mDateFormat;
         boolean mMute;
-        boolean minAmbientMode;
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
@@ -405,8 +404,10 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             super.onAmbientModeChanged(inAmbientMode);
 
-            mBackgroundPaint.setColor(isInAmbientMode() ? mInteractiveBackgroundColor :
-                                                          CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
+            mBackgroundPaint.setColor(isInAmbientMode() ?
+                    mInteractiveBackgroundColor :
+                    CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
+            updateVisibility();
 
             if (mLowBitAmbient) {
                 for (DrawableText t : mTextFields) {
@@ -574,10 +575,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 mTextFields[eTF_WEATHER_TEMP].setText(tempText);
                 mTextFields[eTF_WEATHER_AGE].setText(ageText);
                 mTextFields[eTF_WEATHER_DESC].setText(mWeather.currentCondition.getCondition());
-            }
-            if (minAmbientMode != isInAmbientMode()) {
-                minAmbientMode = isInAmbientMode();
-                updateVisibility();
             }
 
             // Draw the background.
