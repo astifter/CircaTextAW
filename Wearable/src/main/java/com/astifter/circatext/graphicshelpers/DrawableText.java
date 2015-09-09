@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.text.TextPaint;
 
 import java.lang.ref.WeakReference;
@@ -14,24 +13,18 @@ public class DrawableText implements CircaTextDrawable {
     public static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
     public static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
+    private Rect bounds;
     private final Paint paint;
-    WeakReference<DrawableText> stackX;
-    WeakReference<DrawableText> stackY;
-    StackDirection stackDirection;
-    private float x;
-    private float y;
-    private float maxWidth = -1;
     private int color;
     private float drawnSize;
     private float defaultTextSize;
 
     private String text = "";
     private boolean hidden = false;
-    private boolean isInAmbientMode;
+    private boolean isInAmbientMode = false;
 
     public DrawableText() {
         this.paint = new Paint();
-        this.stackDirection = new StackDirection(StackDirection.NONE);
     }
     public DrawableText(int c) {
         this.color = c;
@@ -61,28 +54,21 @@ public class DrawableText implements CircaTextDrawable {
 
     public void onDraw(Canvas canvas, Rect bounds) {
         if (this.text == "" || hidden) return;
+        this.bounds = bounds;
 
         this.drawnSize = this.getWidth();
+        Paint.FontMetrics fm = this.paint.getFontMetrics();
 
-        if (this.stackX != null && this.stackX.get() != null) {
-            if (this.stackDirection.isLeftSet()) {
-                this.x = this.stackX.get().getRight();
-            } else if (this.stackDirection.isRightSet()) {
-                // this is currently not supported
-            }
-            if (this.stackDirection.isSet(StackDirection.NEXTTO)) {
-                this.y = this.stackX.get().getY();
-            }
-        }
-        if (this.stackY != null && this.stackY.get() != null) {
-            if (this.stackDirection.isBelowSet()) {
-                this.y = this.stackY.get().getBottom() + -this.paint.ascent();
-            } else if (this.stackDirection.isAboveSet()) {
-                this.y = this.stackY.get().getTop() - this.paint.descent();
-            }
-        }
-        float x = this.x;
-        float y = this.y;
+        float x = 0;
+        Paint.Align a = this.paint.getTextAlign();
+        if (a == Paint.Align.LEFT)
+            x = bounds.left;
+        else if (a == Paint.Align.RIGHT)
+            x = bounds.right;
+        else if (a == Paint.Align.CENTER)
+            x = (bounds.left + bounds.right) / 2;
+        float y = bounds.top + -fm.ascent;
+        int maxWidth = -1; //bounds.width();
 
         /**
          * Some comments are in order:
@@ -96,17 +82,16 @@ public class DrawableText implements CircaTextDrawable {
          * - Adjust the actually used size (drawnSize) to the maxWidth.
          */
         boolean hasSavedState = false;
-        if (this.maxWidth != -1 && this.drawnSize > this.maxWidth) {
-            Paint.FontMetrics fm = this.paint.getFontMetrics();
+        if (maxWidth != -1 && this.drawnSize > maxWidth) {
             float ellipsisSize = paint.measureText("...");
 
-            canvas.drawText("...", x + this.maxWidth - ellipsisSize, y, paint);
+            canvas.drawText("...", x + maxWidth - ellipsisSize, y, paint);
 
             canvas.save();
             hasSavedState = true;
-            canvas.clipRect(x, y + fm.ascent, x + this.maxWidth - ellipsisSize, y + fm.descent);
+            canvas.clipRect(x, y + fm.ascent, x + maxWidth - ellipsisSize, y + fm.descent);
 
-            this.drawnSize = this.maxWidth;
+            this.drawnSize = maxWidth;
         }
         canvas.drawText(text, x, y, paint);
         /** In case the state was saved for clipping text, restore state. */
@@ -126,18 +111,6 @@ public class DrawableText implements CircaTextDrawable {
         //}
     }
 
-    private float getY() {
-        return this.y;
-    }
-
-    private float getRight() {
-        if (this.stackX != null && this.stackX.get() != null) {
-            return this.stackX.get().getRight() + this.drawnSize;
-        } else {
-            return this.x + this.drawnSize;
-        }
-    }
-
     public float getHeight() {
         Paint.FontMetrics fm = this.paint.getFontMetrics();
         return -fm.ascent + fm.descent;
@@ -146,45 +119,6 @@ public class DrawableText implements CircaTextDrawable {
     @Override
     public float getWidth() {
         return paint.measureText(text);
-    }
-
-    private float getBottom() {
-        if (this.stackY != null && this.stackY.get() != null) {
-            return this.stackY.get().getBottom() + this.getHeight();
-        } else {
-            return this.y + this.paint.descent();
-        }
-    }
-
-    private float getTop() {
-        if (this.stackY != null && this.stackY.get() != null) {
-            return this.stackY.get().getTop() - this.getHeight();
-        } else {
-            return this.y + this.paint.ascent();
-        }
-    }
-
-    public void setCoord(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public void setCoord(DrawableText t, float y) {
-        this.y = y;
-        this.stackX = new WeakReference<>(t);
-        this.stackDirection = new StackDirection(StackDirection.LEFT);
-    }
-
-    public void setCoord(float x, DrawableText t, int d) {
-        this.x = x;
-        this.stackY = new WeakReference<>(t);
-        this.stackDirection = new StackDirection(d);
-    }
-
-    public void setCoord(DrawableText tx, DrawableText ty, int d) {
-        this.stackX = new WeakReference<>(tx);
-        this.stackY = new WeakReference<>(ty);
-        this.stackDirection = new StackDirection(d | StackDirection.LEFT);
     }
 
     public void setTextSize(float s) {
@@ -230,52 +164,7 @@ public class DrawableText implements CircaTextDrawable {
         this.hidden = false;
     }
 
-    public void setMaxWidth(float maxWidth) {
-        this.maxWidth = maxWidth;
-    }
-
     public float getDefaultTextSize() {
         return this.defaultTextSize;
-    }
-
-    public class StackDirection {
-        public static final int NONE = -1;
-        public static final int LEFT = 1;
-        public static final int RIGHT = 2;
-        public static final int ABOVE = 4;
-        public static final int BELOW = 8;
-        public static final int NEXTTO = 16;
-
-        private final int dir;
-
-        protected StackDirection(int dir) {
-            this.dir = dir;
-        }
-
-        protected int direction() {
-            return dir;
-        }
-
-        public boolean isSet(int d) {
-            int setDirection = (this.dir & d);
-            boolean returnValue = setDirection == d;
-            return returnValue;
-        }
-
-        public boolean isLeftSet() {
-            return isSet(LEFT);
-        }
-
-        public boolean isRightSet() {
-            return isSet(RIGHT);
-        }
-
-        public boolean isBelowSet() {
-            return isSet(BELOW);
-        }
-
-        public boolean isAboveSet() {
-            return isSet(ABOVE);
-        }
     }
 }
