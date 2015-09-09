@@ -531,42 +531,41 @@ public class CircaTextService extends CanvasWatchFaceService {
             mCalendar.setTimeInMillis(now);
             mDate.setTime(now);
 
-            {
-                String hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
-                mTextFields[eTF_HOUR].setText(hourString);
-                String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
-                mTextFields[eTF_MINUTE].setText(minuteString);
-                String secondString = formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
-                mTextFields[eTF_SECOND].setText(secondString);
-                BatteryHelper.BatteryInfo mBatteryInfo = mBatteryHelper.getBatteryInfo();
-                if (mBatteryInfo != null) {
-                    String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
-                    mTextFields[eTF_BATTERY].setText(pctText);
-                } else {
-                    mTextFields[eTF_BATTERY].setText("");
-                }
-                mTextFields[eTF_DAY_OF_WEEK].setText(mDayFormat.format(mDate));
-                mTextFields[eTF_DATE].setText(mDateFormat.format(mDate));
-            }
-            {
-                CalendarHelper.EventInfo[] mMeetings = mCalendarHelper.getMeetings();
-                int i = 0;
-                while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
+            String hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
+            mTextFields[eTF_HOUR].setText(hourString);
+            String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
+            mTextFields[eTF_MINUTE].setText(minuteString);
+            String secondString = formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
+            mTextFields[eTF_SECOND].setText(secondString);
+            mTextFields[eTF_DAY_OF_WEEK].setText(mDayFormat.format(mDate));
+            mTextFields[eTF_DATE].setText(mDateFormat.format(mDate));
 
+            BatteryHelper.BatteryInfo mBatteryInfo = mBatteryHelper.getBatteryInfo();
+            if (mBatteryInfo != null) {
+                String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
+                mTextFields[eTF_BATTERY].setText(pctText);
+            } else {
+                mTextFields[eTF_BATTERY].setText("");
+            }
+
+            CalendarHelper.EventInfo[] mMeetings = mCalendarHelper.getMeetings();
+            int i = 0;
+            while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
+
+            if (i >= mMeetings.length) {
+                mTextFields[eTF_CALENDAR_1].setText("no meetings");
                 mTextFields[eTF_CALENDAR_2].setText("");
-                if (i >= mMeetings.length) {
-                    mTextFields[eTF_CALENDAR_1].setText("no meetings");
-                } else {
-                    @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                    mTextFields[eTF_CALENDAR_1].setText(sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
+            } else {
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+                mTextFields[eTF_CALENDAR_1].setText(sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
 
-                    int additionalEvents = mMeetings.length - 1 - i;
-                    if (additionalEvents == 1)
-                        mTextFields[eTF_CALENDAR_2].setText("+" + additionalEvents + " additional event");
-                    if (additionalEvents > 1)
-                        mTextFields[eTF_CALENDAR_2].setText("+" + additionalEvents + " additional events");
-                }
+                int additionalEvents = mMeetings.length - 1 - i;
+                if (additionalEvents == 1)
+                    mTextFields[eTF_CALENDAR_2].setText("+" + additionalEvents + " additional event");
+                if (additionalEvents > 1)
+                    mTextFields[eTF_CALENDAR_2].setText("+" + additionalEvents + " additional events");
             }
+
             if (mWeather != null) {
                 long age = now - mWeather.lastupdate.getTime();
                 float ageFloat = age / (60 * 1000);
@@ -658,9 +657,8 @@ public class CircaTextService extends CanvasWatchFaceService {
                     uiUpdated = true;
                 } else {
                     int color = config.getInt(configKey);
-                    if (updateUiForKey(configKey, color)) {
-                        uiUpdated = true;
-                    }
+                    updateUiForKey(configKey, color);
+                    uiUpdated = true;
                 }
             }
             if (uiUpdated) {
