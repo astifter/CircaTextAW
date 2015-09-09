@@ -512,93 +512,91 @@ public class CircaTextService extends CanvasWatchFaceService {
             mCalendar.setTimeInMillis(now);
             mDate.setTime(now);
 
-            // Show colons for the first half of each second so the colons blink on when the time
-            // updates.
-            mShouldDrawColons = (System.currentTimeMillis() % 1000) < 500;
-
-            // Draw the background.
-            canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
-
-            // Draw the hours.
-            String hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
-            mTextFields[eTF_HOUR].setText(hourString);
-            mTextFields[eTF_HOUR].onDraw(canvas, bounds);
-
-            // In ambient and mute modes, always draw the first colon. Otherwise, draw the
-            // first colon for the first half of each second.
-            if (isInAmbientMode() || mMute || mShouldDrawColons) {
-                mTextFields[eTF_COLON_1].onDraw(canvas, bounds);
-            }
-
-            // Draw the minutes.
-            String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
-            mTextFields[eTF_MINUTE].setText(minuteString);
-            mTextFields[eTF_MINUTE].onDraw(canvas, bounds);
-
-            // In unmuted interactive mode, draw a second blinking colon followed by the seconds.
-            // Otherwise, if we're in 12-hour mode, draw AM/PM
-            if (!isInAmbientMode() && !mMute) {
-                if (mShouldDrawColons) {
-                    mTextFields[eTF_COLON_2].onDraw(canvas, bounds);
-                }
+            {
+                String hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
+                mTextFields[eTF_HOUR].setText(hourString);
+                String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
+                mTextFields[eTF_MINUTE].setText(minuteString);
                 String secondString = formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
                 mTextFields[eTF_SECOND].setText(secondString);
-                mTextFields[eTF_SECOND].onDraw(canvas, bounds);
-
                 BatteryHelper.BatteryInfo mBatteryInfo = mBatteryHelper.getBatteryInfo();
                 if (mBatteryInfo != null) {
                     String pctText = String.format("%3.0f%%", mBatteryInfo.getPercent() * 100);
                     mTextFields[eTF_BATTERY].setText(pctText);
-                    mTextFields[eTF_BATTERY].onDraw(canvas, bounds);
+                } else {
+                    mTextFields[eTF_BATTERY].setText("");
                 }
-            }
-
-            if (!mMute) {
                 mTextFields[eTF_DAY_OF_WEEK].setText(mDayFormat.format(mDate));
                 mTextFields[eTF_DATE].setText(mDateFormat.format(mDate));
+            }
+            {
+                CalendarHelper.EventInfo[] mMeetings = mCalendarHelper.getMeetings();
+                int i = 0;
+                while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
+
+                mTextFields[eTF_CALENDAR_2].setText("");
+                if (i >= mMeetings.length) {
+                    mTextFields[eTF_CALENDAR_1].setText("no meetings");
+                } else {
+                    @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+                    mTextFields[eTF_CALENDAR_1].setText(sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
+
+                    int additionalEvents = mMeetings.length - 1 - i;
+                    if (additionalEvents == 1)
+                        mTextFields[eTF_CALENDAR_2].setText("+" + additionalEvents + " additional event");
+                    if (additionalEvents > 1)
+                        mTextFields[eTF_CALENDAR_2].setText("+" + additionalEvents + " additional events");
+                }
+            }
+            if (mWeather != null) {
+                long age = now - mWeather.lastupdate.getTime();
+                float ageFloat = age / (60 * 1000);
+                String tempText = String.format("%2.1f", mWeather.temperature.getTemp());
+                String ageText = String.format("(%.0fm)", ageFloat);
+                mTextFields[eTF_WEATHER_TEMP].setText(tempText);
+                mTextFields[eTF_WEATHER_AGE].setText(ageText);
+                mTextFields[eTF_WEATHER_DESC].setText(mWeather.currentCondition.getCondition());
+            }
+
+            // Show colons for the first half of each second so the colons blink on when the time
+            // updates.
+            mShouldDrawColons = (System.currentTimeMillis() % 1000) < 500 || mMute;
+
+            // Draw the background.
+            canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
+
+            mTextFields[eTF_HOUR].onDraw(canvas, bounds);
+            if (isInAmbientMode() || mShouldDrawColons) {
+                mTextFields[eTF_COLON_1].onDraw(canvas, bounds);
+            }
+            mTextFields[eTF_MINUTE].onDraw(canvas, bounds);
+
+            // draw the rest only when not in mute mode
+            if (mMute) return;
+
+            if (getPeekCardPosition().isEmpty()) {
                 mTextFields[eTF_DAY_OF_WEEK].onDraw(canvas, bounds);
                 mTextFields[eTF_DATE].onDraw(canvas, bounds);
             }
 
-            // Only render the day of week and date if there is no peek card, so they do not bleed
-            // into each other in ambient mode.
+            // draw the rest only when not in ambient mode
+            if(isInAmbientMode()) return;
+
+            if (mShouldDrawColons) {
+                mTextFields[eTF_COLON_2].onDraw(canvas, bounds);
+            }
+            mTextFields[eTF_SECOND].onDraw(canvas, bounds);
+            mTextFields[eTF_BATTERY].onDraw(canvas, bounds);
+
+            // if peek card is shown, exit
             if (getPeekCardPosition().isEmpty()) {
+                mTextFields[eTF_CALENDAR_1].onDraw(canvas, bounds);
+                mTextFields[eTF_CALENDAR_2].onDraw(canvas, bounds);
 
-                if (!isInAmbientMode() && !mMute) {
-                    CalendarHelper.EventInfo[] mMeetings = mCalendarHelper.getMeetings();
-
-                    // do not show events that have already started, those are still in
-                    // the mMeetings list.
-                    int i = 0;
-                    while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
-
-                    if (i >= mMeetings.length) {
-                        mTextFields[eTF_CALENDAR_1].setText("no meetings");
-                    } else {
-                        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                        mTextFields[eTF_CALENDAR_1].setText(sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
-
-                        int additionalEvents = mMeetings.length - 1 - i;
-                        if (additionalEvents == 1)
-                            mTextFields[eTF_CALENDAR_2].setText("+" + additionalEvents + " additional event");
-                        if (additionalEvents > 1)
-                            mTextFields[eTF_CALENDAR_2].setText("+" + additionalEvents + " additional events");
-                    }
-                    mTextFields[eTF_CALENDAR_1].onDraw(canvas, bounds);
-                    mTextFields[eTF_CALENDAR_2].onDraw(canvas, bounds);
-
-                    if (mWeather != null) {
-                        long age = now - mWeather.lastupdate.getTime();
-                        float ageFloat = age / (60*1000);
-                        String tempText = String.format("%2.1f", mWeather.temperature.getTemp());
-                        String ageText = String.format("(%.0fm)", ageFloat);
-                        mTextFields[eTF_WEATHER_TEMP].setText(tempText);
-                        mTextFields[eTF_WEATHER_AGE].setText(ageText);
-                        mTextFields[eTF_WEATHER_DESC].setText(mWeather.currentCondition.getCondition());
-                        mTextFields[eTF_WEATHER_TEMP].onDraw(canvas, bounds);
-                        mTextFields[eTF_WEATHER_AGE].onDraw(canvas, bounds);
-                        mTextFields[eTF_WEATHER_DESC].onDraw(canvas, bounds);
-                    }
+                if (mWeather != null) {
+                    mTextFields[eTF_WEATHER_TEMP].onDraw(canvas, bounds);
+                    mTextFields[eTF_WEATHER_AGE].onDraw(canvas, bounds);
+                    mTextFields[eTF_WEATHER_DESC].onDraw(canvas, bounds);
                 }
             }
         }

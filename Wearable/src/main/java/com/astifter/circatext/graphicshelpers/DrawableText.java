@@ -31,21 +31,25 @@ public class DrawableText implements CircaTextDrawable {
         this.engine = engine;
         this.paint = new Paint();
         this.stackDirection = new StackDirection(StackDirection.NONE);
+        this.text = "";
     }
     public DrawableText(CanvasWatchFaceService.Engine engine, int c) {
         this.engine = engine;
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, Paint.Align.LEFT);
+        this.text = "";
     }
     public DrawableText(CanvasWatchFaceService.Engine engine, int c, Paint.Align a) {
         this.engine = engine;
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, a);
+        this.text = "";
     }
     public DrawableText(CanvasWatchFaceService.Engine engine, int c, Typeface t) {
         this.engine = engine;
         this.color = c;
         this.paint = createTextPaint(t, Paint.Align.LEFT);
+        this.text = "";
     }
 
     private TextPaint createTextPaint(Typeface t, Paint.Align a) {
@@ -62,7 +66,7 @@ public class DrawableText implements CircaTextDrawable {
     }
 
     public void onDraw(Canvas canvas, Rect bounds) {
-        if (text == null) return;
+        if (this.text == "") return;
 
         this.drawnSize = paint.measureText(text);
 
