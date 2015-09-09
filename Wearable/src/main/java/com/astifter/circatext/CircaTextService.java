@@ -125,7 +125,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         SimpleDateFormat mDayFormat;
         SimpleDateFormat mDateFormat;
         boolean mMute;
-        boolean mShouldDrawColons;
+        boolean minAmbientMode;
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
@@ -237,10 +237,8 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public void onPeekCardPositionUpdate (Rect rect) {
-            // invalidate display in ambient mode when a card shows to hide date
-            if (isInAmbientMode() && !getPeekCardPosition().isEmpty()) {
-                invalidate();
-            }
+            updateVisibility();
+            invalidate();
         }
 
         @Override // WatchFaceService.Engine
@@ -475,7 +473,45 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             if (mMute != inMuteMode) {
                 mMute = inMuteMode;
+                updateVisibility();
                 invalidate();
+            }
+        }
+
+        private void updateVisibility() {
+            for(DrawableText t : mTextFields) {
+                t.hide();
+            }
+
+            mTextFields[eTF_HOUR].show();
+            mTextFields[eTF_COLON_1].show();
+            mTextFields[eTF_MINUTE].show();
+
+            // draw the rest only when not in mute mode
+            if (mMute) return;
+
+            if (getPeekCardPosition().isEmpty()) {
+                mTextFields[eTF_DAY_OF_WEEK].show();
+                mTextFields[eTF_DATE].show();
+            }
+
+            // draw the rest only when not in ambient mode
+            if(isInAmbientMode()) return;
+
+            mTextFields[eTF_COLON_2].show();
+            mTextFields[eTF_SECOND].show();
+            mTextFields[eTF_BATTERY].show();
+
+            // if peek card is shown, exit
+            if (getPeekCardPosition().isEmpty()) {
+                mTextFields[eTF_CALENDAR_1].show();
+                mTextFields[eTF_CALENDAR_2].show();
+
+                if (mWeather != null) {
+                    mTextFields[eTF_WEATHER_TEMP].show();
+                    mTextFields[eTF_WEATHER_AGE].show();
+                    mTextFields[eTF_WEATHER_DESC].show();
+                }
             }
         }
 
@@ -557,48 +593,17 @@ public class CircaTextService extends CanvasWatchFaceService {
                 mTextFields[eTF_WEATHER_AGE].setText(ageText);
                 mTextFields[eTF_WEATHER_DESC].setText(mWeather.currentCondition.getCondition());
             }
-
-            // Show colons for the first half of each second so the colons blink on when the time
-            // updates.
-            mShouldDrawColons = (System.currentTimeMillis() % 1000) < 500 || mMute;
+            if (minAmbientMode != isInAmbientMode()) {
+                minAmbientMode = isInAmbientMode();
+                updateVisibility();
+            }
 
             // Draw the background.
             canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
-
-            mTextFields[eTF_HOUR].onDraw(canvas, bounds);
-            if (isInAmbientMode() || mShouldDrawColons) {
-                mTextFields[eTF_COLON_1].onDraw(canvas, bounds);
-            }
-            mTextFields[eTF_MINUTE].onDraw(canvas, bounds);
-
-            // draw the rest only when not in mute mode
-            if (mMute) return;
-
-            if (getPeekCardPosition().isEmpty()) {
-                mTextFields[eTF_DAY_OF_WEEK].onDraw(canvas, bounds);
-                mTextFields[eTF_DATE].onDraw(canvas, bounds);
+            for (DrawableText t : mTextFields) {
+                t.onDraw(canvas, bounds);
             }
 
-            // draw the rest only when not in ambient mode
-            if(isInAmbientMode()) return;
-
-            if (mShouldDrawColons) {
-                mTextFields[eTF_COLON_2].onDraw(canvas, bounds);
-            }
-            mTextFields[eTF_SECOND].onDraw(canvas, bounds);
-            mTextFields[eTF_BATTERY].onDraw(canvas, bounds);
-
-            // if peek card is shown, exit
-            if (getPeekCardPosition().isEmpty()) {
-                mTextFields[eTF_CALENDAR_1].onDraw(canvas, bounds);
-                mTextFields[eTF_CALENDAR_2].onDraw(canvas, bounds);
-
-                if (mWeather != null) {
-                    mTextFields[eTF_WEATHER_TEMP].onDraw(canvas, bounds);
-                    mTextFields[eTF_WEATHER_AGE].onDraw(canvas, bounds);
-                    mTextFields[eTF_WEATHER_DESC].onDraw(canvas, bounds);
-                }
-            }
         }
 
         private String formatTwoDigitNumber(int hour) {

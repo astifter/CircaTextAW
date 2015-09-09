@@ -13,5 +13,7 @@ public interface CircaTextDrawable {
     void setAmbientMode(boolean inAmbientMode);
     void setColor(int c);
     void setAlpha(int a);
+    void hide();
+    void show();
 }
 

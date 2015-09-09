@@ -25,31 +25,28 @@ public class DrawableText implements CircaTextDrawable {
     private float drawnSize;
     private float defaultTextSize;
 
-    private String text;
+    private String text = "";
+    private boolean hidden = false;
 
     public DrawableText(CanvasWatchFaceService.Engine engine) {
         this.engine = engine;
         this.paint = new Paint();
         this.stackDirection = new StackDirection(StackDirection.NONE);
-        this.text = "";
     }
     public DrawableText(CanvasWatchFaceService.Engine engine, int c) {
         this.engine = engine;
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, Paint.Align.LEFT);
-        this.text = "";
     }
     public DrawableText(CanvasWatchFaceService.Engine engine, int c, Paint.Align a) {
         this.engine = engine;
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, a);
-        this.text = "";
     }
     public DrawableText(CanvasWatchFaceService.Engine engine, int c, Typeface t) {
         this.engine = engine;
         this.color = c;
         this.paint = createTextPaint(t, Paint.Align.LEFT);
-        this.text = "";
     }
 
     private TextPaint createTextPaint(Typeface t, Paint.Align a) {
@@ -66,7 +63,7 @@ public class DrawableText implements CircaTextDrawable {
     }
 
     public void onDraw(Canvas canvas, Rect bounds) {
-        if (this.text == "") return;
+        if (this.text == "" || hidden) return;
 
         this.drawnSize = this.getWidth();
 
@@ -223,6 +220,16 @@ public class DrawableText implements CircaTextDrawable {
 
     public void setAlpha(int a) {
         this.paint.setAlpha(a);
+    }
+
+    @Override
+    public void hide() {
+        this.hidden = true;
+    }
+
+    @Override
+    public void show() {
+        this.hidden = false;
     }
 
     public void setMaxWidth(float maxWidth) {
