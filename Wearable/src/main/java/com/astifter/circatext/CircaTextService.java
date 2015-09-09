@@ -125,7 +125,7 @@ public class CircaTextService extends CanvasWatchFaceService {
          * disable anti-aliasing in ambient mode.
          */
         boolean mLowBitAmbient;
-        int mInteractiveBackgroundColor = CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
+        int mInteractiveBackgroundColor = CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
         Paint mBackgroundPaint;
         float mXOffset;
         float mYOffset;
@@ -202,11 +202,11 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_WEATHER_TEMP] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.LEFT);
             mTextFields[eTF_WEATHER_AGE] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.LEFT);
             mTextFields[eTF_WEATHER_DESC] = new DrawableText(this, resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
-            mTextFields[eTF_HOUR] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, DrawableText.BOLD_TYPEFACE);
+            mTextFields[eTF_HOUR] = new DrawableText(this, CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, DrawableText.BOLD_TYPEFACE);
             mTextFields[eTF_COLON_1] = new DrawableText(this, resources.getColor(R.color.digital_colons));
-            mTextFields[eTF_MINUTE] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
+            mTextFields[eTF_MINUTE] = new DrawableText(this, CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
             mTextFields[eTF_COLON_2] = new DrawableText(this, resources.getColor(R.color.digital_colons));
-            mTextFields[eTF_SECOND] = new DrawableText(this, CircaTextUtil.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
+            mTextFields[eTF_SECOND] = new DrawableText(this, CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
             mTextFieldsAnimated.add(mTextFields[eTF_CALENDAR_1]);
             mTextFieldsAnimated.add(mTextFields[eTF_CALENDAR_2]);
             mTextFieldsAnimated.add(mTextFields[eTF_COLON_2]);
@@ -632,7 +632,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
                             // If the DataItem hasn't been created yet or some keys are missing,
                             // use the default values.
-                            setDefaultValuesForMissingConfigKeys(startupConfig);
+                            CircaTextConsts.setDefaultValuesForMissingConfigKeys(startupConfig);
                             CircaTextUtil.putConfigDataItem(mGoogleApiClient, CircaTextConsts.PATH_WITH_FEATURE, startupConfig);
 
                             updateUiForConfigDataMap(startupConfig);
@@ -668,7 +668,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             }
         }
 
-        private boolean updateUiForKey(String configKey, int color) {
+        private void updateUiForKey(String configKey, int color) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForKey()");
 
             switch (configKey) {
@@ -687,12 +687,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 case CircaTextConsts.KEY_SECONDS_COLOR:
                     mTextFields[eTF_SECOND].setColor(color);
                     break;
-                default:
-                    return false;
-            }
-            return true;
-        }
-
             }
         }
 
