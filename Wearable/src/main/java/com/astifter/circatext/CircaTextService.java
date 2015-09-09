@@ -553,14 +553,16 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
             }
 
+            if (!mMute) {
+                mTextFields[eTF_DAY_OF_WEEK].setText(mDayFormat.format(mDate));
+                mTextFields[eTF_DATE].setText(mDateFormat.format(mDate));
+                mTextFields[eTF_DAY_OF_WEEK].onDraw(canvas, bounds);
+                mTextFields[eTF_DATE].onDraw(canvas, bounds);
+            }
+
             // Only render the day of week and date if there is no peek card, so they do not bleed
             // into each other in ambient mode.
             if (getPeekCardPosition().isEmpty()) {
-
-                if (!mMute) {
-                    mTextFields[eTF_DAY_OF_WEEK].draw(canvas, mDayFormat.format(mDate));
-                    mTextFields[eTF_DATE].draw(canvas, mDateFormat.format(mDate));
-                }
 
                 if (!isInAmbientMode() && !mMute) {
                     CalendarHelper.EventInfo[] mMeetings = mCalendarHelper.getMeetings();
