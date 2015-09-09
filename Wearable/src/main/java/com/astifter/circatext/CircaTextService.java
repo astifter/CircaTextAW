@@ -77,12 +77,7 @@ public class CircaTextService extends CanvasWatchFaceService {
      * Update rate in milliseconds for normal (not ambient and not mute) mode. We update twice
      * a second to blink the colons.
      */
-    private static final long NORMAL_UPDATE_RATE_MS = 500;
-
-    /**
-     * Update rate in milliseconds for mute mode. We update every minute, like in ambient mode.
-     */
-    private static final long MUTE_UPDATE_RATE_MS = TimeUnit.MINUTES.toMillis(1);
+    private static final long NORMAL_UPDATE_RATE_MS = 1000;
 
     @Override
     public Engine onCreateEngine() {
@@ -135,7 +130,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         Paint mBackgroundPaint;
         float mXOffset;
         float mYOffset;
-        long mInteractiveUpdateRateMs = NORMAL_UPDATE_RATE_MS;
         final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
@@ -145,7 +139,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                         invalidate();
                         if (shouldTimerBeRunning()) {
                             long timeMs = System.currentTimeMillis();
-                            long delayMs = mInteractiveUpdateRateMs - (timeMs % mInteractiveUpdateRateMs);
+                            long delayMs = NORMAL_UPDATE_RATE_MS - (timeMs % NORMAL_UPDATE_RATE_MS);
                             mUpdateHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
                         }
                         break;
@@ -469,7 +463,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             super.onInterruptionFilterChanged(interruptionFilter);
 
             boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
-            setInteractiveUpdateRateMs(inMuteMode ? MUTE_UPDATE_RATE_MS : NORMAL_UPDATE_RATE_MS);
+            updateTimer();
 
             if (mMute != inMuteMode) {
                 mMute = inMuteMode;
@@ -512,18 +506,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                     mTextFields[eTF_WEATHER_AGE].show();
                     mTextFields[eTF_WEATHER_DESC].show();
                 }
-            }
-        }
-
-        public void setInteractiveUpdateRateMs(long updateRateMs) {
-            if (updateRateMs == mInteractiveUpdateRateMs) {
-                return;
-            }
-            mInteractiveUpdateRateMs = updateRateMs;
-
-            // Stop and restart the timer so the new update rate takes effect immediately.
-            if (shouldTimerBeRunning()) {
-                updateTimer();
             }
         }
 
