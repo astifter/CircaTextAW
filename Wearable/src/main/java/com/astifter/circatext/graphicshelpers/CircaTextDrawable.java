@@ -8,5 +8,10 @@ import android.graphics.Rect;
  */
 public interface CircaTextDrawable {
     void onDraw(Canvas canvas, Rect bounds);
+    float getHeight();
+    float getWidth();
+    void setAmbientMode(boolean inAmbientMode);
+    void setColor(int c);
+    void setAlpha(int a);
 }
 

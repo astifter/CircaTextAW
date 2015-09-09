@@ -68,7 +68,7 @@ public class DrawableText implements CircaTextDrawable {
     public void onDraw(Canvas canvas, Rect bounds) {
         if (this.text == "") return;
 
-        this.drawnSize = paint.measureText(text);
+        this.drawnSize = this.getWidth();
 
         if (this.stackX != null && this.stackX.get() != null) {
             if (this.stackDirection.isLeftSet()) {
@@ -144,14 +144,19 @@ public class DrawableText implements CircaTextDrawable {
         }
     }
 
-    private float getHeigth() {
+    public float getHeight() {
         Paint.FontMetrics fm = this.paint.getFontMetrics();
         return -fm.ascent + fm.descent;
     }
 
+    @Override
+    public float getWidth() {
+        return paint.measureText(text);
+    }
+
     private float getBottom() {
         if (this.stackY != null && this.stackY.get() != null) {
-            return this.stackY.get().getBottom() + this.getHeigth();
+            return this.stackY.get().getBottom() + this.getHeight();
         } else {
             return this.y + this.paint.descent();
         }
@@ -159,7 +164,7 @@ public class DrawableText implements CircaTextDrawable {
 
     private float getTop() {
         if (this.stackY != null && this.stackY.get() != null) {
-            return this.stackY.get().getTop() - this.getHeigth();
+            return this.stackY.get().getTop() - this.getHeight();
         } else {
             return this.y + this.paint.ascent();
         }
