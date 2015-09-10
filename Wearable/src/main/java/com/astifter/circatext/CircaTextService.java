@@ -196,19 +196,19 @@ public class CircaTextService extends CanvasWatchFaceService {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
 
-            mTextFields[eTF_BATTERY] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
+            mTextFields[eTF_BATTERY] = new DrawableText(resources.getColor(R.color.digital_colons), DrawableText.Align.RIGHT);
             mTextFields[eTF_HOUR] = new DrawableText(CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, DrawableText.BOLD_TYPEFACE);
             mTextFields[eTF_COLON_1] = new DrawableText(resources.getColor(R.color.digital_colons));
             mTextFields[eTF_MINUTE] = new DrawableText(CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
             mTextFields[eTF_COLON_2] = new DrawableText(resources.getColor(R.color.digital_colons));
             mTextFields[eTF_SECOND] = new DrawableText(CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
             mTextFields[eTF_DAY_OF_WEEK] = new DrawableText(resources.getColor(R.color.digital_date));
-            mTextFields[eTF_DATE] = new DrawableText(resources.getColor(R.color.digital_date), Paint.Align.RIGHT);
+            mTextFields[eTF_DATE] = new DrawableText(resources.getColor(R.color.digital_date), DrawableText.Align.RIGHT);
             mTextFields[eTF_CALENDAR_1] = new DrawableText(resources.getColor(R.color.digital_date));
             mTextFields[eTF_CALENDAR_2] = new DrawableText(resources.getColor(R.color.digital_date));
-            mTextFields[eTF_WEATHER_TEMP] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.LEFT);
-            mTextFields[eTF_WEATHER_AGE] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.LEFT);
-            mTextFields[eTF_WEATHER_DESC] = new DrawableText(resources.getColor(R.color.digital_colons), Paint.Align.RIGHT);
+            mTextFields[eTF_WEATHER_TEMP] = new DrawableText(resources.getColor(R.color.digital_colons), DrawableText.Align.LEFT);
+            mTextFields[eTF_WEATHER_AGE] = new DrawableText(resources.getColor(R.color.digital_colons), DrawableText.Align.LEFT);
+            mTextFields[eTF_WEATHER_DESC] = new DrawableText(resources.getColor(R.color.digital_colons), DrawableText.Align.RIGHT);
 
             topDrawable.addBelow(mTextFields[eTF_BATTERY]);
             HorizontalStack hours = new HorizontalStack();

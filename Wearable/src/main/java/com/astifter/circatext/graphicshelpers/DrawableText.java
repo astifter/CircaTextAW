@@ -15,6 +15,7 @@ public class DrawableText implements CircaTextDrawable {
 
     private Rect bounds;
     private final Paint paint;
+    private int alignment;
     private int color;
     private float drawnSize;
     private float defaultTextSize;
@@ -28,23 +29,28 @@ public class DrawableText implements CircaTextDrawable {
     }
     public DrawableText(int c) {
         this.color = c;
-        this.paint = createTextPaint(NORMAL_TYPEFACE, Paint.Align.LEFT);
+        this.paint = createTextPaint(NORMAL_TYPEFACE, DrawableText.Align.LEFT);
     }
-    public DrawableText(int c, Paint.Align a) {
+    public DrawableText(int c, int a) {
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, a);
     }
     public DrawableText(int c, Typeface t) {
         this.color = c;
-        this.paint = createTextPaint(t, Paint.Align.LEFT);
+        this.paint = createTextPaint(t, DrawableText.Align.LEFT);
     }
 
-    private TextPaint createTextPaint(Typeface t, Paint.Align a) {
+    private TextPaint createTextPaint(Typeface t, int a) {
         TextPaint paint = new TextPaint();
         paint.setColor(this.color);
         paint.setTypeface(t);
         paint.setAntiAlias(true);
-        paint.setTextAlign(a);
+        this.alignment = a;
+        switch(a & 0xF) {
+            case Align.LEFT: paint.setTextAlign(Paint.Align.LEFT); break;
+            case Align.RIGHT: paint.setTextAlign(Paint.Align.RIGHT); break;
+            case Align.CENTER: paint.setTextAlign(Paint.Align.CENTER); break;
+        }
         return paint;
     }
 
@@ -166,5 +172,14 @@ public class DrawableText implements CircaTextDrawable {
 
     public float getDefaultTextSize() {
         return this.defaultTextSize;
+    }
+
+    public class Align {
+        public static final int LEFT = 0x01;
+        public static final int RIGHT = 0x02;
+        public static final int CENTER = 0x03;
+        public static final int TOP = 0x10;
+        public static final int MIDDLE = 0x20;
+        public static final int BOTTOM = 0x30;
     }
 }
