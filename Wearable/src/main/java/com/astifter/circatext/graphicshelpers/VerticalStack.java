@@ -23,17 +23,25 @@ public class VerticalStack extends AbstractStack {
         if (hidden) return;
         this.bounds = bounds;
 
-        if (yCenter == -1) {
-            belowStackHeight = 0;
-            for (CircaTextDrawable t : belowStack) {
-                Rect newBounds = new Rect(this.bounds.left, this.bounds.top + belowStackHeight,
-                                          this.bounds.right, this.bounds.bottom);
-                t.onDraw(canvas, newBounds);
-                belowStackHeight += t.getHeight();
-            }
+        int width = 0;
+        for (CircaTextDrawable t : this.belowStack) {
+            if (t.getWidth() > width)
+                width = (int)t.getWidth();
         }
+        this.bounds.right = this.bounds.left + width;
 
-        this.bounds.bottom = belowStackHeight;
+        int heigth = 0;
+        for (CircaTextDrawable t : this.belowStack) {
+            Rect newBounds = new Rect(this.bounds.left, this.bounds.top + heigth,
+                                      this.bounds.right, this.bounds.bottom);
+            t.onDraw(canvas, newBounds);
+            heigth += t.getHeight();
+        }
+        this.bounds.bottom = this.bounds.top + heigth;
+    }
+
+    private void onDrawWithOffset(Canvas canvas, Rect bounds) {
+
     }
 
     public void addBelow(CircaTextDrawable d) {

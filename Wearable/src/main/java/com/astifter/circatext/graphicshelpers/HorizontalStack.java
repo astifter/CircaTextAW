@@ -9,19 +9,21 @@ public class HorizontalStack extends AbstractStack {
         if (hidden) return;
         this.bounds = bounds;
 
-        int width = 0;
         int height = 0;
+        for (CircaTextDrawable t : stack) {
+            if (t.getHeight() > height)
+                height = (int)t.getHeight();
+        }
+        this.bounds.bottom = this.bounds.top + height;
+
+        int width = 0;
         for (CircaTextDrawable t : stack) {
             Rect newBounds = new Rect(this.bounds.left + width, this.bounds.top,
                                       this.bounds.right, this.bounds.bottom);
             t.onDraw(canvas, newBounds);
             width += t.getWidth();
-            if (t.getHeight() > height)
-                height = (int)t.getHeight();
         }
-
-        this.bounds.right = width;
-        this.bounds.bottom = this.bounds.top + height;
+        this.bounds.right = this.bounds.left + width;
     }
 
     public void addRight(CircaTextDrawable d) {
