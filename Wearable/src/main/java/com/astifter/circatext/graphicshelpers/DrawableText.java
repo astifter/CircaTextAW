@@ -58,23 +58,25 @@ public class DrawableText implements CircaTextDrawable {
         this.text = text;
     }
 
-    public void onDraw(Canvas canvas, Rect bounds) {
+    public void onDraw(Canvas canvas, Rect b) {
         if (this.text == "" || hidden) return;
-        this.bounds = bounds;
+        this.bounds = b;
 
         this.drawnSize = this.getWidth();
         Paint.FontMetrics fm = this.paint.getFontMetrics();
 
         float x = 0;
-        Paint.Align a = this.paint.getTextAlign();
-        if (a == Paint.Align.LEFT)
+        if (this.alignment == DrawableText.Align.LEFT) {
             x = bounds.left;
-        else if (a == Paint.Align.RIGHT)
+            this.bounds.right = this.bounds.left + (int)this.drawnSize;
+        } else if (this.alignment == DrawableText.Align.RIGHT) {
             x = bounds.right;
-        else if (a == Paint.Align.CENTER)
+        } else if (this.alignment == DrawableText.Align.CENTER) {
             x = (bounds.left + bounds.right) / 2;
+        }
+
         float y = bounds.top + -fm.ascent;
-        int maxWidth = -1; //bounds.width();
+        this.bounds.bottom = this.bounds.top + (int)getHeight();
 
         /**
          * Some comments are in order:
@@ -88,17 +90,18 @@ public class DrawableText implements CircaTextDrawable {
          * - Adjust the actually used size (drawnSize) to the maxWidth.
          */
         boolean hasSavedState = false;
-        if (maxWidth != -1 && this.drawnSize > maxWidth) {
-            float ellipsisSize = paint.measureText("...");
-
-            canvas.drawText("...", x + maxWidth - ellipsisSize, y, paint);
-
-            canvas.save();
-            hasSavedState = true;
-            canvas.clipRect(x, y + fm.ascent, x + maxWidth - ellipsisSize, y + fm.descent);
-
-            this.drawnSize = maxWidth;
-        }
+//        int maxWidth = -1; //bounds.width();
+//        if (maxWidth != -1 && this.drawnSize > maxWidth) {
+//            float ellipsisSize = paint.measureText("...");
+//
+//            canvas.drawText("...", x + maxWidth - ellipsisSize, y, paint);
+//
+//            canvas.save();
+//            hasSavedState = true;
+//            canvas.clipRect(x, y + fm.ascent, x + maxWidth - ellipsisSize, y + fm.descent);
+//
+//            this.drawnSize = maxWidth;
+//        }
         canvas.drawText(text, x, y, paint);
         /** In case the state was saved for clipping text, restore state. */
         if (hasSavedState) {
@@ -106,7 +109,7 @@ public class DrawableText implements CircaTextDrawable {
         }
         //{
         //    float ds = this.drawnSize;
-        //    if (this.paint.getTextAlign() == Paint.Align.RIGHT)
+        //    if (this.paint.getTextAlign() == DrawableText.Align.RIGHT)
         //        ds = -ds;
         //    canvas.drawLine(x, y, x + ds, y, this.paint);
         //    float a = this.paint.ascent();
@@ -118,12 +121,14 @@ public class DrawableText implements CircaTextDrawable {
     }
 
     public float getHeight() {
+        //if (this.hidden) return 0;
         Paint.FontMetrics fm = this.paint.getFontMetrics();
         return -fm.ascent + fm.descent;
     }
 
     @Override
     public float getWidth() {
+        //if (this.hidden) return 0;
         return paint.measureText(text);
     }
 
