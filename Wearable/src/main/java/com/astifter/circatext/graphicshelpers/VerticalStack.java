@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import com.astifter.circatextutils.CircaTextConsts;
+
 import java.util.ArrayList;
 
 public class VerticalStack extends AbstractStack {
@@ -39,9 +41,12 @@ public class VerticalStack extends AbstractStack {
         this.bounds.bottom = Math.min(this.bounds.bottom, this.bounds.top + heigth);
         this.bounds.right = Math.min(this.bounds.right, this.bounds.left + width);
 
-        Paint p = new Paint();
-        p.setColor(Color.WHITE); p.setStyle(Paint.Style.STROKE);
-        canvas.drawRect(this.bounds, p);
+        if (CircaTextConsts.DEBUG) {
+            Paint p = new Paint();
+            p.setColor(Color.WHITE);
+            p.setStyle(Paint.Style.STROKE);
+            canvas.drawRect(this.bounds, p);
+        }
     }
 
     private void onDrawWithOffset(Canvas canvas, Rect bounds) {

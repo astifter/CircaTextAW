@@ -8,6 +8,8 @@ import com.google.android.gms.wearable.DataMap;
 public class CircaTextConsts {
     private static final String TAG = "CircaTextConsts";
 
+    public static final boolean DEBUG = false;
+
     public static final String KEY_BACKGROUND_COLOR = "BACKGROUND_COLOR";
     public static final String KEY_HOURS_COLOR = "HOURS_COLOR";
     public static final String KEY_MINUTES_COLOR = "MINUTES_COLOR";

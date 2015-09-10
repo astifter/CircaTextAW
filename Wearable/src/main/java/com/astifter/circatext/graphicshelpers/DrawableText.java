@@ -6,10 +6,15 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.TextPaint;
+import android.util.Log;
+
+import com.astifter.circatextutils.CircaTextConsts;
 
 import java.lang.ref.WeakReference;
 
 public class DrawableText implements CircaTextDrawable {
+    private static final String TAG = "CircaTextDrawable";
+
     public static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
     public static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
@@ -90,34 +95,34 @@ public class DrawableText implements CircaTextDrawable {
          * - Adjust the actually used size (drawnSize) to the maxWidth.
          */
         boolean hasSavedState = false;
-//        int maxWidth = -1; //bounds.width();
-//        if (maxWidth != -1 && this.drawnSize > maxWidth) {
-//            float ellipsisSize = paint.measureText("...");
-//
-//            canvas.drawText("...", x + maxWidth - ellipsisSize, y, paint);
-//
-//            canvas.save();
-//            hasSavedState = true;
-//            canvas.clipRect(x, y + fm.ascent, x + maxWidth - ellipsisSize, y + fm.descent);
-//
-//            this.drawnSize = maxWidth;
-//        }
+        int maxWidth = -1; //bounds.width();
+        if (maxWidth != -1 && this.drawnSize > maxWidth) {
+            float ellipsisSize = paint.measureText("...");
+
+            canvas.drawText("...", x + maxWidth - ellipsisSize, y, paint);
+
+            canvas.save();
+            hasSavedState = true;
+            canvas.clipRect(x, y + fm.ascent, x + maxWidth - ellipsisSize, y + fm.descent);
+
+            this.drawnSize = maxWidth;
+        }
         canvas.drawText(text, x, y, paint);
         /** In case the state was saved for clipping text, restore state. */
         if (hasSavedState) {
             canvas.restore();
         }
-        //{
-        //    float ds = this.drawnSize;
-        //    if (this.paint.getTextAlign() == DrawableText.Align.RIGHT)
-        //        ds = -ds;
-        //    canvas.drawLine(x, y, x + ds, y, this.paint);
-        //    float a = this.paint.ascent();
-        //    canvas.drawLine(x, y + a, x + ds, y + a, this.paint);
-        //    float d = this.paint.descent();
-        //    canvas.drawLine(x, y + d, x + ds, y + d, this.paint);
-        //    canvas.drawLine(x, y + a, x, y + d, this.paint);
-        //}
+        if (CircaTextConsts.DEBUG) {
+            float ds = this.drawnSize;
+            if (this.alignment == DrawableText.Align.RIGHT)
+                ds = -ds;
+            canvas.drawLine(x, y, x + ds, y, this.paint);
+            float a = this.paint.ascent();
+            canvas.drawLine(x, y + a, x + ds, y + a, this.paint);
+            float d = this.paint.descent();
+            canvas.drawLine(x, y + d, x + ds, y + d, this.paint);
+            canvas.drawLine(x, y + a, x, y + d, this.paint);
+        }
     }
 
     public float getHeight() {
@@ -129,7 +134,11 @@ public class DrawableText implements CircaTextDrawable {
     @Override
     public float getWidth() {
         //if (this.hidden) return 0;
-        return paint.measureText(text);
+        if (this.alignment != Align.LEFT && this.bounds != null) {
+            return this.bounds.width();
+        } else {
+            return paint.measureText(text);
+        }
     }
 
     public void setTextSize(float s) {

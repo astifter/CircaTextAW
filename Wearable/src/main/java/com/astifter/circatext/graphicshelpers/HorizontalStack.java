@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import com.astifter.circatextutils.CircaTextConsts;
+
 public class HorizontalStack extends AbstractStack {
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
@@ -25,9 +27,12 @@ public class HorizontalStack extends AbstractStack {
         this.bounds.right = Math.min(this.bounds.right, this.bounds.left + width);
         this.bounds.bottom = Math.min(this.bounds.bottom, this.bounds.top + height);
 
-        Paint p = new Paint();
-        p.setColor(Color.GRAY); p.setStyle(Paint.Style.STROKE);
-        canvas.drawRect(this.bounds, p);
+        if (CircaTextConsts.DEBUG) {
+            Paint p = new Paint();
+            p.setColor(Color.GRAY);
+            p.setStyle(Paint.Style.STROKE);
+            canvas.drawRect(this.bounds, p);
+        }
     }
 
     public void addRight(CircaTextDrawable d) {
