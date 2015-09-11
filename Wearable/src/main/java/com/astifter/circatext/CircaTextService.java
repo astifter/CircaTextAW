@@ -16,6 +16,7 @@
 
 package com.astifter.circatext;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -25,8 +26,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -37,6 +41,7 @@ import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
+import android.view.animation.Animation;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
@@ -189,7 +194,9 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate()");
             super.onCreate(holder);
 
-            setWatchFaceStyle(new WatchFaceStyle.Builder(CircaTextService.this).build());
+            setWatchFaceStyle(new WatchFaceStyle.Builder(CircaTextService.this)
+                    .setAcceptsTapEvents(true)
+                    .build());
 
             Resources resources = CircaTextService.this.getResources();
 
@@ -468,6 +475,22 @@ public class CircaTextService extends CanvasWatchFaceService {
             anim.start();
         }
 
+        private ValueAnimator startAnimation(CircaTextDrawable t, String attribute, int start, int stop,
+                                             int duration, Animator.AnimatorListener a) {
+            ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
+            anim.setDuration(duration);
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    invalidate();
+                }
+            });
+            if (a != null)
+                anim.addListener(a);
+            anim.start();
+            return anim;
+        }
+
         @Override // WatchFaceService.Engine
         public void onInterruptionFilterChanged(int interruptionFilter) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onInterruptionFilterChanged()");
@@ -706,6 +729,63 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
         }
 
+        @Override
+        public void onTapCommand(int tapType, int x, int y, long eventTime) {
+            switch (tapType) {
+                case WatchFaceService.TAP_TYPE_TAP:
+                    startTapHighlight(x, y);
+                    onWatchFaceTap(x, y);
+                    break;
+                case WatchFaceService.TAP_TYPE_TOUCH:
+                    break;
+                case WatchFaceService.TAP_TYPE_TOUCH_CANCEL:
+                    break;
+                default:
+                    super.onTapCommand(tapType, x, y, eventTime);
+                    break;
+            }
 
+            String tapTypeStr = "";
+            switch(tapType) {
+                case TAP_TYPE_TAP: tapTypeStr = "TAP_TYPE_TAP"; break;
+                case TAP_TYPE_TOUCH: tapTypeStr = "TAP_TYPE_TOUCH"; break;
+                case TAP_TYPE_TOUCH_CANCEL: tapTypeStr = "TAP_TYPE_TOUCH_CANCEL"; break;
+            }
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                String output = String.format("%s: x:%d|y:%d", tapTypeStr, x, y);
+                Log.d(TAG, output);
+            }
+        }
+
+        private void onWatchFaceTap(int x, int y) {
+        }
+
+        ValueAnimator tapAnimator;
+
+        private void startTapHighlight(int x, int y) {
+            Animator.AnimatorListener listener = new ReverseListener();
+            tapAnimator = startAnimation(topDrawable, "alpha", 255, 0, 100, listener);
+        }
+
+        private class ReverseListener implements Animator.AnimatorListener {
+            @Override
+            public void onAnimationStart(Animator animator) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                startAnimation(topDrawable, "alpha", 0, 255, 100, null);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        }
     }
 }

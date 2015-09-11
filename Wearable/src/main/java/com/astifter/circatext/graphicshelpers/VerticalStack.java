@@ -54,6 +54,7 @@ public class VerticalStack extends AbstractStack {
     }
 
     public void addBelow(CircaTextDrawable d) {
+        this.stack.add(d);
         this.belowStack.add(d);
     }
 }
