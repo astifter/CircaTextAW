@@ -199,12 +199,14 @@ public class CircaTextService extends CanvasWatchFaceService {
                     .build());
 
             Resources resources = CircaTextService.this.getResources();
+            DrawableText.NORMAL_TYPEFACE = Typeface.createFromAsset(resources.getAssets(), "fonts/RobotoCondensed-Light.ttf");
+            DrawableText.BOLD_TYPEFACE = Typeface.createFromAsset(resources.getAssets(), "fonts/RobotoCondensed-Regular.ttf");
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
 
             mTextFields[eTF_BATTERY] = new DrawableText(resources.getColor(R.color.digital_colons), DrawableText.Align.RIGHT);
-            mTextFields[eTF_HOUR] = new DrawableText(CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS, DrawableText.BOLD_TYPEFACE);
+            mTextFields[eTF_HOUR] = new DrawableText(CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS);
             mTextFields[eTF_COLON_1] = new DrawableText(resources.getColor(R.color.digital_colons));
             mTextFields[eTF_MINUTE] = new DrawableText(CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS);
             mTextFields[eTF_COLON_2] = new DrawableText(resources.getColor(R.color.digital_colons));
@@ -362,7 +364,16 @@ public class CircaTextService extends CanvasWatchFaceService {
             Resources resources = CircaTextService.this.getResources();
             boolean isRound = insets.isRound();
 
-            float textSize = resources.getDimension(isRound ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
+            int width = resources.getDisplayMetrics().widthPixels;
+            int heigth = resources.getDisplayMetrics().heightPixels;
+            int mXOffset = (int)resources.getDimension(isRound ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
+            int mYOffset = (int)resources.getDimension(R.dimen.digital_y_offset);
+            mBounds = new Rect(mXOffset, mXOffset, width-mXOffset, heigth-mXOffset);
+
+            float textSize = DrawableText.getMaximumTextSize(DrawableText.NORMAL_TYPEFACE, "00:00:00", mBounds);
+            float biggerTextSize = DrawableText.getMaximumTextSize(DrawableText.NORMAL_TYPEFACE, "00:00", mBounds);
+            textScaleFactor = biggerTextSize / textSize;
+
             for (DrawableText t : mTextFields) {
                 t.setTextSize(textSize);
                 t.setDefaultTextSize(textSize);
@@ -381,11 +392,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             mTextFields[eTF_WEATHER_AGE].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size)/1.5f);
             mTextFields[eTF_WEATHER_DESC].setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
 
-            int width = resources.getDisplayMetrics().widthPixels;
-            int heigth = resources.getDisplayMetrics().heightPixels;
-            int mXOffset = (int)resources.getDimension(isRound ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-            int mYOffset = (int)resources.getDimension(R.dimen.digital_y_offset);
-            mBounds = new Rect(mXOffset, mXOffset, width-mXOffset, heigth-mXOffset);
         }
 
         @Override // WatchFaceService.Engine
@@ -603,8 +609,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (mWeather != null) {
                 long age = now - mWeather.lastupdate.getTime();
                 float ageFloat = age / (60 * 1000);
-                String tempText = String.format("%2.1f", mWeather.temperature.getTemp());
-                String ageText = String.format("(%.0fm)", ageFloat);
+                String tempText = String.format("%2.0f°C", mWeather.temperature.getTemp());
+                String ageText = String.format(" (%.0fm)", ageFloat);
                 mTextFields[eTF_WEATHER_TEMP].setText(tempText);
                 mTextFields[eTF_WEATHER_AGE].setText(ageText);
                 mTextFields[eTF_WEATHER_DESC].setText(mWeather.currentCondition.getCondition());

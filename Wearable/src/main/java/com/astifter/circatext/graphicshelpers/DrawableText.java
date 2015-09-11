@@ -11,12 +11,13 @@ import android.util.Log;
 import com.astifter.circatextutils.CircaTextConsts;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
 
 public class DrawableText implements CircaTextDrawable {
     private static final String TAG = "CircaTextDrawable";
 
-    public static final Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
-    public static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
+    public static Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
+    public static Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
     private Rect bounds;
     private final Paint paint;
@@ -195,5 +196,26 @@ public class DrawableText implements CircaTextDrawable {
         public static final int TOP = 0x10;
         public static final int MIDDLE = 0x20;
         public static final int BOTTOM = 0x30;
+    }
+
+    public static float getMaximumTextSize(Typeface f, String t, Rect bounds) {
+        Paint p = new Paint();
+        p.setTypeface(f);
+        p.setAntiAlias(true);
+
+        float width = bounds.width();
+        float lowerWidth = width * 0.99f;
+
+        p.setTextSize(0);
+        while (p.measureText(t) < width) {
+            p.setTextSize(p.getTextSize()+1);
+        }
+        while (p.measureText(t) > lowerWidth) {
+            p.setTextSize(p.getTextSize()-0.1f);
+        }
+        while (p.measureText(t) < width) {
+            p.setTextSize(p.getTextSize()+0.01f);
+        }
+        return p.getTextSize();
     }
 }
