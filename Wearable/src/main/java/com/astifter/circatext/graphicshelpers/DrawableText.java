@@ -30,23 +30,15 @@ public class DrawableText implements CircaTextDrawable {
     private HashMap<Integer, String> textSource;
 
     public DrawableText() {
-        this.paint = createTextPaint(NORMAL_TYPEFACE, Align.LEFT);
-    }
-    public DrawableText(int a) {
-        this.paint = createTextPaint(NORMAL_TYPEFACE, a);
+        this.paint = createTextPaint(NORMAL_TYPEFACE);
+        setAlignment(Align.LEFT);
     }
 
-    private TextPaint createTextPaint(Typeface t, int a) {
+    private TextPaint createTextPaint(Typeface t) {
         TextPaint paint = new TextPaint();
         paint.setColor(Color.WHITE);
         paint.setTypeface(t);
         paint.setAntiAlias(true);
-        this.alignment = a;
-        switch(a & 0xF) {
-            case Align.LEFT: paint.setTextAlign(Paint.Align.LEFT); break;
-            case Align.RIGHT: paint.setTextAlign(Paint.Align.RIGHT); break;
-            case Align.CENTER: paint.setTextAlign(Paint.Align.CENTER); break;
-        }
         return paint;
     }
 
@@ -169,6 +161,15 @@ public class DrawableText implements CircaTextDrawable {
 
     public float getDefaultTextSize() {
         return this.defaultTextSize;
+    }
+
+    public void setAlignment(int a) {
+        this.alignment = a;
+        switch(a & 0xF) {
+            case Align.LEFT: paint.setTextAlign(Paint.Align.LEFT); break;
+            case Align.RIGHT: paint.setTextAlign(Paint.Align.RIGHT); break;
+            case Align.CENTER: paint.setTextAlign(Paint.Align.CENTER); break;
+        }
     }
 
     public class Align {
