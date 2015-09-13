@@ -6,17 +6,14 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.TextPaint;
-import android.util.Log;
 
 import com.astifter.circatextutils.CircaTextConsts;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Type;
+import java.util.HashMap;
 
 public class DrawableText implements CircaTextDrawable {
     private static final String TAG = "CircaTextDrawable";
 
-    public static Typeface BOLD_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
     public static Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
     private Rect bounds;
@@ -30,6 +27,9 @@ public class DrawableText implements CircaTextDrawable {
     private boolean hidden = false;
     private boolean isInAmbientMode = false;
 
+    private Integer textSourceName;
+    private HashMap<Integer, String> textSource;
+
     public DrawableText() {
         this.paint = new Paint();
     }
@@ -40,10 +40,6 @@ public class DrawableText implements CircaTextDrawable {
     public DrawableText(int c, int a) {
         this.color = c;
         this.paint = createTextPaint(NORMAL_TYPEFACE, a);
-    }
-    public DrawableText(int c, Typeface t) {
-        this.color = c;
-        this.paint = createTextPaint(t, DrawableText.Align.LEFT);
     }
 
     private TextPaint createTextPaint(Typeface t, int a) {
@@ -65,6 +61,10 @@ public class DrawableText implements CircaTextDrawable {
     }
 
     public void onDraw(Canvas canvas, Rect b) {
+        if (this.textSource != null && this.textSource.get(this.textSourceName) != null) {
+            this.text = this.textSource.get(this.textSourceName);
+        }
+
         if (this.text == "" || hidden) return;
         this.bounds = b;
 
@@ -217,5 +217,10 @@ public class DrawableText implements CircaTextDrawable {
             p.setTextSize(p.getTextSize()+0.01f);
         }
         return p.getTextSize();
+    }
+
+    public void setTextSource(Integer where, HashMap<Integer, String> source) {
+        this.textSource = source;
+        this.textSourceName = where;
     }
 }
