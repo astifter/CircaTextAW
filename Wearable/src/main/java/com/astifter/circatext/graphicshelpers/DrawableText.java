@@ -19,7 +19,6 @@ public class DrawableText implements CircaTextDrawable {
     private Rect bounds;
     private final Paint paint;
     private int alignment;
-    private int color;
     private float drawnSize;
     private float defaultTextSize;
 
@@ -31,20 +30,15 @@ public class DrawableText implements CircaTextDrawable {
     private HashMap<Integer, String> textSource;
 
     public DrawableText() {
-        this.paint = new Paint();
+        this.paint = createTextPaint(NORMAL_TYPEFACE, Align.LEFT);
     }
-    public DrawableText(int c) {
-        this.color = c;
-        this.paint = createTextPaint(NORMAL_TYPEFACE, DrawableText.Align.LEFT);
-    }
-    public DrawableText(int c, int a) {
-        this.color = c;
+    public DrawableText(int a) {
         this.paint = createTextPaint(NORMAL_TYPEFACE, a);
     }
 
     private TextPaint createTextPaint(Typeface t, int a) {
         TextPaint paint = new TextPaint();
-        paint.setColor(this.color);
+        paint.setColor(Color.WHITE);
         paint.setTypeface(t);
         paint.setAntiAlias(true);
         this.alignment = a;
@@ -153,22 +147,10 @@ public class DrawableText implements CircaTextDrawable {
     public void setAmbientMode(boolean inAmbientMode) {
         this.isInAmbientMode = inAmbientMode;
         this.paint.setAntiAlias(!inAmbientMode);
-        if (inAmbientMode) {
-            this.paint.setColor(Color.WHITE);
-        } else {
-            this.paint.setColor(this.color);
-        }
     }
 
-    public void setTypeface(Typeface t) {
-        this.paint.setTypeface(t);
-    }
-
+    @Override
     public void setColor(int c) {
-        this.color = c;
-        if (!this.isInAmbientMode) {
-            this.paint.setColor(c);
-        }
     }
 
     public void setAlpha(int a) {

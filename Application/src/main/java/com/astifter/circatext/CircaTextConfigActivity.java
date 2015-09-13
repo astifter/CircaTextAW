@@ -162,17 +162,10 @@ public class CircaTextConfigActivity extends Activity
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpAllPickers()");
 
         setUpColorPickerSelection(R.id.background, CircaTextConsts.KEY_BACKGROUND_COLOR, config, R.string.color_black);
-        setUpColorPickerSelection(R.id.hours, CircaTextConsts.KEY_HOURS_COLOR, config, R.string.color_white);
-        setUpColorPickerSelection(R.id.minutes, CircaTextConsts.KEY_MINUTES_COLOR, config, R.string.color_white);
-        setUpColorPickerSelection(R.id.seconds, CircaTextConsts.KEY_SECONDS_COLOR, config, R.string.color_gray);
 
         setUpEditTextContent(R.id.exclude_calendars, CircaTextConsts.KEY_EXCLUDED_CALENDARS, config, "");
 
         setUpColorPickerListener(R.id.background, CircaTextConsts.KEY_BACKGROUND_COLOR);
-        setUpColorPickerListener(R.id.hours, CircaTextConsts.KEY_HOURS_COLOR);
-        setUpColorPickerListener(R.id.minutes, CircaTextConsts.KEY_MINUTES_COLOR);
-        setUpColorPickerListener(R.id.seconds, CircaTextConsts.KEY_SECONDS_COLOR);
-
         setUpEditTextListener(R.id.exclude_calendars, CircaTextConsts.KEY_EXCLUDED_CALENDARS);
     }
 

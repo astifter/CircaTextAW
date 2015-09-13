@@ -208,19 +208,19 @@ public class CircaTextService extends CanvasWatchFaceService {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(mInteractiveBackgroundColor);
 
-            mTextFields.put(eTF.BATTERY, new DrawableText(resources.getColor(R.color.digital_colons), DrawableText.Align.RIGHT));
-            mTextFields.put(eTF.HOUR, new DrawableText(CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_HOUR_DIGITS));
-            mTextFields.put(eTF.COLON_1, new DrawableText(resources.getColor(R.color.digital_colons)));
-            mTextFields.put(eTF.MINUTE, new DrawableText(CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_MINUTE_DIGITS));
-            mTextFields.put(eTF.COLON_2, new DrawableText(resources.getColor(R.color.digital_colons)));
-            mTextFields.put(eTF.SECOND, new DrawableText(CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS));
-            mTextFields.put(eTF.DAY_OF_WEEK, new DrawableText(resources.getColor(R.color.digital_date)));
-            mTextFields.put(eTF.DATE, new DrawableText(resources.getColor(R.color.digital_date), DrawableText.Align.RIGHT));
-            mTextFields.put(eTF.CALENDAR_1, new DrawableText(resources.getColor(R.color.digital_date)));
-            mTextFields.put(eTF.CALENDAR_2, new DrawableText(resources.getColor(R.color.digital_date)));
-            mTextFields.put(eTF.WEATHER_TEMP, new DrawableText(resources.getColor(R.color.digital_colons), DrawableText.Align.LEFT));
-            mTextFields.put(eTF.WEATHER_AGE, new DrawableText(resources.getColor(R.color.digital_colons), DrawableText.Align.LEFT));
-            mTextFields.put(eTF.WEATHER_DESC, new DrawableText(resources.getColor(R.color.digital_colons), DrawableText.Align.RIGHT));
+            mTextFields.put(eTF.BATTERY, new DrawableText(DrawableText.Align.RIGHT));
+            mTextFields.put(eTF.HOUR, new DrawableText());
+            mTextFields.put(eTF.COLON_1, new DrawableText());
+            mTextFields.put(eTF.MINUTE, new DrawableText());
+            mTextFields.put(eTF.COLON_2, new DrawableText());
+            mTextFields.put(eTF.SECOND, new DrawableText());
+            mTextFields.put(eTF.DAY_OF_WEEK, new DrawableText());
+            mTextFields.put(eTF.DATE, new DrawableText(DrawableText.Align.RIGHT));
+            mTextFields.put(eTF.CALENDAR_1, new DrawableText());
+            mTextFields.put(eTF.CALENDAR_2, new DrawableText());
+            mTextFields.put(eTF.WEATHER_TEMP, new DrawableText());
+            mTextFields.put(eTF.WEATHER_AGE, new DrawableText());
+            mTextFields.put(eTF.WEATHER_DESC, new DrawableText(DrawableText.Align.RIGHT));
             for (Integer i : mTextFields.keySet()) {
                 mTextFields.get(i).setTextSource(i, mTexts);
             }
@@ -716,15 +716,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                     if (!isInAmbientMode() && mBackgroundPaint != null) {
                         mBackgroundPaint.setColor(color);
                     }
-                    break;
-                case CircaTextConsts.KEY_HOURS_COLOR:
-                    mTextFields.get(eTF.HOUR).setColor(color);
-                    break;
-                case CircaTextConsts.KEY_MINUTES_COLOR:
-                    mTextFields.get(eTF.MINUTE).setColor(color);
-                    break;
-                case CircaTextConsts.KEY_SECONDS_COLOR:
-                    mTextFields.get(eTF.SECOND).setColor(color);
                     break;
             }
         }
