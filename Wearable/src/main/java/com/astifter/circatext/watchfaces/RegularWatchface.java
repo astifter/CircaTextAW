@@ -29,10 +29,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
-/**
- * Created by astifter on 14.09.15.
- */
-public class RegularWatchface implements Watchface {
+public class RegularWatchFace implements WatchFace {
     CanvasWatchFaceService.Engine parent;
 
     class eTF {
@@ -76,7 +73,7 @@ public class RegularWatchface implements Watchface {
     CalendarHelper.EventInfo[] mMeetings;
     private Weather mWeather = null;
 
-    public RegularWatchface(CanvasWatchFaceService.Engine parent) {
+    public RegularWatchFace(CanvasWatchFaceService.Engine parent) {
         this.parent = parent;
         mCalendar = Calendar.getInstance();
 
@@ -277,7 +274,6 @@ public class RegularWatchface implements Watchface {
         return anim;
     }
 
-    @Override
     public void updateVisibilty() {
         for(Integer i : mTF.keySet()) {
             mTF.get(i).hide();

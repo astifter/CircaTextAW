@@ -37,8 +37,8 @@ import android.view.WindowInsets;
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.graphicshelpers.DrawableText;
-import com.astifter.circatext.watchfaces.RegularWatchface;
-import com.astifter.circatext.watchfaces.Watchface;
+import com.astifter.circatext.watchfaces.RegularWatchFace;
+import com.astifter.circatext.watchfaces.WatchFace;
 import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.CircaTextUtil;
 import com.astifter.circatextutils.Serializer;
@@ -81,7 +81,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                       implements DataApi.DataListener,
                                  GoogleApiClient.ConnectionCallbacks,
                                  GoogleApiClient.OnConnectionFailedListener {
-        Watchface wtf;
+        WatchFace wtf;
 
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
@@ -141,7 +141,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                     Typeface.createFromAsset(CircaTextService.this.getResources().getAssets(),
                                              "fonts/RobotoCondensed-Light.ttf");
 
-            wtf = new RegularWatchface(this);
+            wtf = new RegularWatchFace(this);
             wtf.localeChanged();
         }
 
@@ -153,7 +153,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             setWatchFaceStyle(new WatchFaceStyle.Builder(CircaTextService.this)
                     .setAcceptsTapEvents(true)
                     .build());
-
 
             mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
         }
