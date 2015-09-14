@@ -91,14 +91,14 @@ public class RegularWatchFace implements WatchFace {
         mTexts.put(eTF.COLON_1, ":");
         mTexts.put(eTF.COLON_2, ":");
 
-        topDrawable.addBelow(mTF.get(eTF.BATTERY));
         HorizontalStack hours = new HorizontalStack();
         hours.addRight(mTF.get(eTF.HOUR));
         hours.addRight(mTF.get(eTF.COLON_1));
         hours.addRight(mTF.get(eTF.MINUTE));
         hours.addRight(mTF.get(eTF.COLON_2));
         hours.addRight(mTF.get(eTF.SECOND));
-        topDrawable.addBelow(hours);
+        topDrawable.addAbove(hours);
+        topDrawable.addAbove(mTF.get(eTF.BATTERY));
         HorizontalStack date = new HorizontalStack();
         date.addRight(mTF.get(eTF.DAY_OF_WEEK));
         date.addRight(mTF.get(eTF.DATE));
@@ -143,8 +143,9 @@ public class RegularWatchFace implements WatchFace {
         int height = resources.getDisplayMetrics().heightPixels;
 
         int mOffset = (int)resources.getDimension(insets.isRound() ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-        //int mYOffset = (int)resources.getDimension(R.dimen.digital_y_offset);
+        int mYOffset = (int)resources.getDimension(R.dimen.digital_y_offset);
         mBounds = new Rect(mOffset, mOffset, width-mOffset, height-mOffset);
+        topDrawable.setOffset(mYOffset);
 
         float textSize = DrawableText.getMaximumTextSize(DrawableText.NORMAL_TYPEFACE, "00:00:00", mBounds);
         float biggerTextSize = DrawableText.getMaximumTextSize(DrawableText.NORMAL_TYPEFACE, "00:00", mBounds);

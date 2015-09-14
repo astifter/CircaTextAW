@@ -109,6 +109,10 @@ public class DrawableText implements CircaTextDrawable {
             float d = this.paint.descent();
             canvas.drawLine(x, y + d, x + ds, y + d, this.paint);
             canvas.drawLine(x, y + a, x, y + d, this.paint);
+
+            Paint red = new Paint(); red.setColor(Color.RED);
+            canvas.drawLine(x - 10, y, x + 10, y, red);
+            canvas.drawLine(x, y - 10, x, y + 10, red);
         }
     }
 

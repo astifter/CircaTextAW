@@ -10,12 +10,10 @@ import com.astifter.circatextutils.CircaTextConsts;
 import java.util.ArrayList;
 
 public class VerticalStack extends AbstractStack {
-    float yCenter = -1;
+    int yCenter = -1;
 
     ArrayList<CircaTextDrawable> aboveStack;
     ArrayList<CircaTextDrawable> belowStack;
-    int aboveStackHeight = 0;
-    int belowStackHeight = 0;
 
     public VerticalStack() {
         aboveStack = new ArrayList<>();
@@ -26,6 +24,11 @@ public class VerticalStack extends AbstractStack {
     public void onDraw(Canvas canvas, Rect bounds) {
         if (hidden) return;
         this.bounds = bounds;
+
+        if (yCenter >= 0) {
+            onDrawWithOffset(canvas);
+            return;
+        }
 
         int width = 0;
         int heigth = 0;
@@ -49,12 +52,53 @@ public class VerticalStack extends AbstractStack {
         }
     }
 
-    private void onDrawWithOffset(Canvas canvas, Rect bounds) {
+    private void onDrawWithOffset(Canvas canvas) {
+        int width = 0;
 
+        int heigthAbove = 0;
+        for (CircaTextDrawable t : this.aboveStack) {
+            int currentHeight = (int)t.getHeight();
+            Rect newBounds = new Rect(this.bounds.left, yCenter - heigthAbove - currentHeight,
+                                      this.bounds.right, yCenter - heigthAbove);
+            t.onDraw(canvas, newBounds);
+            heigthAbove += currentHeight;
+
+            if (t.getWidth() > width)
+                width = (int)t.getWidth();
+        }
+        int heigthBelow = 0;
+        for (CircaTextDrawable t : this.belowStack) {
+            Rect newBounds = new Rect(this.bounds.left, yCenter + heigthBelow,
+                                      this.bounds.right, this.bounds.bottom);
+            t.onDraw(canvas, newBounds);
+            heigthBelow += t.getHeight();
+
+            if (t.getWidth() > width)
+                width = (int)t.getWidth();
+        }
+
+        this.bounds.bottom = Math.min(this.bounds.bottom, yCenter + heigthBelow);
+        this.bounds.right = Math.min(this.bounds.right, this.bounds.left + width);
+
+        if (CircaTextConsts.DEBUG) {
+            Paint p = new Paint();
+            p.setColor(Color.WHITE);
+            p.setStyle(Paint.Style.STROKE);
+            canvas.drawRect(this.bounds, p);
+        }
     }
 
     public void addBelow(CircaTextDrawable d) {
         this.stack.add(d);
         this.belowStack.add(d);
+    }
+
+    public void addAbove(CircaTextDrawable d) {
+        this.stack.add(0, d);
+        this.aboveStack.add(d);
+    }
+
+    public void setOffset(int mYOffset) {
+        yCenter = mYOffset;
     }
 }

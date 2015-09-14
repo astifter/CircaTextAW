@@ -38,4 +38,14 @@ public class HorizontalStack extends AbstractStack {
     public void addRight(CircaTextDrawable d) {
         this.stack.add(d);
     }
+
+    @Override
+    public float getHeight() {
+        int height = 0;
+        for (CircaTextDrawable t : stack) {
+            if (t.getHeight() > height)
+                height = (int)t.getHeight();
+        }
+        return height;
+    }
 }
