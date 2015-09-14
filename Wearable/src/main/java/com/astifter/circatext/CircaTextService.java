@@ -16,17 +16,11 @@
 
 package com.astifter.circatext;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -42,10 +36,9 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
-import com.astifter.circatext.graphicshelpers.CircaTextDrawable;
 import com.astifter.circatext.graphicshelpers.DrawableText;
-import com.astifter.circatext.graphicshelpers.HorizontalStack;
-import com.astifter.circatext.graphicshelpers.VerticalStack;
+import com.astifter.circatext.watchfaces.RegularWatchface;
+import com.astifter.circatext.watchfaces.Watchface;
 import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.CircaTextUtil;
 import com.astifter.circatextutils.Serializer;
@@ -60,13 +53,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * Sample digital watch face with blinking colons and seconds. In ambient mode, the seconds not
@@ -94,6 +81,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                       implements DataApi.DataListener,
                                  GoogleApiClient.ConnectionCallbacks,
                                  GoogleApiClient.OnConnectionFailedListener {
+        Watchface wtf;
 
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
@@ -101,46 +89,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
-        private Weather mWeather = null;
-        private Date    mWeatherRequested = null;
+        private Date  mWeatherRequested = null;
 
-        class eTF {
-            private static final int DAY_OF_WEEK = 0;
-            private static final int DATE = DAY_OF_WEEK + 1;
-            private static final int CALENDAR_1 = DATE + 1;
-            private static final int CALENDAR_2 = CALENDAR_1 + 1;
-            private static final int BATTERY = CALENDAR_2 + 1;
-            private static final int HOUR = BATTERY + 1;
-            private static final int COLON_1 = HOUR + 1;
-            private static final int MINUTE = COLON_1 + 1;
-            private static final int COLON_2 = MINUTE + 1;
-            private static final int SECOND = COLON_2 + 1;
-            private static final int WEATHER_TEMP = SECOND + 1;
-            private static final int WEATHER_AGE = WEATHER_TEMP + 1;
-            private static final int WEATHER_DESC = WEATHER_AGE + 1;
-            private static final int SIZE = WEATHER_DESC + 1;
-        }
-        private final HashMap<Integer, DrawableText> mTF = new HashMap<>();
-        private final HashMap<Integer, String> mTexts = new HashMap<>();
-        private final ArrayList<DrawableText> mTFFading = new ArrayList<>();
-        private final ArrayList<DrawableText> mTFAnimated = new ArrayList<>();
-
-        private final VerticalStack topDrawable = new VerticalStack();
-        private Rect mBounds;
-        
-        Calendar mCalendar;
-        Date mDate;
-        SimpleDateFormat mDayFormat;
-        SimpleDateFormat mDateFormat;
-
-        boolean mMute;
-        /**
-         * Whether the display supports fewer bits for each color in ambient mode. When true, we
-         * disable anti-aliasing in ambient mode.
-         */
-        boolean mLowBitAmbient;
-        int mInteractiveBackgroundColor = CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
-        Paint mBackgroundPaint;
         final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
@@ -167,12 +117,11 @@ public class CircaTextService extends CanvasWatchFaceService {
                 if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "mReceiver.onReceive()");
 
                 if (Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()) ||
-                        Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())) {
-                    mCalendar.setTimeZone(TimeZone.getDefault());
-                    initFormats();
+                    Intent.ACTION_LOCALE_CHANGED.equals(intent.getAction())      ) {
+                    wtf.localeChanged();
                 }
-                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction()) &&
-                        WearableCalendarContract.CONTENT_URI.equals(intent.getData())) {
+                if (Intent.ACTION_PROVIDER_CHANGED.equals(intent.getAction())     &&
+                    WearableCalendarContract.CONTENT_URI.equals(intent.getData())    ) {
                     mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
                 }
                 invalidate();
@@ -191,10 +140,9 @@ public class CircaTextService extends CanvasWatchFaceService {
             DrawableText.NORMAL_TYPEFACE =
                     Typeface.createFromAsset(CircaTextService.this.getResources().getAssets(),
                                              "fonts/RobotoCondensed-Light.ttf");
-            for (int i = 0; i < eTF.SIZE; i++) {
-                mTF.put(i, new DrawableText());
-                mTF.get(i).setTextSource(i, mTexts);
-            }
+
+            wtf = new RegularWatchface(this);
+            wtf.localeChanged();
         }
 
         @Override // WatchFaceService.Engine
@@ -206,59 +154,13 @@ public class CircaTextService extends CanvasWatchFaceService {
                     .setAcceptsTapEvents(true)
                     .build());
 
-            mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(mInteractiveBackgroundColor);
-
-            mTF.get(eTF.BATTERY).setAlignment(DrawableText.Align.RIGHT);
-            mTF.get(eTF.DATE).setAlignment(DrawableText.Align.RIGHT);
-            mTF.get(eTF.WEATHER_DESC).setAlignment(DrawableText.Align.RIGHT);
-            mTexts.put(eTF.COLON_1, ":");
-            mTexts.put(eTF.COLON_2, ":");
-
-            topDrawable.addBelow(mTF.get(eTF.BATTERY));
-            HorizontalStack hours = new HorizontalStack();
-            hours.addRight(mTF.get(eTF.HOUR));
-            hours.addRight(mTF.get(eTF.COLON_1));
-            hours.addRight(mTF.get(eTF.MINUTE));
-            hours.addRight(mTF.get(eTF.COLON_2));
-            hours.addRight(mTF.get(eTF.SECOND));
-            topDrawable.addBelow(hours);
-            HorizontalStack date = new HorizontalStack();
-            date.addRight(mTF.get(eTF.DAY_OF_WEEK));
-            date.addRight(mTF.get(eTF.DATE));
-            topDrawable.addBelow(date);
-            topDrawable.addBelow(mTF.get(eTF.CALENDAR_1));
-            topDrawable.addBelow(mTF.get(eTF.CALENDAR_2));
-            HorizontalStack weather = new HorizontalStack();
-            weather.addRight(mTF.get(eTF.WEATHER_TEMP));
-            weather.addRight(mTF.get(eTF.WEATHER_AGE));
-            weather.addRight(mTF.get(eTF.WEATHER_DESC));
-            topDrawable.addBelow(weather);
-
-            mTFFading.add(mTF.get(eTF.CALENDAR_1));
-            mTFFading.add(mTF.get(eTF.CALENDAR_2));
-            mTFFading.add(mTF.get(eTF.COLON_2));
-            mTFFading.add(mTF.get(eTF.SECOND));
-            mTFFading.add(mTF.get(eTF.BATTERY));
-            mTFFading.add(mTF.get(eTF.WEATHER_TEMP));
-            mTFFading.add(mTF.get(eTF.WEATHER_AGE));
-            mTFFading.add(mTF.get(eTF.WEATHER_DESC));
-
-            mTFAnimated.add(mTF.get(eTF.HOUR));
-            mTFAnimated.add(mTF.get(eTF.COLON_1));
-            mTFAnimated.add(mTF.get(eTF.MINUTE));
-
-            mCalendar = Calendar.getInstance();
-            mDate = new Date();
-            initFormats();
 
             mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
         }
 
         @Override
         public void onPeekCardPositionUpdate (Rect rect) {
-            updateVisibility();
-            invalidate();
+            wtf.setPeekCardPosition(rect);
         }
 
         @Override // WatchFaceService.Engine
@@ -282,8 +184,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 registerReceiver();
 
                 // Update time zone and date formats, in case they changed while we weren't visible.
-                mCalendar.setTimeZone(TimeZone.getDefault());
-                initFormats();
+                wtf.localeChanged();
 
                 mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
             } else {
@@ -300,13 +201,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             // Whether the timer should be running depends on whether we're visible (as well as
             // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
-        }
-
-        private void initFormats() {
-            mDayFormat = new SimpleDateFormat("EEE", Locale.getDefault());
-            mDayFormat.setCalendar(mCalendar);
-            mDateFormat = new SimpleDateFormat("MMM d yyyy", Locale.getDefault());
-            mDateFormat.setCalendar(mCalendar);
         }
 
         private void registerReceiver() {
@@ -355,38 +249,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             super.onApplyWindowInsets(insets);
 
-            // Load resources that have alternate values for round watches.
-            Resources resources = CircaTextService.this.getResources();
-            boolean isRound = insets.isRound();
-
-            int width = resources.getDisplayMetrics().widthPixels;
-            int height = resources.getDisplayMetrics().heightPixels;
-            int mOffset = (int)resources.getDimension(isRound ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-            //int mYOffset = (int)resources.getDimension(R.dimen.digital_y_offset);
-            mBounds = new Rect(mOffset, mOffset, width-mOffset, height-mOffset);
-
-            float textSize = DrawableText.getMaximumTextSize(DrawableText.NORMAL_TYPEFACE, "00:00:00", mBounds);
-            float biggerTextSize = DrawableText.getMaximumTextSize(DrawableText.NORMAL_TYPEFACE, "00:00", mBounds);
-            textScaleFactor = biggerTextSize / textSize;
-
-            for (Integer i : mTF.keySet()) {
-                DrawableText t = mTF.get(i);
-                t.setTextSize(textSize);
-                t.setDefaultTextSize(textSize);
-            }
-            if (isInAmbientMode()) {
-                for (DrawableText t : mTFAnimated) {
-                    t.setTextSize(textSize*textScaleFactor);
-                }
-            }
-            mTF.get(eTF.DAY_OF_WEEK).setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
-            mTF.get(eTF.DATE).setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
-            mTF.get(eTF.CALENDAR_1).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-            mTF.get(eTF.CALENDAR_2).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-            mTF.get(eTF.BATTERY).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-            mTF.get(eTF.WEATHER_TEMP).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-            mTF.get(eTF.WEATHER_AGE).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size)/1.5f);
-            mTF.get(eTF.WEATHER_DESC).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
+            wtf.setMetrics(getResources(), insets);
         }
 
         @Override // WatchFaceService.Engine
@@ -396,8 +259,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             super.onPropertiesChanged(properties);
 
             //boolean burnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
-
-            mLowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
+            wtf.setLowBitAmbientMode(properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false));
         }
 
         @Override // WatchFaceService.Engine
@@ -414,81 +276,16 @@ public class CircaTextService extends CanvasWatchFaceService {
             invalidate();
         }
 
-        float textScaleFactor = 1.55f;
-
         @Override // WatchFaceService.Engine
         public void onAmbientModeChanged(boolean inAmbientMode) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onAmbientModeChanged()");
 
             super.onAmbientModeChanged(inAmbientMode);
-
-            mBackgroundPaint.setColor(isInAmbientMode() ?
-                    mInteractiveBackgroundColor :
-                    CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
-            updateVisibility();
-
-            if (mLowBitAmbient) {
-                for (Integer i : mTF.keySet()) {
-                    mTF.get(i).setAmbientMode(inAmbientMode);
-                }
-            }
-            if (!inAmbientMode) {
-                for (DrawableText dt : mTFFading) {
-                    createIntAnimation(dt, "alpha", 0, 255);
-                }
-                for (DrawableText dt : mTFAnimated) {
-                    createTextSizeAnimation(dt, dt.getDefaultTextSize() * textScaleFactor, dt.getDefaultTextSize());
-                }
-            } else {
-                for (DrawableText dt : mTFAnimated) {
-                    createTextSizeAnimation(dt, dt.getDefaultTextSize(), dt.getDefaultTextSize() * textScaleFactor);
-                }
-            }
+            wtf.setAmbientMode(inAmbientMode);
 
             // Whether the timer should be running depends on whether we're in ambient mode (as well
             // as whether we're visible), so we may need to start or stop the timer.
             updateTimer();
-        }
-
-        private void createIntAnimation(DrawableText t, String attribute, int start, int stop) {
-            ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
-            startAnimation(anim);
-        }
-
-        private void createTextSizeAnimation(DrawableText t, float from, float to) {
-            createFloatAnimation(t, "textSize", from, to);
-        }
-
-        private void createFloatAnimation(DrawableText t, String attribute, float start, float stop) {
-            ValueAnimator anim = ObjectAnimator.ofFloat(t, attribute, start, stop);
-            startAnimation(anim);
-        }
-
-        private void startAnimation(ValueAnimator anim) {
-            anim.setDuration(500);
-            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    invalidate();
-                }
-            });
-            anim.start();
-        }
-
-        private ValueAnimator startAnimation(CircaTextDrawable t, String attribute, int start, int stop,
-                                             int duration, Animator.AnimatorListener a) {
-            ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
-            anim.setDuration(duration);
-            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    invalidate();
-                }
-            });
-            if (a != null)
-                anim.addListener(a);
-            anim.start();
-            return anim;
         }
 
         @Override // WatchFaceService.Engine
@@ -499,49 +296,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
             updateTimer();
-
-            if (mMute != inMuteMode) {
-                mMute = inMuteMode;
-                updateVisibility();
-                invalidate();
-            }
-        }
-
-        private void updateVisibility() {
-            for(Integer i : mTF.keySet()) {
-                mTF.get(i).hide();
-            }
-
-            mTF.get(eTF.HOUR).show();
-            mTF.get(eTF.COLON_1).show();
-            mTF.get(eTF.MINUTE).show();
-
-            // draw the rest only when not in mute mode
-            if (mMute) return;
-
-            if (getPeekCardPosition().isEmpty()) {
-                mTF.get(eTF.DAY_OF_WEEK).show();
-                mTF.get(eTF.DATE).show();
-            }
-
-            // draw the rest only when not in ambient mode
-            if(isInAmbientMode()) return;
-
-            mTF.get(eTF.COLON_2).show();
-            mTF.get(eTF.SECOND).show();
-            mTF.get(eTF.BATTERY).show();
-
-            // if peek card is shown, exit
-            if (getPeekCardPosition().isEmpty()) {
-                mTF.get(eTF.CALENDAR_1).show();
-                mTF.get(eTF.CALENDAR_2).show();
-
-                if (mWeather != null) {
-                    mTF.get(eTF.WEATHER_TEMP).show();
-                    mTF.get(eTF.WEATHER_AGE).show();
-                    mTF.get(eTF.WEATHER_DESC).show();
-                }
-            }
+            wtf.setMuteMode(inMuteMode);
         }
 
         private void updateTimer() {
@@ -561,58 +316,10 @@ public class CircaTextService extends CanvasWatchFaceService {
         public void onDraw(Canvas canvas, Rect bounds) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDraw()");
 
-            long now = System.currentTimeMillis();
-            mCalendar.setTimeInMillis(now);
-            mDate.setTime(now);
+            wtf.setBatteryInfo(mBatteryHelper.getBatteryInfo());
+            wtf.setEventInfo(mCalendarHelper.getMeetings());
 
-            mTexts.put(eTF.HOUR, formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY)));
-            mTexts.put(eTF.MINUTE, formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE)));
-            mTexts.put(eTF.SECOND, formatTwoDigitNumber(mCalendar.get(Calendar.SECOND)));
-            mTexts.put(eTF.DAY_OF_WEEK, mDayFormat.format(mDate));
-            mTexts.put(eTF.DATE, mDateFormat.format(mDate));
-
-            BatteryHelper.BatteryInfo mBatteryInfo = mBatteryHelper.getBatteryInfo();
-            if (mBatteryInfo != null) {
-                mTexts.put(eTF.BATTERY, String.format("%3.0f%%", mBatteryInfo.getPercent() * 100));
-            } else {
-                mTexts.put(eTF.BATTERY, "");
-            }
-
-            CalendarHelper.EventInfo[] mMeetings = mCalendarHelper.getMeetings();
-            int i = 0;
-            while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
-
-            if (i >= mMeetings.length) {
-                mTexts.put(eTF.CALENDAR_1, "no meetings");
-                mTexts.put(eTF.CALENDAR_2, "");
-            } else {
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                mTexts.put(eTF.CALENDAR_1, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
-
-                int additionalEvents = mMeetings.length - 1 - i;
-                if (additionalEvents == 1)
-                    mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional event");
-                if (additionalEvents > 1)
-                    mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional events");
-            }
-
-            if (mWeather != null) {
-                long age = now - mWeather.lastupdate.getTime();
-                float ageFloat = age / (60 * 1000);
-                String tempText = String.format("%2.0f°C", mWeather.temperature.getTemp());
-                String ageText = String.format(" (%.0fm)", ageFloat);
-                mTexts.put(eTF.WEATHER_TEMP, tempText);
-                mTexts.put(eTF.WEATHER_AGE, ageText);
-                mTexts.put(eTF.WEATHER_DESC, mWeather.currentCondition.getCondition());
-            }
-
-            // Draw the background.
-            canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
-            topDrawable.onDraw(canvas, mBounds);
-        }
-
-        private String formatTwoDigitNumber(int hour) {
-            return String.format("%02d", hour);
+            wtf.onDraw(canvas, bounds);
         }
 
         @Override // DataApi.DataListener
@@ -633,7 +340,8 @@ public class CircaTextService extends CanvasWatchFaceService {
                 if (dataItem.getUri().getPath().equals(CircaTextConsts.SEND_WEATHER_MESSAGE)) {
                     if (config.containsKey("weather")) {
                         try {
-                            mWeather = (Weather) Serializer.deserialize(config.getByteArray("weather"));
+                            Weather mWeather = (Weather) Serializer.deserialize(config.getByteArray("weather"));
+                            wtf.setWeatherInfo(mWeather);
                             if (Log.isLoggable(TAG, Log.DEBUG))
                                 Log.d(TAG, "onDataChanged(): weather=" + mWeather.toString());
                         } catch (Throwable t) {
@@ -700,10 +408,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             switch (configKey) {
                 case CircaTextConsts.KEY_BACKGROUND_COLOR:
-                    mInteractiveBackgroundColor = color;
-                    if (!isInAmbientMode() && mBackgroundPaint != null) {
-                        mBackgroundPaint.setColor(color);
-                    }
+                    wtf.setBackgroundColor(color);
                     break;
             }
         }
@@ -722,7 +427,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         public void onTapCommand(int tapType, int x, int y, long eventTime) {
             switch (tapType) {
                 case WatchFaceService.TAP_TYPE_TAP:
-                    startTapHighlight();
+                    wtf.startTapHighlight();
                     //onWatchFaceTap(x, y);
                     break;
                 case WatchFaceService.TAP_TYPE_TOUCH:
@@ -748,33 +453,5 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         //private void onWatchFaceTap(int x, int y) {
         //}
-
-        ValueAnimator tapAnimator;
-
-        private void startTapHighlight() {
-            Animator.AnimatorListener listener = new ReverseListener();
-            tapAnimator = startAnimation(topDrawable, "alpha", 255, 0, 100, listener);
-        }
-
-        private class ReverseListener implements Animator.AnimatorListener {
-            @Override
-            public void onAnimationStart(Animator animator) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                startAnimation(topDrawable, "alpha", 0, 255, 100, null);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        }
     }
 }

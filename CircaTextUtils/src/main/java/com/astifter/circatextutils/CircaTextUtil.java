@@ -17,7 +17,6 @@
 package com.astifter.circatextutils;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 

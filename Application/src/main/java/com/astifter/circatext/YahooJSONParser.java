@@ -10,17 +10,14 @@
  */
 package com.astifter.circatext;
 
-import com.astifter.circatextutils.Location;
 import com.astifter.circatextutils.Weather;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.TimeZone;
 
 /*
