@@ -111,6 +111,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
             }
         };
+
         final BroadcastReceiver mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -127,12 +128,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 invalidate();
             }
         };
-
-        /**
-         * Unregistering an unregistered receiver throws an exception. Keep track of the
-         * registration state to prevent that.
-         */
-        boolean mRegisteredReceiver = false;
 
         Engine() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
@@ -201,6 +196,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
         }
+
+        boolean mRegisteredReceiver = false;
 
         private void registerReceiver() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "registerReceiver()");
@@ -388,27 +385,19 @@ public class CircaTextService extends CanvasWatchFaceService {
                 if (!config.containsKey(configKey)) {
                     continue;
                 }
-                if (configKey.equals(CircaTextConsts.KEY_EXCLUDED_CALENDARS)) {
-                    mCalendarHelper.setExcludedCalendars(config.getString(CircaTextConsts.KEY_EXCLUDED_CALENDARS));
-                    uiUpdated = true;
-                } else {
-                    int color = config.getInt(configKey);
-                    updateUiForKey(configKey, color);
-                    uiUpdated = true;
+                switch (configKey) {
+                    case CircaTextConsts.KEY_EXCLUDED_CALENDARS:
+                        mCalendarHelper.setExcludedCalendars(config.getString(CircaTextConsts.KEY_EXCLUDED_CALENDARS));
+                        uiUpdated = true;
+                        break;
+                    case CircaTextConsts.KEY_BACKGROUND_COLOR:
+                        wtf.setBackgroundColor(config.getInt(configKey));
+                        uiUpdated = true;
+                        break;
                 }
             }
             if (uiUpdated) {
                 invalidate();
-            }
-        }
-
-        private void updateUiForKey(String configKey, int color) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForKey()");
-
-            switch (configKey) {
-                case CircaTextConsts.KEY_BACKGROUND_COLOR:
-                    wtf.setBackgroundColor(color);
-                    break;
             }
         }
 
@@ -449,8 +438,5 @@ public class CircaTextService extends CanvasWatchFaceService {
                 Log.d(TAG, output);
             }
         }
-
-        //private void onWatchFaceTap(int x, int y) {
-        //}
     }
 }
