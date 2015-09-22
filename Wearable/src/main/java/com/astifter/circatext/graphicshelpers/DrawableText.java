@@ -34,6 +34,12 @@ public class DrawableText implements CircaTextDrawable {
         setAlignment(Align.LEFT);
     }
 
+    public DrawableText(int where, HashMap<Integer, String> source) {
+        this.paint = createTextPaint(NORMAL_TYPEFACE);
+        setAlignment(Align.LEFT);
+        setTextSource(where, source);
+    }
+
     private TextPaint createTextPaint(Typeface t) {
         TextPaint paint = new TextPaint();
         paint.setColor(Color.WHITE);
@@ -189,6 +195,8 @@ public class DrawableText implements CircaTextDrawable {
         Paint p = new Paint();
         p.setTypeface(f);
         p.setAntiAlias(true);
+
+        if (bounds == null) return 0;
 
         float width = bounds.width();
         float lowerWidth = width * 0.99f;

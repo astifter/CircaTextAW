@@ -1,33 +1,19 @@
 package com.astifter.circatext.watchfaces;
 
 import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
 import com.astifter.circatext.R;
-import com.astifter.circatext.datahelpers.BatteryHelper;
-import com.astifter.circatext.datahelpers.CalendarHelper;
-import com.astifter.circatext.graphicshelpers.CircaTextDrawable;
 import com.astifter.circatext.graphicshelpers.DrawableText;
 import com.astifter.circatext.graphicshelpers.HorizontalStack;
 import com.astifter.circatext.graphicshelpers.VerticalStack;
-import com.astifter.circatextutils.CircaTextConsts;
-import com.astifter.circatextutils.Weather;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public class RegularWatchFace extends BaseWatchFace {
     private final HashMap<Integer, DrawableText> mTF = new HashMap<>();
@@ -50,23 +36,23 @@ public class RegularWatchFace extends BaseWatchFace {
         mTF.get(eTF.WEATHER_DESC).setAlignment(DrawableText.Align.RIGHT);
 
         HorizontalStack hours = new HorizontalStack();
-        hours.addRight(mTF.get(eTF.HOUR));
-        hours.addRight(mTF.get(eTF.COLON_1));
-        hours.addRight(mTF.get(eTF.MINUTE));
-        hours.addRight(mTF.get(eTF.COLON_2));
-        hours.addRight(mTF.get(eTF.SECOND));
+        hours.add(mTF.get(eTF.HOUR));
+        hours.add(mTF.get(eTF.COLON_1));
+        hours.add(mTF.get(eTF.MINUTE));
+        hours.add(mTF.get(eTF.COLON_2));
+        hours.add(mTF.get(eTF.SECOND));
         topDrawable.addAbove(hours);
         topDrawable.addAbove(mTF.get(eTF.BATTERY));
         HorizontalStack date = new HorizontalStack();
-        date.addRight(mTF.get(eTF.DAY_OF_WEEK));
-        date.addRight(mTF.get(eTF.DATE));
+        date.add(mTF.get(eTF.DAY_OF_WEEK));
+        date.add(mTF.get(eTF.DATE));
         topDrawable.addBelow(date);
         topDrawable.addBelow(mTF.get(eTF.CALENDAR_1));
         topDrawable.addBelow(mTF.get(eTF.CALENDAR_2));
         HorizontalStack weather = new HorizontalStack();
-        weather.addRight(mTF.get(eTF.WEATHER_TEMP));
-        weather.addRight(mTF.get(eTF.WEATHER_AGE));
-        weather.addRight(mTF.get(eTF.WEATHER_DESC));
+        weather.add(mTF.get(eTF.WEATHER_TEMP));
+        weather.add(mTF.get(eTF.WEATHER_AGE));
+        weather.add(mTF.get(eTF.WEATHER_DESC));
         topDrawable.addBelow(weather);
 
         mTFFading.add(mTF.get(eTF.CALENDAR_1));

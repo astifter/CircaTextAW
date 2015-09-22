@@ -35,7 +35,7 @@ public class HorizontalStack extends AbstractStack {
         }
     }
 
-    public void addRight(CircaTextDrawable d) {
+    public void add(CircaTextDrawable d) {
         this.stack.add(d);
     }
 

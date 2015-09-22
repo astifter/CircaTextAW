@@ -115,16 +115,16 @@ public abstract class BaseWatchFace implements WatchFace {
         updateVisibilty();
     }
 
-    protected void createIntAnimation(DrawableText t, String attribute, int start, int stop) {
+    protected void createIntAnimation(CircaTextDrawable t, String attribute, int start, int stop) {
         ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
         startAnimation(anim);
     }
 
-    protected void createTextSizeAnimation(DrawableText t, float from, float to) {
+    protected void createTextSizeAnimation(CircaTextDrawable t, float from, float to) {
         createFloatAnimation(t, "textSize", from, to);
     }
 
-    private void createFloatAnimation(DrawableText t, String attribute, float start, float stop) {
+    private void createFloatAnimation(CircaTextDrawable t, String attribute, float start, float stop) {
         ValueAnimator anim = ObjectAnimator.ofFloat(t, attribute, start, stop);
         startAnimation(anim);
     }

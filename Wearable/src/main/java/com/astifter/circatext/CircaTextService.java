@@ -133,7 +133,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
 
             DrawableText.NORMAL_TYPEFACE =
-                    Typeface.createFromAsset(CircaTextService.this.getResources().getAssets(),
+                    Typeface.createFromAsset(getResources().getAssets(),
                                              "fonts/RobotoCondensed-Light.ttf");
 
             wtf = new RegularWatchFace(this);
