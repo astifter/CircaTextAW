@@ -36,33 +36,18 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public CircaTextWatchFace(CanvasWatchFaceService.Engine parent) {
         super(parent);
         {
-            for (int i = 0; i < eTF.SIZE; i++) {
-                mTF.put(i, new DrawableText());
-                mTF.get(i).setTextSource(i, mTexts);
-            }
-            for (int i = myETF.FIRST_LINE; i < myETF.SIZE; i++) {
-                DrawableText t = new DrawableText();
-                t.setTextSource(i, myTexts);
-                t.setAlignment(DrawableText.Align.CENTER);
-                mTF.put(i, t);
-            }
-
-            mTF.get(eTF.BATTERY).setAlignment(DrawableText.Align.RIGHT);
-            mTF.get(eTF.DATE).setAlignment(DrawableText.Align.RIGHT);
-            mTF.get(eTF.WEATHER_DESC).setAlignment(DrawableText.Align.RIGHT);
-
-            topDrawable.addAbove(mTF.get(myETF.FIRST_LINE));
+            stackTop(mTF, topDrawable, myETF.FIRST_LINE, myTexts, DrawableText.Align.CENTER);
             HorizontalStack topInfo = new HorizontalStack();
-            topInfo.add(mTF.get(eTF.WEATHER_TEMP));
-            topInfo.add(mTF.get(eTF.BATTERY));
+            stackRight(mTF, topInfo, eTF.WEATHER_TEMP, mTexts);
+            stackRight(mTF, topInfo, eTF.BATTERY, mTexts, DrawableText.Align.RIGHT);
             topDrawable.addAbove(topInfo);
-            topDrawable.addBelow(mTF.get(myETF.SECOND_LINE));
-            topDrawable.addBelow(mTF.get(myETF.THIRD_LINE));
+            stackBottom(mTF, topDrawable, myETF.SECOND_LINE, myTexts, DrawableText.Align.CENTER);
+            stackBottom(mTF, topDrawable, myETF.THIRD_LINE, myTexts, DrawableText.Align.CENTER);
             HorizontalStack date = new HorizontalStack();
-            date.add(mTF.get(eTF.DAY_OF_WEEK));
-            date.add(mTF.get(eTF.DATE));
+            stackRight(mTF, date, eTF.DAY_OF_WEEK, mTexts);
+            stackRight(mTF, date, eTF.DATE, mTexts, DrawableText.Align.RIGHT);
             topDrawable.addBelow(date);
-            topDrawable.addBelow(mTF.get(eTF.CALENDAR_1));
+            stackBottom(mTF, topDrawable, eTF.CALENDAR_1, mTexts);
         }
         {
             HorizontalStack hours = new HorizontalStack();
@@ -77,6 +62,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
             ambientDrawable.addAbove(hours);
             ambientDrawable.addBelow(ambientDate);
         }
+        updateVisibilty();
     }
 
     @Override
@@ -94,11 +80,8 @@ public class CircaTextWatchFace extends BaseWatchFace {
             mTF.get(eTF.DAY_OF_WEEK).setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
             mTF.get(eTF.DATE).setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
             mTF.get(eTF.CALENDAR_1).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-            mTF.get(eTF.CALENDAR_2).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTF.get(eTF.BATTERY).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTF.get(eTF.WEATHER_TEMP).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-            mTF.get(eTF.WEATHER_AGE).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size) / 1.5f);
-            mTF.get(eTF.WEATHER_DESC).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             for (int i = myETF.FIRST_LINE; i <= myETF.THIRD_LINE; i++) {
                 DrawableText dt = mTF.get(i);
                 dt.setLineHeight(0.75f);
@@ -118,6 +101,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
             ambientTF.get(eTF.COLON_1).setTextSize(textSize);
             ambientTF.get(eTF.MINUTE).setTextSize(textSize);
         }
+        updateVisibilty();
     }
 
     @Override
@@ -129,13 +113,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 mTF.get(i).setAmbientMode(inAmbientMode);
             }
         }
-        if (inAmbientMode) {
-            createIntAnimation(topDrawable,     "alpha", 255, 0);
-            createIntAnimation(ambientDrawable, "alpha", 0, 255);
-        } else {
-            createIntAnimation(topDrawable,     "alpha", 0, 255);
-            createIntAnimation(ambientDrawable, "alpha", 255, 0);
-        }
+        updateVisibilty();
     }
 
     @Override
@@ -166,6 +144,13 @@ public class CircaTextWatchFace extends BaseWatchFace {
     }
 
     protected void updateVisibilty() {
+        if (this.ambientMode) {
+            createIntAnimation(topDrawable, "alpha", 255, 0);
+            createIntAnimation(ambientDrawable, "alpha", 0, 255);
+        } else {
+            createIntAnimation(topDrawable,     "alpha", 0, 255);
+            createIntAnimation(ambientDrawable, "alpha", 255, 0);
+        }
     }
 
     @Override
