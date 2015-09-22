@@ -28,6 +28,7 @@ public class DrawableText implements CircaTextDrawable {
 
     private Integer textSourceName;
     private HashMap<Integer, String> textSource;
+    private float lineHeight = 1.0f;
 
     public DrawableText() {
         this.paint = createTextPaint(NORMAL_TYPEFACE);
@@ -73,7 +74,7 @@ public class DrawableText implements CircaTextDrawable {
             x = (bounds.left + bounds.right) / 2;
         }
 
-        float y = bounds.top + -fm.ascent;
+        float y = bounds.top + (-fm.ascent*lineHeight);
         this.bounds.bottom = this.bounds.top + (int)getHeight();
 
         /**
@@ -125,7 +126,7 @@ public class DrawableText implements CircaTextDrawable {
     public float getHeight() {
         //if (this.hidden) return 0;
         Paint.FontMetrics fm = this.paint.getFontMetrics();
-        return -fm.ascent + fm.descent;
+        return (-fm.ascent + fm.descent) * this.lineHeight;
     }
 
     @Override
@@ -180,6 +181,10 @@ public class DrawableText implements CircaTextDrawable {
             case Align.RIGHT: paint.setTextAlign(Paint.Align.RIGHT); break;
             case Align.CENTER: paint.setTextAlign(Paint.Align.CENTER); break;
         }
+    }
+
+    public void setLineHeight(float lineHeight) {
+        this.lineHeight = lineHeight;
     }
 
     public class Align {

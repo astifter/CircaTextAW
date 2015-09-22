@@ -65,22 +65,16 @@ public class CircaTextWatchFace extends BaseWatchFace {
             topDrawable.addBelow(mTF.get(eTF.CALENDAR_1));
         }
         {
-            ambientTF.put(eTF.HOUR, new DrawableText(eTF.HOUR, mTexts));
-            ambientTF.put(eTF.COLON_1, new DrawableText(eTF.COLON_1, mTexts));
-            ambientTF.put(eTF.MINUTE, new DrawableText(eTF.MINUTE, mTexts));
-            ambientTF.put(eTF.DAY_OF_WEEK, new DrawableText(eTF.DAY_OF_WEEK, mTexts));
-            ambientTF.put(eTF.DATE, new DrawableText(eTF.DATE, mTexts));
-
-            ambientTF.get(eTF.DATE).setAlignment(DrawableText.Align.RIGHT);
-
             HorizontalStack hours = new HorizontalStack();
-            hours.add(ambientTF.get(eTF.HOUR));
-            hours.add(ambientTF.get(eTF.COLON_1));
-            hours.add(ambientTF.get(eTF.MINUTE));
-            ambientDrawable.addAbove(hours);
+            stackRight(ambientTF, hours, eTF.HOUR, mTexts);
+            stackRight(ambientTF, hours, eTF.COLON_1, mTexts);
+            stackRight(ambientTF, hours, eTF.MINUTE, mTexts);
+
             HorizontalStack ambientDate = new HorizontalStack();
-            ambientDate.add(ambientTF.get(eTF.DAY_OF_WEEK));
-            ambientDate.add(ambientTF.get(eTF.DATE));
+            stackRight(ambientTF, ambientDate, eTF.DAY_OF_WEEK, mTexts);
+            stackRight(ambientTF, ambientDate, eTF.DATE, mTexts, DrawableText.Align.RIGHT);
+
+            ambientDrawable.addAbove(hours);
             ambientDrawable.addBelow(ambientDate);
         }
     }
@@ -89,11 +83,9 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void setMetrics(Resources resources, WindowInsets insets) {
         super.setMetrics(resources, insets);
 
-        int mYOffset = (int) resources.getDimension(R.dimen.digital_y_offset);
-        topDrawable.setOffset(mYOffset);
-        ambientDrawable.setOffset(mYOffset);
-
         {
+            int mYOffset = (int) resources.getDimension(R.dimen.digital_y_offset_circatext);
+            topDrawable.setOffset(mYOffset);
             float textSize = DrawableText.getMaximumTextSize(DrawableText.NORMAL_TYPEFACE, "dreiviertel", mBounds);
 
             for (int i = myETF.FIRST_LINE; i <= myETF.THIRD_LINE; i++) {
@@ -107,8 +99,15 @@ public class CircaTextWatchFace extends BaseWatchFace {
             mTF.get(eTF.WEATHER_TEMP).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
             mTF.get(eTF.WEATHER_AGE).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size) / 1.5f);
             mTF.get(eTF.WEATHER_DESC).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
+            for (int i = myETF.FIRST_LINE; i <= myETF.THIRD_LINE; i++) {
+                DrawableText dt = mTF.get(i);
+                dt.setLineHeight(0.75f);
+            }
         }
         {
+            int mYOffset = (int) resources.getDimension(R.dimen.digital_y_offset);
+            ambientDrawable.setOffset(mYOffset);
+
             float textSize = DrawableText.getMaximumTextSize(DrawableText.NORMAL_TYPEFACE, "00:00", mBounds);
             float dateTextSize = resources.getDimension(R.dimen.digital_date_text_size);
 
@@ -173,9 +172,13 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void onDraw(Canvas canvas, Rect bounds) {
         setTexts();
         String[] circaTexts = cTS.getString();
-        myTexts.put(myETF.FIRST_LINE, circaTexts[0]);
-        myTexts.put(myETF.SECOND_LINE, circaTexts[1]);
-        myTexts.put(myETF.THIRD_LINE, circaTexts[2]);
+        for (int i = 0; i < 3; i++) {
+            if (circaTexts[i] == "") {
+                myTexts.put(myETF.FIRST_LINE + i, "<none>");
+            } else {
+                myTexts.put(myETF.FIRST_LINE + i, circaTexts[i]);
+            }
+        }
 
         // Draw the background.
         canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);

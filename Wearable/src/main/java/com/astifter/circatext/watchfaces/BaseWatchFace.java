@@ -247,4 +247,23 @@ public abstract class BaseWatchFace implements WatchFace {
     protected boolean haveWeather() {
         return mWeather != null;
     }
+
+    protected void stackRight(HashMap<Integer, DrawableText> store,
+                              HorizontalStack st,
+                              Integer index, HashMap<Integer, String> source,
+                              int align) {
+        DrawableText dt = new DrawableText(index, source);
+        dt.setAlignment(align);
+        st.add(dt);
+        store.put(index, dt);
+    }
+
+    protected void stackRight(HashMap<Integer, DrawableText> store,
+                              HorizontalStack st,
+                              Integer index, HashMap<Integer, String> source) {
+        DrawableText dt = new DrawableText(index, source);
+        dt.setAlignment(DrawableText.Align.LEFT);
+        st.add(dt);
+        store.put(index, dt);
+    }
 }
