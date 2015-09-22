@@ -1,16 +1,15 @@
 package com.astifter.circatext.watchfaces;
 
-import android.animation.Animator;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
-import com.astifter.circatext.CircaTextService;
 import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.CircaTextStringer;
-import com.astifter.circatext.graphicshelpers.CircaTextDrawable;
+import com.astifter.circatext.datahelpers.CircaTextStringerV1;
+import com.astifter.circatext.datahelpers.CircaTextStringerV2;
 import com.astifter.circatext.graphicshelpers.DrawableText;
 import com.astifter.circatext.graphicshelpers.HorizontalStack;
 import com.astifter.circatext.graphicshelpers.VerticalStack;
@@ -31,7 +30,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private final VerticalStack topDrawable = new VerticalStack();
     private final VerticalStack ambientDrawable = new VerticalStack();
 
-    CircaTextStringer cTS = new CircaTextStringer();
+    CircaTextStringer cTS = new CircaTextStringerV2();
 
     public CircaTextWatchFace(CanvasWatchFaceService.Engine parent) {
         super(parent);
@@ -137,8 +136,9 @@ public class CircaTextWatchFace extends BaseWatchFace {
         String[] circaTexts = cTS.getString();
         for (int i = 0; i < 3; i++) {
             if (circaTexts[i] == "") {
-                myTexts.put(myETF.FIRST_LINE + i, "<none>");
+                mTF.get(myETF.FIRST_LINE + i).hide();
             } else {
+                mTF.get(myETF.FIRST_LINE + i).show();
                 myTexts.put(myETF.FIRST_LINE + i, circaTexts[i]);
             }
         }

@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
+import android.view.ViewPropertyAnimator;
 import android.view.WindowInsets;
 
 import com.astifter.circatext.R;

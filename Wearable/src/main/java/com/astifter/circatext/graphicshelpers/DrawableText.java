@@ -59,6 +59,7 @@ public class DrawableText implements CircaTextDrawable {
         }
 
         if (this.text == "" || hidden) return;
+
         this.bounds = b;
 
         this.drawnSize = this.getWidth();
@@ -124,14 +125,14 @@ public class DrawableText implements CircaTextDrawable {
     }
 
     public float getHeight() {
-        //if (this.hidden) return 0;
+        if (this.hidden) return 0;
         Paint.FontMetrics fm = this.paint.getFontMetrics();
         return (-fm.ascent + fm.descent) * this.lineHeight;
     }
 
     @Override
     public float getWidth() {
-        //if (this.hidden) return 0;
+        if (this.hidden) return 0;
         if (this.alignment != Align.LEFT && this.bounds != null) {
             return this.bounds.width();
         } else {

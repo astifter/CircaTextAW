@@ -5,7 +5,7 @@ package com.astifter.circatext.datahelpers;
  */
 public class CircaTextStringerTest {
     public static void main (String[] args) {
-        CircaTextStringer cs = new CircaTextStringer();
+        CircaTextStringer cs = new CircaTextStringerV2();
 
         for (int hour = 0; hour < 24; hour++) {
             for (int minute = 0; minute < 60; minute++) {
