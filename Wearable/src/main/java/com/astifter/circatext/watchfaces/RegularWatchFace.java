@@ -26,47 +26,32 @@ public class RegularWatchFace extends BaseWatchFace {
     public RegularWatchFace(CanvasWatchFaceService.Engine parent) {
         super(parent);
 
-        for (int i = 0; i < eTF.SIZE; i++) {
-            mTF.put(i, new DrawableText());
-            mTF.get(i).setTextSource(i, mTexts);
-        }
-
-        mTF.get(eTF.BATTERY).setAlignment(DrawableText.Align.RIGHT);
-        mTF.get(eTF.DATE).setAlignment(DrawableText.Align.RIGHT);
-        mTF.get(eTF.WEATHER_DESC).setAlignment(DrawableText.Align.RIGHT);
-
         HorizontalStack hours = new HorizontalStack();
-        hours.add(mTF.get(eTF.HOUR));
-        hours.add(mTF.get(eTF.COLON_1));
-        hours.add(mTF.get(eTF.MINUTE));
-        hours.add(mTF.get(eTF.COLON_2));
-        hours.add(mTF.get(eTF.SECOND));
+        stackRight(mTF, hours, eTF.HOUR, mTexts);
+        stackRight(mTF, hours, eTF.COLON_1, mTexts);
+        stackRight(mTF, hours, eTF.MINUTE, mTexts);
+        stackRight(mTF, hours, eTF.COLON_2, mTexts);
+        stackRight(mTF, hours, eTF.SECOND, mTexts);
         topDrawable.addAbove(hours);
-        topDrawable.addAbove(mTF.get(eTF.BATTERY));
+        stackTop(mTF, topDrawable, eTF.BATTERY, mTexts, DrawableText.Align.RIGHT);
         HorizontalStack date = new HorizontalStack();
-        date.add(mTF.get(eTF.DAY_OF_WEEK));
-        date.add(mTF.get(eTF.DATE));
+        stackRight(mTF, date, eTF.DAY_OF_WEEK, mTexts);
+        stackRight(mTF, date, eTF.DATE, mTexts, DrawableText.Align.RIGHT);
         topDrawable.addBelow(date);
-        topDrawable.addBelow(mTF.get(eTF.CALENDAR_1));
-        topDrawable.addBelow(mTF.get(eTF.CALENDAR_2));
+        stackBottom(mTF, topDrawable, eTF.CALENDAR_1, mTexts);
+        stackBottom(mTF, topDrawable, eTF.CALENDAR_2, mTexts);
         HorizontalStack weather = new HorizontalStack();
-        weather.add(mTF.get(eTF.WEATHER_TEMP));
-        weather.add(mTF.get(eTF.WEATHER_AGE));
-        weather.add(mTF.get(eTF.WEATHER_DESC));
+        stackRight(mTF, weather, eTF.WEATHER_TEMP, mTexts);
+        stackRight(mTF, weather, eTF.WEATHER_AGE, mTexts);
+        stackRight(mTF, weather, eTF.WEATHER_DESC, mTexts, DrawableText.Align.RIGHT);
         topDrawable.addBelow(weather);
 
-        mTFFading.add(mTF.get(eTF.CALENDAR_1));
-        mTFFading.add(mTF.get(eTF.CALENDAR_2));
-        mTFFading.add(mTF.get(eTF.COLON_2));
-        mTFFading.add(mTF.get(eTF.SECOND));
-        mTFFading.add(mTF.get(eTF.BATTERY));
-        mTFFading.add(mTF.get(eTF.WEATHER_TEMP));
-        mTFFading.add(mTF.get(eTF.WEATHER_AGE));
-        mTFFading.add(mTF.get(eTF.WEATHER_DESC));
+        int fadeList[] = {eTF.CALENDAR_1, eTF.CALENDAR_2, eTF.COLON_2, eTF.SECOND,
+                          eTF.BATTERY, eTF.WEATHER_TEMP, eTF.WEATHER_AGE, eTF.WEATHER_DESC};
+        addToUIList(mTF, mTFFading, fadeList);
 
-        mTFAnimated.add(mTF.get(eTF.HOUR));
-        mTFAnimated.add(mTF.get(eTF.COLON_1));
-        mTFAnimated.add(mTF.get(eTF.MINUTE));
+        int animList[] = {eTF.HOUR, eTF.COLON_1, eTF.MINUTE};
+        addToUIList(mTF, mTFAnimated, animList);
     }
 
     @Override

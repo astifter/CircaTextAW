@@ -137,7 +137,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                     Typeface.createFromAsset(getResources().getAssets(),
                                              "fonts/RobotoCondensed-Light.ttf");
 
-            wtf = new CircaTextWatchFace(this);
+            wtf = new RegularWatchFace(this);
             wtf.localeChanged();
         }
 

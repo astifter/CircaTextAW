@@ -261,9 +261,49 @@ public abstract class BaseWatchFace implements WatchFace {
     protected void stackRight(HashMap<Integer, DrawableText> store,
                               HorizontalStack st,
                               Integer index, HashMap<Integer, String> source) {
+        stackRight(store, st, index, source, DrawableText.Align.LEFT);
+    }
+
+    protected void stackVertical(HashMap<Integer, DrawableText> store,
+                                 VerticalStack st,
+                                 Integer index, HashMap<Integer, String> source,
+                                 int align, boolean above) {
         DrawableText dt = new DrawableText(index, source);
-        dt.setAlignment(DrawableText.Align.LEFT);
-        st.add(dt);
+        dt.setAlignment(align);
+        if (above)
+            st.addAbove(dt);
+        else
+            st.addBelow(dt);
         store.put(index, dt);
+    }
+
+    protected void stackTop(HashMap<Integer, DrawableText> store,
+                            VerticalStack st,
+                            Integer index, HashMap<Integer, String> source) {
+        stackVertical(store, st, index, source, DrawableText.Align.LEFT, true);
+    }
+    protected void stackTop(HashMap<Integer, DrawableText> store,
+                            VerticalStack st,
+                            Integer index, HashMap<Integer, String> source,
+                            int align) {
+        stackVertical(store, st, index, source, align, true);
+    }
+    protected void stackBottom(HashMap<Integer, DrawableText> store,
+                               VerticalStack st,
+                               Integer index, HashMap<Integer, String> source) {
+        stackVertical(store, st, index, source, DrawableText.Align.LEFT, false);
+    }
+    protected void stackBottom(HashMap<Integer, DrawableText> store,
+                               VerticalStack st,
+                               Integer index, HashMap<Integer, String> source,
+                               int align) {
+        stackVertical(store, st, index, source, align, false);
+    }
+
+    protected void addToUIList(HashMap<Integer, DrawableText> source, ArrayList<DrawableText> dest,
+                               int[] fadeList) {
+        for (int i : fadeList) {
+            dest.add(source.get(i));
+        }
     }
 }
