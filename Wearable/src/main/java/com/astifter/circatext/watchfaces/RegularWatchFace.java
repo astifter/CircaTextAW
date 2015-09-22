@@ -110,29 +110,7 @@ public class RegularWatchFace extends BaseWatchFace {
 
     @Override
     public void startTapHighlight() {
-        Animator.AnimatorListener listener = new ReverseListener();
-        startAnimation(topDrawable, "alpha", 255, 0, 100, listener);
-    }
-
-    private class ReverseListener implements Animator.AnimatorListener {
-        @Override
-        public void onAnimationStart(Animator animator) {
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animator) {
-            startAnimation(topDrawable, "alpha", 0, 255, 100, null);
-        }
-
-        @Override
-        public void onAnimationCancel(Animator animator) {
-
-        }
-
-        @Override
-        public void onAnimationRepeat(Animator animator) {
-
-        }
+        startTapHighlight(topDrawable);
     }
 
     protected void updateVisibilty() {

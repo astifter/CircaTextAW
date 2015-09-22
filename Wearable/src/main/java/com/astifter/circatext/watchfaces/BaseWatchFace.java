@@ -306,4 +306,36 @@ public abstract class BaseWatchFace implements WatchFace {
             dest.add(source.get(i));
         }
     }
+
+    protected void startTapHighlight(CircaTextDrawable ct) {
+        Animator.AnimatorListener listener = new ReverseListener(ct);
+        startAnimation(ct, "alpha", 255, 0, 100, listener);
+    }
+
+    private class ReverseListener implements Animator.AnimatorListener {
+        private final CircaTextDrawable drawable;
+
+        public ReverseListener(CircaTextDrawable d) {
+            this.drawable = d;
+        }
+
+        @Override
+        public void onAnimationStart(Animator animator) {
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animator) {
+            startAnimation(drawable, "alpha", 0, 255, 100, null);
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animator) {
+
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animator) {
+
+        }
+    }
 }
