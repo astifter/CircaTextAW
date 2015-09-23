@@ -61,7 +61,6 @@ public class CircaTextWatchFace extends BaseWatchFace {
             ambientDrawable.addAbove(hours);
             ambientDrawable.addBelow(ambientDate);
         }
-        updateVisibilty();
     }
 
     @Override
@@ -96,11 +95,18 @@ public class CircaTextWatchFace extends BaseWatchFace {
             for (DrawableText dt : ambientTF.values()) {
                 dt.setTextSize(dateTextSize);
             }
-            ambientTF.get(eTF.HOUR).setTextSize(textSize);
-            ambientTF.get(eTF.COLON_1).setTextSize(textSize);
-            ambientTF.get(eTF.MINUTE).setTextSize(textSize);
+            for (int i = eTF.HOUR; i <= eTF.MINUTE; i++) {
+                DrawableText dt = ambientTF.get(i);
+                dt.setTextSize(textSize); dt.setDefaultTextSize(textSize);
+            }
         }
-        updateVisibilty();
+        if (this.ambientMode) {
+            topDrawable.setAlpha(0);
+            ambientDrawable.setAlpha(255);
+        } else {
+            topDrawable.setAlpha(255);
+            ambientDrawable.setAlpha(0);
+        }
     }
 
     @Override
@@ -112,15 +118,6 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 mTF.get(i).setAmbientMode(inAmbientMode);
             }
         }
-        updateVisibilty();
-    }
-
-    @Override
-    public void startTapHighlight() {
-        startTapHighlight(topDrawable);
-    }
-
-    protected void updateVisibilty() {
         if (this.ambientMode) {
             createIntAnimation(topDrawable, "alpha", 255, 0);
             createIntAnimation(ambientDrawable, "alpha", 0, 255);
@@ -131,16 +128,24 @@ public class CircaTextWatchFace extends BaseWatchFace {
     }
 
     @Override
+    public void startTapHighlight() {
+        startTapHighlight(topDrawable);
+    }
+
+    protected void updateVisibilty() {
+    }
+
+    @Override
     public void onDraw(Canvas canvas, Rect bounds) {
         setTexts();
         String[] circaTexts = cTS.getString();
-        for (int i = 0; i < 3; i++) {
-            if (circaTexts[i] == "") {
-                mTF.get(myETF.FIRST_LINE + i).hide();
-            } else {
-                mTF.get(myETF.FIRST_LINE + i).show();
-                myTexts.put(myETF.FIRST_LINE + i, circaTexts[i]);
+        int sourceIdx = 0, targetIdx = 0;
+        while(sourceIdx < circaTexts.length) {
+            if (circaTexts[sourceIdx] != "") {
+                myTexts.put(myETF.FIRST_LINE + targetIdx, circaTexts[sourceIdx]);
+                targetIdx++;
             }
+            sourceIdx++;
         }
 
         // Draw the background.
