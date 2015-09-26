@@ -147,6 +147,9 @@ public class CircaTextWatchFace extends BaseWatchFace {
             }
             sourceIdx++;
         }
+        for (int j = myETF.FIRST_LINE + targetIdx; j <= myETF.THIRD_LINE; j++) {
+            myTexts.put(j, "");
+        }
 
         // Draw the background.
         canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);

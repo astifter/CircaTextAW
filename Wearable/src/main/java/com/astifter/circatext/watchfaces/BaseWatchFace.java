@@ -71,7 +71,6 @@ public abstract class BaseWatchFace implements WatchFace {
 
     public BaseWatchFace(CanvasWatchFaceService.Engine parent) {
         this.parent = parent;
-        mCalendar = Calendar.getInstance();
 
         mBackgroundPaint = new Paint();
         mBackgroundPaint.setColor(mInteractiveBackgroundColor);
@@ -79,6 +78,7 @@ public abstract class BaseWatchFace implements WatchFace {
         mTexts.put(eTF.COLON_1, ":");
         mTexts.put(eTF.COLON_2, ":");
 
+        mCalendar = Calendar.getInstance();
         mDate = new Date();
         localeChanged();
     }
@@ -141,8 +141,8 @@ public abstract class BaseWatchFace implements WatchFace {
         anim.start();
     }
 
-    protected ValueAnimator startAnimation(CircaTextDrawable t, String attribute, int start, int stop,
-                                           int duration, Animator.AnimatorListener a) {
+    protected void startAnimation(CircaTextDrawable t, String attribute, int start, int stop,
+                                  int duration, Animator.AnimatorListener a) {
         ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
         anim.setDuration(duration);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -154,7 +154,6 @@ public abstract class BaseWatchFace implements WatchFace {
         if (a != null)
             anim.addListener(a);
         anim.start();
-        return anim;
     }
 
     abstract protected void updateVisibilty();
@@ -278,11 +277,6 @@ public abstract class BaseWatchFace implements WatchFace {
         store.put(index, dt);
     }
 
-    protected void stackTop(HashMap<Integer, DrawableText> store,
-                            VerticalStack st,
-                            Integer index, HashMap<Integer, String> source) {
-        stackVertical(store, st, index, source, DrawableText.Align.LEFT, true);
-    }
     protected void stackTop(HashMap<Integer, DrawableText> store,
                             VerticalStack st,
                             Integer index, HashMap<Integer, String> source,

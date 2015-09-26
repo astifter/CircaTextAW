@@ -137,7 +137,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                     Typeface.createFromAsset(getResources().getAssets(),
                                              "fonts/RobotoCondensed-Light.ttf");
 
-            wtf = new RegularWatchFace(this);
+            wtf = new CircaTextWatchFace(this);
             wtf.localeChanged();
         }
 
@@ -146,7 +146,8 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         @Override
         public synchronized void invalidate() {
-            final int updateRate = 1000 / 15; // 60 FPS
+            final int FPS = 15;
+            final int updateRate = 1000 / FPS;
             long timeMs = System.currentTimeMillis();
             if ( (lastInvalidated + updateRate) < timeMs ) {
                 if (lastInvalidated == 0)
@@ -273,6 +274,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             super.onPropertiesChanged(properties);
 
+            // TODO make sure we conform to the burn-in-protectoin guidelines
             //boolean burnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
             wtf.setLowBitAmbientMode(properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false));
         }
@@ -310,7 +312,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             super.onInterruptionFilterChanged(interruptionFilter);
 
             boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
-            updateTimer();
             wtf.setMuteMode(inMuteMode);
         }
 
@@ -446,13 +447,13 @@ public class CircaTextService extends CanvasWatchFaceService {
                     break;
             }
 
-            String tapTypeStr = "";
-            switch(tapType) {
-                case TAP_TYPE_TAP: tapTypeStr = "TAP_TYPE_TAP"; break;
-                case TAP_TYPE_TOUCH: tapTypeStr = "TAP_TYPE_TOUCH"; break;
-                case TAP_TYPE_TOUCH_CANCEL: tapTypeStr = "TAP_TYPE_TOUCH_CANCEL"; break;
-            }
             if (Log.isLoggable(TAG, Log.DEBUG)) {
+                String tapTypeStr = "";
+                switch(tapType) {
+                    case TAP_TYPE_TAP: tapTypeStr = "TAP_TYPE_TAP"; break;
+                    case TAP_TYPE_TOUCH: tapTypeStr = "TAP_TYPE_TOUCH"; break;
+                    case TAP_TYPE_TOUCH_CANCEL: tapTypeStr = "TAP_TYPE_TOUCH_CANCEL"; break;
+                }
                 String output = String.format("%s: x:%d|y:%d", tapTypeStr, x, y);
                 Log.d(TAG, output);
             }
