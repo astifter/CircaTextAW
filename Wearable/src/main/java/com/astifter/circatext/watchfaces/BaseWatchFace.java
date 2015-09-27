@@ -16,9 +16,6 @@ import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.graphicshelpers.CircaTextDrawable;
-import com.astifter.circatext.graphicshelpers.DrawableText;
-import com.astifter.circatext.graphicshelpers.HorizontalStack;
-import com.astifter.circatext.graphicshelpers.VerticalStack;
 import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.Weather;
 
@@ -246,60 +243,6 @@ public abstract class BaseWatchFace implements WatchFace {
 
     protected boolean haveWeather() {
         return mWeather != null;
-    }
-
-    protected void stackRight(HashMap<Integer, DrawableText> store,
-                              HorizontalStack st,
-                              Integer index, HashMap<Integer, String> source,
-                              int align) {
-        DrawableText dt = new DrawableText(index, source);
-        dt.setAlignment(align);
-        st.add(dt);
-        store.put(index, dt);
-    }
-
-    protected void stackRight(HashMap<Integer, DrawableText> store,
-                              HorizontalStack st,
-                              Integer index, HashMap<Integer, String> source) {
-        stackRight(store, st, index, source, DrawableText.Align.LEFT);
-    }
-
-    protected void stackVertical(HashMap<Integer, DrawableText> store,
-                                 VerticalStack st,
-                                 Integer index, HashMap<Integer, String> source,
-                                 int align, boolean above) {
-        DrawableText dt = new DrawableText(index, source);
-        dt.setAlignment(align);
-        if (above)
-            st.addAbove(dt);
-        else
-            st.addBelow(dt);
-        store.put(index, dt);
-    }
-
-    protected void stackTop(HashMap<Integer, DrawableText> store,
-                            VerticalStack st,
-                            Integer index, HashMap<Integer, String> source,
-                            int align) {
-        stackVertical(store, st, index, source, align, true);
-    }
-    protected void stackBottom(HashMap<Integer, DrawableText> store,
-                               VerticalStack st,
-                               Integer index, HashMap<Integer, String> source) {
-        stackVertical(store, st, index, source, DrawableText.Align.LEFT, false);
-    }
-    protected void stackBottom(HashMap<Integer, DrawableText> store,
-                               VerticalStack st,
-                               Integer index, HashMap<Integer, String> source,
-                               int align) {
-        stackVertical(store, st, index, source, align, false);
-    }
-
-    protected void addToUIList(HashMap<Integer, DrawableText> source, ArrayList<DrawableText> dest,
-                               int[] fadeList) {
-        for (int i : fadeList) {
-            dest.add(source.get(i));
-        }
     }
 
     protected void startTapHighlight(CircaTextDrawable ct) {
