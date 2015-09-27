@@ -102,8 +102,7 @@ public class OpenWeatherMapJSONParser implements JSONWeatherParser {
         String lat = "lat=" + Double.toString(location.getLatitude());
         String lon = "lon=" + Double.toString(location.getLongitude());
         try {
-            URL url = new URL(BASE_URL + lat + "&" + lon);
-            return url;
+            return new URL(BASE_URL + lat + "&" + lon);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -111,8 +110,7 @@ public class OpenWeatherMapJSONParser implements JSONWeatherParser {
     }
 
     private static JSONObject getObject(String tagName, JSONObject jObj) throws JSONException {
-        JSONObject subObj = jObj.getJSONObject(tagName);
-        return subObj;
+        return jObj.getJSONObject(tagName);
     }
 
     private static String getString(String tagName, JSONObject jObj) throws JSONException {

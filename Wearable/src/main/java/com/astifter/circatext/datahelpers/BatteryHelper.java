@@ -10,9 +10,6 @@ import android.util.Log;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-/**
- * Created by astifter on 01.08.15.
- */
 public class BatteryHelper {
     private static final String TAG = "CircaTextService";
     private final CanvasWatchFaceService.Engine engine;

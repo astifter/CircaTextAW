@@ -1,8 +1,5 @@
 package com.astifter.circatext.datahelpers;
 
-/**
- * Created by astifter on 10.09.15.
- */
 public class CircaTextStringerTest {
     public static void main (String[] args) {
         CircaTextStringer cs = new CircaTextStringerV2();
@@ -12,7 +9,7 @@ public class CircaTextStringerTest {
                 String[] strings = cs.getStringFromTime(hour, minute);
                 System.out.printf("--- %2d:%02d ---\n", hour, minute);
                 for (int i = 0; i < 3; i++) {
-                    if (strings[i] != "") {
+                    if (!strings[i].equals("")) {
                         System.out.println(strings[i]);
                     }
                 }

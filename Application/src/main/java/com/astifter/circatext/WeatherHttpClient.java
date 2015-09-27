@@ -47,12 +47,14 @@ public class WeatherHttpClient {
             con.connect();
 
             // Let's read the response
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             is = con.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String line = null;
-            while ((line = br.readLine()) != null)
-                buffer.append(line + "\r\n");
+            String line;
+            while ((line = br.readLine()) != null) {
+                buffer.append(line);
+                buffer.append("\r\n");
+            }
 
             is.close();
             con.disconnect();
@@ -61,11 +63,13 @@ public class WeatherHttpClient {
             t.printStackTrace();
         } finally {
             try {
-                is.close();
+                if (is != null)
+                    is.close();
             } catch (Throwable t) {
             }
             try {
-                con.disconnect();
+                if (con != null)
+                    con.disconnect();
             } catch (Throwable t) {
             }
         }

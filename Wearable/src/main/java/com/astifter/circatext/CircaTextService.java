@@ -16,6 +16,7 @@
 
 package com.astifter.circatext;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +37,6 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
-import com.astifter.circatext.graphicshelpers.CircaTextDrawable;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.watchfaces.CircaTextWatchFace;
 import com.astifter.circatext.watchfaces.WatchFace;
@@ -92,6 +92,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
         private Date  mWeatherRequested = null;
 
+        @SuppressLint({"Java", "HandlerLeak"})
         final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {

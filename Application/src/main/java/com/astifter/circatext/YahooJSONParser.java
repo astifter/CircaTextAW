@@ -77,8 +77,7 @@ public class YahooJSONParser implements JSONWeatherParser {
         String urlCityName = cityName.replace(",","%2C");
         String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=select%20item.condition%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22"+urlCityName+"%22)&format=json";
         try {
-            URL url = new URL(BASE_URL);
-            return url;
+            return new URL(BASE_URL);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -86,8 +85,7 @@ public class YahooJSONParser implements JSONWeatherParser {
     }
 
     private static JSONObject getObject(String tagName, JSONObject jObj) throws JSONException {
-        JSONObject subObj = jObj.getJSONObject(tagName);
-        return subObj;
+        return jObj.getJSONObject(tagName);
     }
 
     private static String getString(String tagName, JSONObject jObj) throws JSONException {

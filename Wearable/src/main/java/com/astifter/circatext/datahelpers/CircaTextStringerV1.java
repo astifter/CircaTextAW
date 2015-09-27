@@ -2,9 +2,6 @@ package com.astifter.circatext.datahelpers;
 
 import java.util.Calendar;
 
-/**
- * Created by astifter on 10.09.15.
- */
 public class CircaTextStringerV1 implements CircaTextStringer {
     Calendar calendar;
 

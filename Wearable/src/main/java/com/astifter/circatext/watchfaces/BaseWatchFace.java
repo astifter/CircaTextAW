@@ -5,11 +5,9 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
-import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
-import android.view.ViewPropertyAnimator;
 import android.view.WindowInsets;
 
 import com.astifter.circatext.R;
@@ -20,7 +18,6 @@ import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.Weather;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;

@@ -48,8 +48,7 @@ public class CircaTextWeatherService extends WearableListenerService {
             List<Address> listAddresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
             if (null != listAddresses && listAddresses.size() > 0) {
                 Address address = listAddresses.get(0);
-                String returnValue = address.getLocality() + "," + address.getCountryCode();
-                return returnValue;
+                return address.getLocality() + "," + address.getCountryCode();
             }
         } catch (IOException e) {
             e.printStackTrace();
