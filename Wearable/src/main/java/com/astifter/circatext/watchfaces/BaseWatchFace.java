@@ -34,10 +34,7 @@ public abstract class BaseWatchFace implements WatchFace {
         public static final int CALENDAR_2 = CALENDAR_1 + 1;
         public static final int BATTERY = CALENDAR_2 + 1;
         public static final int HOUR = BATTERY + 1;
-        public static final int COLON_1 = HOUR + 1;
-        public static final int MINUTE = COLON_1 + 1;
-        public static final int COLON_2 = MINUTE + 1;
-        public static final int SECOND = COLON_2 + 1;
+        public static final int SECOND = HOUR + 1;
         public static final int WEATHER_TEMP = SECOND + 1;
         public static final int WEATHER_AGE = WEATHER_TEMP + 1;
         public static final int WEATHER_DESC = WEATHER_AGE + 1;
@@ -68,9 +65,6 @@ public abstract class BaseWatchFace implements WatchFace {
 
         mBackgroundPaint = new Paint();
         mBackgroundPaint.setColor(mInteractiveBackgroundColor);
-
-        mTexts.put(eTF.COLON_1, ":");
-        mTexts.put(eTF.COLON_2, ":");
 
         mCalendar = Calendar.getInstance();
         mDate = new Date();
@@ -108,31 +102,6 @@ public abstract class BaseWatchFace implements WatchFace {
                 mInteractiveBackgroundColor :
                 CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
         updateVisibilty();
-    }
-
-    protected void createIntAnimation(CircaTextDrawable t, String attribute, int start, int stop) {
-        ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
-        startAnimation(anim);
-    }
-
-    protected void createTextSizeAnimation(CircaTextDrawable t, float from, float to) {
-        createFloatAnimation(t, "textSize", from, to);
-    }
-
-    private void createFloatAnimation(CircaTextDrawable t, String attribute, float start, float stop) {
-        ValueAnimator anim = ObjectAnimator.ofFloat(t, attribute, start, stop);
-        startAnimation(anim);
-    }
-
-    private void startAnimation(ValueAnimator anim) {
-        anim.setDuration(500);
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                parent.invalidate();
-            }
-        });
-        anim.start();
     }
 
     protected void startAnimation(CircaTextDrawable t, String attribute, int start, int stop,
@@ -182,9 +151,19 @@ public abstract class BaseWatchFace implements WatchFace {
         mCalendar.setTimeInMillis(now);
         mDate.setTime(now);
 
-        mTexts.put(eTF.HOUR, formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY)));
-        mTexts.put(eTF.MINUTE, formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE)));
-        mTexts.put(eTF.SECOND, formatTwoDigitNumber(mCalendar.get(Calendar.SECOND)));
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append(formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY)));
+            sb.append(":");
+            sb.append(formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE)));
+            mTexts.put(eTF.HOUR, sb.toString());
+        }
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append(":");
+            sb.append(formatTwoDigitNumber(mCalendar.get(Calendar.SECOND)));
+            mTexts.put(eTF.SECOND, sb.toString());
+        }
         mTexts.put(eTF.DAY_OF_WEEK, mDayFormat.format(mDate));
         mTexts.put(eTF.DATE, mDateFormat.format(mDate));
         if (mBatteryInfo != null) {
