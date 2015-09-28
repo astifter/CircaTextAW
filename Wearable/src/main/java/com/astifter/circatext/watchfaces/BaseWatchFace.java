@@ -84,9 +84,7 @@ public abstract class BaseWatchFace implements WatchFace {
     public void setMetrics(Resources resources, WindowInsets insets) {
         int width = resources.getDisplayMetrics().widthPixels;
         int height = resources.getDisplayMetrics().heightPixels;
-
-        int mOffset = (int)resources.getDimension(insets.isRound() ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-        mBounds = new Rect(mOffset, mOffset, width-mOffset, height-mOffset);
+        mBounds = new Rect(0, 0, width, height);
     }
 
     @Override
