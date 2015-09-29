@@ -14,29 +14,54 @@ import java.util.HashMap;
 public class DrawableText implements CircaTextDrawable {
     private static final String TAG = "CircaTextDrawable";
 
-    private Rect bounds;
-    private final Paint paint;
-    private int alignment;
-    private float drawnSize;
-    private float defaultTextSize;
+    private final Paint textPaint;
+    private Rect drawnBounds = new Rect(0, 0, 0, 0);
+    private Align textAlignment = Align.LEFT;
+    private float lineHeight = 1.0f;
 
-    private String text = "";
     private boolean hidden = false;
     private boolean isInAmbientMode = false;
 
     private Integer textSourceName;
     private HashMap<Integer, String> textSource;
-    private float lineHeight = 1.0f;
-
-    public DrawableText() {
-        this.paint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
-        setAlignment(Align.LEFT);
-    }
+    private String currentText = null;
 
     public DrawableText(int where, HashMap<Integer, String> source) {
-        this.paint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
+        this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
         setAlignment(Align.LEFT);
-        setTextSource(where, source);
+        this.textSourceName = where;
+        this.textSource = source;
+    }
+
+    public static float getMaximumTextHeight(Typeface f, Rect bounds, float lineHeight) {
+        Paint p = new Paint();
+        p.setTypeface(f);
+        p.setAntiAlias(true);
+
+        if (bounds == null) return 0;
+
+        float height = bounds.height();
+        float lowerHeight = height * 0.99f;
+
+        p.setTextSize(0);
+        while (getHeightForPaint(p, lineHeight) < height) {
+            p.setTextSize(p.getTextSize() + 1);
+        }
+        while (getHeightForPaint(p, lineHeight) > lowerHeight) {
+            p.setTextSize(p.getTextSize() - 0.1f);
+        }
+        while (getHeightForPaint(p, lineHeight) < height) {
+            p.setTextSize(p.getTextSize() + 0.01f);
+        }
+        while (getHeightForPaint(p, lineHeight) > lowerHeight) {
+            p.setTextSize(p.getTextSize() - 0.001f);
+        }
+        return p.getTextSize();
+    }
+
+    private static float getHeightForPaint(Paint p, float lineHeight) {
+        Paint.FontMetrics fm = p.getFontMetrics();
+        return (-fm.ascent + fm.descent) * lineHeight;
     }
 
     private TextPaint createTextPaint(Typeface t) {
@@ -47,112 +72,108 @@ public class DrawableText implements CircaTextDrawable {
         return paint;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
     public void onDraw(Canvas canvas, Rect b) {
-        if (this.textSource != null && this.textSource.get(this.textSourceName) != null) {
-            this.text = this.textSource.get(this.textSourceName);
-        }
+        setTextFromSource();
+        if (this.currentText == "") return;
 
-        if (this.text == "" || hidden) return;
+        this.drawnBounds = b;
 
-        this.bounds = b;
-
-        this.drawnSize = this.getWidth();
-        Paint.FontMetrics fm = this.paint.getFontMetrics();
+        float targetWidth = this.getWidth();
+        Paint.FontMetrics fm = this.textPaint.getFontMetrics();
 
         float x = 0;
-        if (this.alignment == DrawableText.Align.LEFT) {
-            x = bounds.left;
-            this.bounds.right = this.bounds.left + (int)this.drawnSize;
-        } else if (this.alignment == DrawableText.Align.RIGHT) {
-            x = bounds.right;
-        } else if (this.alignment == DrawableText.Align.CENTER) {
-            x = (bounds.left + bounds.right) / 2;
+        if (this.textAlignment == DrawableText.Align.LEFT) {
+            x = drawnBounds.left;
+            this.drawnBounds.right = this.drawnBounds.left + (int)targetWidth;
+        } else if (this.textAlignment == DrawableText.Align.RIGHT) {
+            x = drawnBounds.right;
+        } else if (this.textAlignment == DrawableText.Align.CENTER) {
+            x = (drawnBounds.left + drawnBounds.right) / 2;
         }
 
-        float y = bounds.top + (-fm.ascent*lineHeight);
-        this.bounds.bottom = this.bounds.top + (int)getHeight();
+        float y = drawnBounds.top + (-fm.ascent * lineHeight);
+        this.drawnBounds.bottom = this.drawnBounds.top + (int) getHeight();
 
         /**
          * Some comments are in order:
-         * We first measure the text to be drawn. In case the maximum width is set and the
-         * text will exceed it do:
-         * - Get the font metrics and measure the overflow text "..." (ellipsis).
+         * We first measure the currentText to be drawn. In case the maximum width is set and the
+         * currentText will exceed it do:
+         * - Get the font metrics and measure the overflow currentText "..." (ellipsis).
          * - Draw the ellpsis right at the end of the allowed area (defined by x, y and
          *   maxWidth).
-         * - Save the canvas and set a clipping rectangle for the text minus the width of
+         * - Save the canvas and set a clipping rectangle for the currentText minus the width of
          *   the ellipsis.
          * - Adjust the actually used size (drawnSize) to the maxWidth.
          */
         boolean hasSavedState = false;
-        int maxWidth = -1; //bounds.width();
-        if (maxWidth != -1 && this.drawnSize > maxWidth) {
-            float ellipsisSize = paint.measureText("...");
-
-            canvas.drawText("...", x + maxWidth - ellipsisSize, y, paint);
+        int maxWidth = b.width();
+        if (targetWidth > maxWidth && this.textAlignment == Align.LEFT) {
+            float ellipsisSize = textPaint.measureText("...");
+            canvas.drawText("...", x + maxWidth - ellipsisSize, y, textPaint);
 
             canvas.save();
             hasSavedState = true;
             canvas.clipRect(x, y + fm.ascent, x + maxWidth - ellipsisSize, y + fm.descent);
 
-            this.drawnSize = maxWidth;
+            targetWidth = maxWidth;
+            this.drawnBounds.right = this.drawnBounds.left + (int)targetWidth;
         }
-        canvas.drawText(text, x, y, paint);
-        /** In case the state was saved for clipping text, restore state. */
+        canvas.drawText(currentText, x, y, textPaint);
+        /** In case the state was saved for clipping currentText, restore state. */
         if (hasSavedState) {
             canvas.restore();
         }
         if (CircaTextConsts.DEBUG) {
-            float ds = this.drawnSize;
-            if (this.alignment == DrawableText.Align.RIGHT)
-                ds = -ds;
-            canvas.drawLine(x, y, x + ds, y, this.paint);
-            float a = this.paint.ascent();
-            canvas.drawLine(x, y + a, x + ds, y + a, this.paint);
-            float d = this.paint.descent();
-            canvas.drawLine(x, y + d, x + ds, y + d, this.paint);
-            canvas.drawLine(x, y + a, x, y + d, this.paint);
+            if (this.textAlignment == DrawableText.Align.RIGHT)
+                targetWidth = -targetWidth;
+            canvas.drawLine(x, y, x + targetWidth, y, this.textPaint);
+            float a = this.textPaint.ascent();
+            canvas.drawLine(x, y + a, x + targetWidth, y + a, this.textPaint);
+            float d = this.textPaint.descent();
+            canvas.drawLine(x, y + d, x + targetWidth, y + d, this.textPaint);
+            canvas.drawLine(x, y + a, x, y + d, this.textPaint);
 
-            Paint red = new Paint(); red.setColor(Color.RED);
+            Paint red = new Paint();
+            red.setColor(Color.RED);
             canvas.drawLine(x - 10, y, x + 10, y, red);
             canvas.drawLine(x, y - 10, x, y + 10, red);
         }
     }
 
+    private void setTextFromSource() {
+        if (this.textSource != null && this.textSource.get(this.textSourceName) != null && !hidden) {
+            this.currentText = this.textSource.get(this.textSourceName);
+        } else {
+            this.currentText = "";
+        }
+    }
+
     public float getHeight() {
         if (this.hidden) return 0;
-        Paint.FontMetrics fm = this.paint.getFontMetrics();
-        return (-fm.ascent + fm.descent) * this.lineHeight;
+        return getHeightForPaint(this.textPaint, this.lineHeight);
     }
 
     @Override
     public float getWidth() {
         if (this.hidden) return 0;
-        if (this.alignment != Align.LEFT && this.bounds != null) {
-            return this.bounds.width();
-        } else {
-            return paint.measureText(text);
-        }
+        setTextFromSource();
+        if (this.currentText == "")
+            return 0;
+        else
+            return textPaint.measureText(currentText);
     }
 
     public void setTextSize(float s) {
-        this.paint.setTextSize(s);
-    }
-
-    public void setDefaultTextSize(float s) {
-        this.defaultTextSize = s;
+        this.textPaint.setTextSize(s);
     }
 
     public void setAmbientMode(boolean inAmbientMode) {
         this.isInAmbientMode = inAmbientMode;
-        this.paint.setAntiAlias(!inAmbientMode);
+        this.textPaint.setAntiAlias(!inAmbientMode);
     }
 
     public void setAlpha(int a) {
-        this.paint.setAlpha(a);
+        this.textPaint.setAlpha(a);
     }
 
     @Override
@@ -165,61 +186,22 @@ public class DrawableText implements CircaTextDrawable {
         this.hidden = false;
     }
 
-    public float getDefaultTextSize() {
-        return this.defaultTextSize;
-    }
-
-    public void setAlignment(int a) {
-        this.alignment = a;
-        switch(a & 0xF) {
-            case Align.LEFT: paint.setTextAlign(Paint.Align.LEFT); break;
-            case Align.RIGHT: paint.setTextAlign(Paint.Align.RIGHT); break;
-            case Align.CENTER: paint.setTextAlign(Paint.Align.CENTER); break;
+    public void setAlignment(Align a) {
+        this.textAlignment = a;
+        switch (a) {
+            case LEFT:
+                textPaint.setTextAlign(Paint.Align.LEFT);
+                break;
+            case RIGHT:
+                textPaint.setTextAlign(Paint.Align.RIGHT);
+                break;
+            case CENTER:
+                textPaint.setTextAlign(Paint.Align.CENTER);
+                break;
         }
     }
 
     public void setLineHeight(float lineHeight) {
         this.lineHeight = lineHeight;
-    }
-
-    public void addPositionPerc(Positions regular, Rect rect) {
-        // TODO
-    }
-
-    public class Align {
-        public static final int LEFT = 0x01;
-        public static final int RIGHT = 0x02;
-        public static final int CENTER = 0x03;
-        public static final int TOP = 0x10;
-        public static final int MIDDLE = 0x20;
-        public static final int BOTTOM = 0x30;
-    }
-
-    public static float getMaximumTextSize(Typeface f, String t, Rect bounds) {
-        Paint p = new Paint();
-        p.setTypeface(f);
-        p.setAntiAlias(true);
-
-        if (bounds == null) return 0;
-
-        float width = bounds.width();
-        float lowerWidth = width * 0.99f;
-
-        p.setTextSize(0);
-        while (p.measureText(t) < width) {
-            p.setTextSize(p.getTextSize()+1);
-        }
-        while (p.measureText(t) > lowerWidth) {
-            p.setTextSize(p.getTextSize()-0.1f);
-        }
-        while (p.measureText(t) < width) {
-            p.setTextSize(p.getTextSize()+0.01f);
-        }
-        return p.getTextSize();
-    }
-
-    public void setTextSource(Integer where, HashMap<Integer, String> source) {
-        this.textSource = source;
-        this.textSourceName = where;
     }
 }

@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Application/Application.iml" filepath="$PROJECT_DIR$/Application/Application.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CircaText.iml" filepath="$PROJECT_DIR$/CircaText.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CircaTextAW.iml" filepath="$PROJECT_DIR$/CircaTextAW.iml" />
       <module fileurl="file://$PROJECT_DIR$/CircaTextUtils/CircaTextUtils.iml" filepath="$PROJECT_DIR$/CircaTextUtils/CircaTextUtils.iml" />
       <module fileurl="file://$PROJECT_DIR$/Wearable/Wearable.iml" filepath="$PROJECT_DIR$/Wearable/Wearable.iml" />
     </modules>

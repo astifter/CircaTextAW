@@ -4,7 +4,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 
 public class DrawingHelpers {
-    public static Typeface NORMAL_TYPEFACE;
+    public static Typeface NORMAL_TYPEFACE = Typeface.create((String)null, Typeface.NORMAL) ;
 
     public static Rect percentageToRect(Rect percentage, Rect screenDims) {
         return new Rect((int)(screenDims.width() *percentage.left/100f),
