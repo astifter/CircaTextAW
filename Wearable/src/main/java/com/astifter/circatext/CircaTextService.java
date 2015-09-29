@@ -86,12 +86,12 @@ public class CircaTextService extends CanvasWatchFaceService {
 
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
-
         final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
-        private Date  mWeatherRequested = null;
-
+        WatchFace wtf;
+        long lastInvalidated = 0;
+        long nonUpdate = 0;
         @SuppressLint({"Java", "HandlerLeak"})
         final Handler mUpdateHandler = new Handler() {
             @Override
@@ -113,7 +113,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 }
             }
         };
-
         final BroadcastReceiver mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -130,6 +129,8 @@ public class CircaTextService extends CanvasWatchFaceService {
                 invalidate();
             }
         };
+        boolean mRegisteredReceiver = false;
+        private Date mWeatherRequested = null;
 
         Engine() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
@@ -142,15 +143,12 @@ public class CircaTextService extends CanvasWatchFaceService {
             wtf.localeChanged();
         }
 
-        long lastInvalidated = 0;
-        long nonUpdate = 0;
-
         @Override
         public synchronized void invalidate() {
             final int FPS = 15;
             final int updateRate = 1000 / FPS;
             long timeMs = System.currentTimeMillis();
-            if ( (lastInvalidated + updateRate) < timeMs ) {
+            if ((lastInvalidated + updateRate) < timeMs) {
                 if (lastInvalidated == 0)
                     lastInvalidated = timeMs;
                 else
@@ -174,7 +172,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         }
 
         @Override
-        public void onPeekCardPositionUpdate (Rect rect) {
+        public void onPeekCardPositionUpdate(Rect rect) {
             wtf.setPeekCardPosition(rect);
         }
 
@@ -217,8 +215,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
         }
-
-        boolean mRegisteredReceiver = false;
 
         private void registerReceiver() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "registerReceiver()");
@@ -285,7 +281,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick()");
 
             long now = System.currentTimeMillis();
-            if (mWeatherRequested == null || (now - mWeatherRequested.getTime() > 15*60*1000)) {
+            if (mWeatherRequested == null || (now - mWeatherRequested.getTime() > 15 * 60 * 1000)) {
                 mWeatherRequested = new Date(now);
                 Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
             }
@@ -450,10 +446,16 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 String tapTypeStr = "";
-                switch(tapType) {
-                    case TAP_TYPE_TAP: tapTypeStr = "TAP_TYPE_TAP"; break;
-                    case TAP_TYPE_TOUCH: tapTypeStr = "TAP_TYPE_TOUCH"; break;
-                    case TAP_TYPE_TOUCH_CANCEL: tapTypeStr = "TAP_TYPE_TOUCH_CANCEL"; break;
+                switch (tapType) {
+                    case TAP_TYPE_TAP:
+                        tapTypeStr = "TAP_TYPE_TAP";
+                        break;
+                    case TAP_TYPE_TOUCH:
+                        tapTypeStr = "TAP_TYPE_TOUCH";
+                        break;
+                    case TAP_TYPE_TOUCH_CANCEL:
+                        tapTypeStr = "TAP_TYPE_TOUCH_CANCEL";
+                        break;
                 }
                 String output = String.format("%s: x:%d|y:%d", tapTypeStr, x, y);
                 Log.d(TAG, output);

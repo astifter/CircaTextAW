@@ -84,7 +84,7 @@ public class DrawableText implements CircaTextDrawable {
         float x = 0;
         if (this.textAlignment == DrawableText.Align.LEFT) {
             x = drawnBounds.left;
-            this.drawnBounds.right = this.drawnBounds.left + (int)targetWidth;
+            this.drawnBounds.right = this.drawnBounds.left + (int) targetWidth;
         } else if (this.textAlignment == DrawableText.Align.RIGHT) {
             x = drawnBounds.right;
         } else if (this.textAlignment == DrawableText.Align.CENTER) {
@@ -116,7 +116,7 @@ public class DrawableText implements CircaTextDrawable {
             canvas.clipRect(x, y + fm.ascent, x + maxWidth - ellipsisSize, y + fm.descent);
 
             targetWidth = maxWidth;
-            this.drawnBounds.right = this.drawnBounds.left + (int)targetWidth;
+            this.drawnBounds.right = this.drawnBounds.left + (int) targetWidth;
         }
         canvas.drawText(currentText, x, y, textPaint);
         /** In case the state was saved for clipping currentText, restore state. */

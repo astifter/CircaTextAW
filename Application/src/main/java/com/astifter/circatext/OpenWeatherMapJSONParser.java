@@ -38,6 +38,26 @@ import java.util.Date;
  */
 public class OpenWeatherMapJSONParser implements JSONWeatherParser {
 
+    private static JSONObject getObject(String tagName, JSONObject jObj) throws JSONException {
+        return jObj.getJSONObject(tagName);
+    }
+
+    private static String getString(String tagName, JSONObject jObj) throws JSONException {
+        return jObj.getString(tagName);
+    }
+
+    private static float getFloat(String tagName, JSONObject jObj) throws JSONException {
+        return (float) jObj.getDouble(tagName);
+    }
+
+    private static int getInt(String tagName, JSONObject jObj) throws JSONException {
+        return jObj.getInt(tagName);
+    }
+
+    private static long getLong(String tagName, JSONObject jObj) throws JSONException {
+        return jObj.getLong(tagName);
+    }
+
     public Weather getWeather(String data) throws JSONException {
         Weather weather = new Weather();
 
@@ -89,7 +109,7 @@ public class OpenWeatherMapJSONParser implements JSONWeatherParser {
         weather.clouds.setPerc(getInt("all", cObj));
 
         long dt = getLong("dt", jObj);
-        weather.time = new Date(dt*1000);
+        weather.time = new Date(dt * 1000);
         weather.lastupdate = weather.time;
 
         return weather;
@@ -107,25 +127,5 @@ public class OpenWeatherMapJSONParser implements JSONWeatherParser {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private static JSONObject getObject(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getJSONObject(tagName);
-    }
-
-    private static String getString(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getString(tagName);
-    }
-
-    private static float getFloat(String tagName, JSONObject jObj) throws JSONException {
-        return (float) jObj.getDouble(tagName);
-    }
-
-    private static int getInt(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getInt(tagName);
-    }
-
-    private static long getLong(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getLong(tagName);
     }
 }

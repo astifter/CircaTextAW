@@ -42,7 +42,7 @@ public class WeatherHttpClient {
             con.setRequestMethod("GET");
             con.setDoInput(true);
             con.setDoOutput(true);
-            con.setConnectTimeout(10*1000);
+            con.setConnectTimeout(10 * 1000);
             con.setUseCaches(false);
             con.connect();
 

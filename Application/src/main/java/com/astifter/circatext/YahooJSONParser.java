@@ -37,6 +37,26 @@ import java.util.TimeZone;
  */
 public class YahooJSONParser implements JSONWeatherParser {
 
+    private static JSONObject getObject(String tagName, JSONObject jObj) throws JSONException {
+        return jObj.getJSONObject(tagName);
+    }
+
+    private static String getString(String tagName, JSONObject jObj) throws JSONException {
+        return jObj.getString(tagName);
+    }
+
+    private static float getFloat(String tagName, JSONObject jObj) throws JSONException {
+        return (float) jObj.getDouble(tagName);
+    }
+
+    private static int getInt(String tagName, JSONObject jObj) throws JSONException {
+        return jObj.getInt(tagName);
+    }
+
+    private static long getLong(String tagName, JSONObject jObj) throws JSONException {
+        return jObj.getLong(tagName);
+    }
+
     public Weather getWeather(String data) throws JSONException {
         Weather weather = new Weather();
 
@@ -58,7 +78,7 @@ public class YahooJSONParser implements JSONWeatherParser {
 
         weather.currentCondition.setCondition(getString("text", condition));
         float temperatureF = getFloat("temp", condition);
-        float temperatureC = (temperatureF - 32f)/1.8f;
+        float temperatureC = (temperatureF - 32f) / 1.8f;
         weather.temperature.setTemp(temperatureC);
         try {
             // Tue, 04 Aug 2015 10:59 pm CEST
@@ -74,33 +94,13 @@ public class YahooJSONParser implements JSONWeatherParser {
 
     @Override
     public URL getURL(android.location.Location location, String cityName) {
-        String urlCityName = cityName.replace(",","%2C");
-        String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=select%20item.condition%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22"+urlCityName+"%22)&format=json";
+        String urlCityName = cityName.replace(",", "%2C");
+        String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=select%20item.condition%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22" + urlCityName + "%22)&format=json";
         try {
             return new URL(BASE_URL);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private static JSONObject getObject(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getJSONObject(tagName);
-    }
-
-    private static String getString(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getString(tagName);
-    }
-
-    private static float getFloat(String tagName, JSONObject jObj) throws JSONException {
-        return (float) jObj.getDouble(tagName);
-    }
-
-    private static int getInt(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getInt(tagName);
-    }
-
-    private static long getLong(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getLong(tagName);
     }
 }

@@ -41,21 +41,6 @@ public class CircaTextWeatherService extends WearableListenerService {
 
     private Location city;
     private String cityName;
-
-    private String getCityName(Location loc) {
-        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-        try {
-            List<Address> listAddresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-            if (null != listAddresses && listAddresses.size() > 0) {
-                Address address = listAddresses.get(0);
-                return address.getLocality() + "," + address.getCountryCode();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     private LocationListener locListener = new LocationListener() {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -78,6 +63,20 @@ public class CircaTextWeatherService extends WearableListenerService {
             locManager.removeUpdates(locListener);
         }
     };
+
+    private String getCityName(Location loc) {
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> listAddresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+            if (null != listAddresses && listAddresses.size() > 0) {
+                Address address = listAddresses.get(0);
+                return address.getLocality() + "," + address.getCountryCode();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     void getCity() {
         LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

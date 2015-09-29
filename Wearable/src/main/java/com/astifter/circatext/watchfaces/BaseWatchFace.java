@@ -10,7 +10,6 @@ import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
-import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.graphicshelpers.CircaTextDrawable;
@@ -25,41 +24,22 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public abstract class BaseWatchFace implements WatchFace {
-    private CanvasWatchFaceService.Engine parent;
-
-    protected class eTF {
-        public static final int DAY_OF_WEEK = 0;
-        public static final int DATE = DAY_OF_WEEK + 1;
-        public static final int CALENDAR_1 = DATE + 1;
-        public static final int CALENDAR_2 = CALENDAR_1 + 1;
-        public static final int BATTERY = CALENDAR_2 + 1;
-        public static final int HOUR = BATTERY + 1;
-        public static final int SECOND = HOUR + 1;
-        public static final int WEATHER_TEMP = SECOND + 1;
-        public static final int WEATHER_AGE = WEATHER_TEMP + 1;
-        public static final int WEATHER_DESC = WEATHER_AGE + 1;
-        public static final int SIZE = WEATHER_DESC + 1;
-    }
     protected final HashMap<Integer, String> mTexts = new HashMap<>();
-
-    private int mInteractiveBackgroundColor = CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
     protected Paint mBackgroundPaint;
     protected Rect mBounds;
     protected Rect peekCardPosition = new Rect();
-
+    protected boolean ambientMode;
+    protected boolean mLowBitAmbient;
+    protected boolean mMute;
+    private CanvasWatchFaceService.Engine parent;
+    private int mInteractiveBackgroundColor = CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
     private Calendar mCalendar;
     private Date mDate;
     private SimpleDateFormat mDayFormat;
     private SimpleDateFormat mDateFormat;
-
-    protected boolean ambientMode;
-    protected boolean mLowBitAmbient;
-    protected boolean mMute;
-
     private BatteryHelper.BatteryInfo mBatteryInfo;
     private CalendarHelper.EventInfo[] mMeetings;
     private Weather mWeather = null;
-
     public BaseWatchFace(CanvasWatchFaceService.Engine parent) {
         this.parent = parent;
 
@@ -222,6 +202,20 @@ public abstract class BaseWatchFace implements WatchFace {
     protected void startTapHighlight(CircaTextDrawable ct) {
         Animator.AnimatorListener listener = new ReverseListener(ct);
         startAnimation(ct, "alpha", 255, 0, 100, listener);
+    }
+
+    protected class eTF {
+        public static final int DAY_OF_WEEK = 0;
+        public static final int DATE = DAY_OF_WEEK + 1;
+        public static final int CALENDAR_1 = DATE + 1;
+        public static final int CALENDAR_2 = CALENDAR_1 + 1;
+        public static final int BATTERY = CALENDAR_2 + 1;
+        public static final int HOUR = BATTERY + 1;
+        public static final int SECOND = HOUR + 1;
+        public static final int WEATHER_TEMP = SECOND + 1;
+        public static final int WEATHER_AGE = WEATHER_TEMP + 1;
+        public static final int WEATHER_DESC = WEATHER_AGE + 1;
+        public static final int SIZE = WEATHER_DESC + 1;
     }
 
     private class ReverseListener implements Animator.AnimatorListener {

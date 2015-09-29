@@ -33,6 +33,10 @@ import com.google.android.gms.wearable.Wearable;
 public final class CircaTextUtil {
     private static final String TAG = "CircaTextUtil";
 
+    private CircaTextUtil() {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CircaTextUtil()");
+    }
+
     public static GoogleApiClient buildGoogleApiClient(
             Context c,
             GoogleApiClient.ConnectionCallbacks cl,
@@ -44,35 +48,27 @@ public final class CircaTextUtil {
                 .build();
     }
 
-    private CircaTextUtil() {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CircaTextUtil()");
-    }
-
-    /// Interface FetchConfigDataMapCallback
-    public interface FetchConfigDataMapCallback {
-        void onConfigDataMapFetched(DataMap config);
-    }
-
     public static void fetchConfigDataMap(final GoogleApiClient client,
                                           final FetchConfigDataMapCallback callback) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "fetchConfigDataMap()");
 
         Wearable.NodeApi.getLocalNode(client).setResultCallback(
-            new ResultCallback<NodeApi.GetLocalNodeResult>() {
-                @Override
-                public void onResult(NodeApi.GetLocalNodeResult getLocalNodeResult) {
-                    if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "fetchConfigDataMap().onResult()");
+                new ResultCallback<NodeApi.GetLocalNodeResult>() {
+                    @Override
+                    public void onResult(NodeApi.GetLocalNodeResult getLocalNodeResult) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "fetchConfigDataMap().onResult()");
 
-                    String localNode = getLocalNodeResult.getNode().getId();
-                    Uri uri = new Uri.Builder()
-                                     .scheme("wear")
-                                     .path(CircaTextConsts.PATH_WITH_FEATURE)
-                                     .authority(localNode)
-                                     .build();
-                    Wearable.DataApi.getDataItem(client, uri)
-                                    .setResultCallback(new DataItemResultCallback(callback));
+                        String localNode = getLocalNodeResult.getNode().getId();
+                        Uri uri = new Uri.Builder()
+                                .scheme("wear")
+                                .path(CircaTextConsts.PATH_WITH_FEATURE)
+                                .authority(localNode)
+                                .build();
+                        Wearable.DataApi.getDataItem(client, uri)
+                                .setResultCallback(new DataItemResultCallback(callback));
+                    }
                 }
-            }
         );
     }
 
@@ -81,17 +77,18 @@ public final class CircaTextUtil {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteKeysInConfigDataMap()");
 
         CircaTextUtil.fetchConfigDataMap(googleApiClient,
-            new FetchConfigDataMapCallback() {
-                @Override
-                public void onConfigDataMapFetched(DataMap currentConfig) {
-                    if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteKeysInConfigDataMap().onConfigDataMapFetched()");
+                new FetchConfigDataMapCallback() {
+                    @Override
+                    public void onConfigDataMapFetched(DataMap currentConfig) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "overwriteKeysInConfigDataMap().onConfigDataMapFetched()");
 
-                    DataMap overwrittenConfig = new DataMap();
-                    overwrittenConfig.putAll(currentConfig);
-                    overwrittenConfig.putAll(configKeysToOverwrite);
-                    CircaTextUtil.putConfigDataItem(googleApiClient, CircaTextConsts.PATH_WITH_FEATURE, overwrittenConfig);
+                        DataMap overwrittenConfig = new DataMap();
+                        overwrittenConfig.putAll(currentConfig);
+                        overwrittenConfig.putAll(configKeysToOverwrite);
+                        CircaTextUtil.putConfigDataItem(googleApiClient, CircaTextConsts.PATH_WITH_FEATURE, overwrittenConfig);
+                    }
                 }
-            }
         );
     }
 
@@ -102,12 +99,18 @@ public final class CircaTextUtil {
         DataMap configToPut = putDataMapRequest.getDataMap();
         configToPut.putAll(newConfig);
         Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest())
-            .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-                @Override
-                public void onResult(DataApi.DataItemResult dataItemResult) {
-                    if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "putConfigDataItem().onResult()");
-                }
-            });
+                .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                    @Override
+                    public void onResult(DataApi.DataItemResult dataItemResult) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "putConfigDataItem().onResult()");
+                    }
+                });
+    }
+
+    /// Interface FetchConfigDataMapCallback
+    public interface FetchConfigDataMapCallback {
+        void onConfigDataMapFetched(DataMap config);
     }
 
     private static class DataItemResultCallback implements ResultCallback<DataApi.DataItemResult> {

@@ -27,6 +27,7 @@ public class CalendarHelper {
     private final Set<String> mExcludedCalendars = new HashSet<>();
     private EventInfo mMeetings[];
     private AsyncTask<Void, Void, Set<EventInfo>> mLoadMeetingsTask;
+
     public CalendarHelper(CanvasWatchFaceService.Engine engine, Context applicationContext) {
         this.engine = engine;
         this.context = applicationContext;

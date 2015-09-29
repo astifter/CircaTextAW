@@ -10,5 +10,6 @@ import java.net.URL;
 
 public interface JSONWeatherParser {
     Weather getWeather(String data) throws JSONException;
+
     URL getURL(Location location, String cityName);
 }

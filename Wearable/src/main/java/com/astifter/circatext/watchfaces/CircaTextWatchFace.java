@@ -14,7 +14,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     @Override
     public void setMetrics(Resources resources, WindowInsets insets) {
         super.setMetrics(resources, insets);
-   }
+    }
 
     @Override
     public void setPeekCardPosition(Rect rect) {

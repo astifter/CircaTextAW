@@ -3,23 +3,22 @@ package com.astifter.circatext.datahelpers;
 import java.util.Calendar;
 
 public class CircaTextStringerV2 implements CircaTextStringer {
-    Calendar calendar;
-
     private static String german_numbers[] = {
-                "null",
-                "eins",
-                "zwei",
-                "drei",
-                "vier",
-                "fünf",
-                "sechs",
-                "sieben",
-                "acht",
-                "neun",
-                "zehn",
-                "elf",
-                "zwölf"
+            "null",
+            "eins",
+            "zwei",
+            "drei",
+            "vier",
+            "fünf",
+            "sechs",
+            "sieben",
+            "acht",
+            "neun",
+            "zehn",
+            "elf",
+            "zwölf"
     };
+    Calendar calendar;
 
     public CircaTextStringerV2() {
         calendar = Calendar.getInstance();
@@ -35,7 +34,7 @@ public class CircaTextStringerV2 implements CircaTextStringer {
     }
 
     public String[] getStringFromTime(int hour, int minute) {
-        String returnvalue[] = {"","",""};
+        String returnvalue[] = {"", "", ""};
 
         // To make things easier the first 13 minutes of the new hour are
         // handled together with the previous hour. For this the minutes are
@@ -76,7 +75,7 @@ public class CircaTextStringerV2 implements CircaTextStringer {
         // This format is inherently 12 hour based, make sure hour is corrected and
         // printed accordingly.
         if (hour >= 12) hour -= 12;
-        returnvalue[2] = german_numbers[hour+1];
+        returnvalue[2] = german_numbers[hour + 1];
 
         return returnvalue;
     }
