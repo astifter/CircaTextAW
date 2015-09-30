@@ -40,6 +40,7 @@ public abstract class BaseWatchFace implements WatchFace {
     private BatteryHelper.BatteryInfo mBatteryInfo;
     private CalendarHelper.EventInfo[] mMeetings;
     private Weather mWeather = null;
+
     public BaseWatchFace(CanvasWatchFaceService.Engine parent) {
         this.parent = parent;
 
