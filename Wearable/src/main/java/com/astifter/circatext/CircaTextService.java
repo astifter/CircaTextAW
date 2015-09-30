@@ -89,7 +89,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
-        WatchFace wtf;
         long lastInvalidated = 0;
         long nonUpdate = 0;
         @SuppressLint({"Java", "HandlerLeak"})
