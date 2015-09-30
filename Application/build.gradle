@@ -62,18 +62,3 @@ android {
         androidTest.java.srcDirs = ['tests/src']
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
