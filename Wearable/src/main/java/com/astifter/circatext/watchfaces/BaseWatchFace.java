@@ -31,7 +31,7 @@ public abstract class BaseWatchFace implements WatchFace {
     protected boolean ambientMode;
     protected boolean mLowBitAmbient;
     protected boolean mMute;
-    private CanvasWatchFaceService.Engine parent;
+    protected final CanvasWatchFaceService.Engine parent;
     private int mInteractiveBackgroundColor = CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
     private Calendar mCalendar;
     private Date mDate;

@@ -41,20 +41,28 @@ public class DrawableText implements CircaTextDrawable {
         if (bounds == null) return 0;
 
         float height = bounds.height();
-        float lowerHeight = height * 0.99f;
 
-        p.setTextSize(0);
-        while (getHeightForPaint(p, lineHeight) < height) {
-            p.setTextSize(p.getTextSize() + 1);
-        }
-        while (getHeightForPaint(p, lineHeight) > lowerHeight) {
-            p.setTextSize(p.getTextSize() - 0.1f);
-        }
-        while (getHeightForPaint(p, lineHeight) < height) {
-            p.setTextSize(p.getTextSize() + 0.01f);
-        }
-        while (getHeightForPaint(p, lineHeight) > lowerHeight) {
-            p.setTextSize(p.getTextSize() - 0.001f);
+        // First double the text size until its too big.
+        p.setTextSize(1);
+        while (getHeightForPaint(p, lineHeight) < height)
+            p.setTextSize(p.getTextSize() * 2);
+
+        // Now determine the high and low borders and define a cutoff threshold.
+        float hi = p.getTextSize();
+        float lo = 1;
+        final float threshold = 0.5f;
+        // When the borders are sufficiently close together, stop otherwise:
+        // - calculate midpoint between borders
+        // - set and measure text size, if:
+        //   - the size is still to big, move upper border to size
+        //   - else move lower border up to size
+        while (hi - lo > threshold) {
+            float size = (hi + lo) / 2;
+            p.setTextSize(size);
+            if(getHeightForPaint(p, lineHeight) >= height)
+                hi = size;
+            else
+                lo = size;
         }
         return p.getTextSize();
     }
@@ -203,5 +211,9 @@ public class DrawableText implements CircaTextDrawable {
 
     public void setLineHeight(float lineHeight) {
         this.lineHeight = lineHeight;
+    }
+
+    public float getMaximumTextHeight(Rect pos) {
+        return getMaximumTextHeight(this.textPaint.getTypeface(), pos, this.lineHeight);
     }
 }
