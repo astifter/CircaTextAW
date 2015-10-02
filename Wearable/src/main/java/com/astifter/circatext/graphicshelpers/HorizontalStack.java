@@ -9,9 +9,12 @@ import com.astifter.circatextutils.CircaTextConsts;
 
 public class HorizontalStack extends AbstractStack {
     @Override
-    public void onDraw(Canvas canvas, Rect bounds) {
-        if (hidden) return;
-        this.bounds = bounds;
+    public void onDraw(Canvas canvas, Rect b) {
+        if (this.hidden) {
+            this.bounds = new Rect(b.left, b.top, b.left, b.top);
+            return;
+        }
+        this.bounds = b;
 
         int width = 0;
         int height = 0;
@@ -39,8 +42,7 @@ public class HorizontalStack extends AbstractStack {
         this.stack.add(d);
     }
 
-    @Override
-    public float getHeight() {
+    public float getCurrentHeight() {
         int height = 0;
         for (CircaTextDrawable t : stack) {
             if (t.getHeight() > height)

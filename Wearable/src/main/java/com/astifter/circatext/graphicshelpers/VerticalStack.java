@@ -21,9 +21,12 @@ public class VerticalStack extends AbstractStack {
     }
 
     @Override
-    public void onDraw(Canvas canvas, Rect bounds) {
-        if (hidden) return;
-        this.bounds = bounds;
+    public void onDraw(Canvas canvas, Rect b) {
+        if (this.hidden) {
+            this.bounds = new Rect(b.left, b.top, b.left, b.top);
+            return;
+        }
+        this.bounds = b;
 
         if (yCenter >= 0) {
             onDrawWithOffset(canvas);

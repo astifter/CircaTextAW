@@ -6,14 +6,12 @@ import java.util.ArrayList;
 
 abstract class AbstractStack implements CircaTextDrawable {
     protected boolean hidden = false;
-    Rect bounds;
+    Rect bounds = new Rect(0, 0, 0, 0);;
     ArrayList<CircaTextDrawable> stack;
     private boolean inAmbientMode = false;
 
     protected AbstractStack() {
-        bounds = new Rect();
         stack = new ArrayList<>();
-        bounds = new Rect();
     }
 
     @Override
@@ -31,13 +29,6 @@ abstract class AbstractStack implements CircaTextDrawable {
         this.inAmbientMode = inAmbientMode;
         for (CircaTextDrawable t : stack) {
             t.setAmbientMode(inAmbientMode);
-        }
-    }
-
-    @Override
-    public void setColor(int c) {
-        for (CircaTextDrawable t : stack) {
-            t.setColor(c);
         }
     }
 

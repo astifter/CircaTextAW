@@ -12,17 +12,20 @@ import java.util.HashMap;
 /**
  * Created by astifter on 01.10.15.
  */
-public class AnimatableText implements CircaTextDrawable, CircaTextAnimatable {
-    private final DrawableText drawableText;
+public class Animatable implements CircaTextDrawable, CircaTextAnimatable {
+    private final CircaTextDrawable drawable;
     private final CanvasWatchFaceService.Engine parent;
+
     HashMap<CircaTextDrawable.Configurations, Rect> configs;
     private CircaTextDrawable.Configurations currentConfig;
-    private Rect currentPosition;
 
-    public AnimatableText(CanvasWatchFaceService.Engine p, int i, HashMap<Integer, String> t) {
+    private Rect currentPosition;
+    private boolean hidden;
+
+    public Animatable(CanvasWatchFaceService.Engine p, CircaTextDrawable d) {
         configs = new HashMap<>();
         this.parent = p;
-        drawableText = new DrawableText(i, t);
+        drawable = d;
     }
 
     @Override
@@ -42,8 +45,8 @@ public class AnimatableText implements CircaTextDrawable, CircaTextAnimatable {
     public void animateToConfig(Configurations c, Rect bounds) {
         Rect oldPosition = this.currentPosition;
         Rect newPosition = DrawingHelpers.percentageToRect(configs.get(c), bounds);
-        float currentSize = drawableText.getMaximumTextHeight(oldPosition);
-        float targetSize = drawableText.getMaximumTextHeight(newPosition);
+        float currentSize = drawable.getMaximumTextHeight(oldPosition);
+        float targetSize = drawable.getMaximumTextHeight(newPosition);
 
         PropertyValuesHolder animateSize = PropertyValuesHolder.ofFloat("TextSize", new float[]{currentSize, targetSize});
         PropertyValuesHolder animateLeft = PropertyValuesHolder.ofInt("Left", oldPosition.left, newPosition.left);
@@ -63,7 +66,7 @@ public class AnimatableText implements CircaTextDrawable, CircaTextAnimatable {
     }
 
     public void setTextSize(float t) {
-        drawableText.setTextSize(t);
+        drawable.setTextSize(t);
     }
 
     public void setLeft(int l) {
@@ -75,37 +78,43 @@ public class AnimatableText implements CircaTextDrawable, CircaTextAnimatable {
     }
 
     @Override
-    public void onDraw(Canvas canvas, Rect bounds) {
-        drawableText.onDraw(canvas, currentPosition);
+    public void onDraw(Canvas canvas, Rect b) {
+        if (this.hidden) {
+            this.currentPosition.bottom = this.currentPosition.top;
+            this.currentPosition.right = this.currentPosition.left;
+            return;
+        }
+        drawable.onDraw(canvas, currentPosition);
     }
 
     @Override
     public float getHeight() {
-        return 0;
+        return this.currentPosition.height();
     }
 
     @Override
     public float getWidth() {
-        return 0;
+        return this.currentPosition.width();
     }
 
     @Override
     public void setAmbientMode(boolean inAmbientMode) {
-
+        this.drawable.setAmbientMode(inAmbientMode);
     }
 
     @Override
     public void setAlpha(int a) {
-
+        this.drawable.setAlpha(a);
     }
 
     @Override
     public void hide() {
-
+        this.hidden = true;
     }
 
     @Override
     public void show() {
+        this.hidden = false;
 
     }
 }

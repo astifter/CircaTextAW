@@ -50,6 +50,8 @@ public abstract class BaseWatchFace implements WatchFace {
         mCalendar = Calendar.getInstance();
         mDate = new Date();
         localeChanged();
+
+        setTexts();
     }
 
     @Override
@@ -150,21 +152,23 @@ public abstract class BaseWatchFace implements WatchFace {
         } else {
             mTexts.put(eTF.BATTERY, "");
         }
-        int i = 0;
-        while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
+        if (mMeetings != null) {
+            int i = 0;
+            while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
 
-        if (i >= mMeetings.length) {
-            mTexts.put(eTF.CALENDAR_1, "no meetings");
-            mTexts.put(eTF.CALENDAR_2, "");
-        } else {
-            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-            mTexts.put(eTF.CALENDAR_1, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
+            if (i >= mMeetings.length) {
+                mTexts.put(eTF.CALENDAR_1, "no meetings");
+                mTexts.put(eTF.CALENDAR_2, "");
+            } else {
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+                mTexts.put(eTF.CALENDAR_1, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
 
-            int additionalEvents = mMeetings.length - 1 - i;
-            if (additionalEvents == 1)
-                mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional event");
-            if (additionalEvents > 1)
-                mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional events");
+                int additionalEvents = mMeetings.length - 1 - i;
+                if (additionalEvents == 1)
+                    mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional event");
+                if (additionalEvents > 1)
+                    mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional events");
+            }
         }
         if (mWeather != null) {
             long age = now - mWeather.lastupdate.getTime();

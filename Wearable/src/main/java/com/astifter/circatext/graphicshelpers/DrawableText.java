@@ -20,17 +20,17 @@ public class DrawableText implements CircaTextDrawable {
     private float lineHeight = 1.0f;
 
     private boolean hidden = false;
-    private boolean isInAmbientMode = false;
 
     private Integer textSourceName;
     private HashMap<Integer, String> textSource;
-    private String currentText = null;
 
     public DrawableText(int where, HashMap<Integer, String> source) {
         this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
         setAlignment(Align.LEFT);
         this.textSourceName = where;
         this.textSource = source;
+        if (this.textSource.get(this.textSourceName) == null)
+            throw new IllegalArgumentException();
     }
 
     public static float getMaximumTextHeight(Typeface f, Rect bounds, float lineHeight) {
@@ -44,7 +44,7 @@ public class DrawableText implements CircaTextDrawable {
 
         // First double the text size until its too big.
         p.setTextSize(1);
-        while (getHeightForPaint(p, lineHeight) < height)
+        while (getTextHeightForPaint(p, lineHeight) < height)
             p.setTextSize(p.getTextSize() * 2);
 
         // Now determine the high and low borders and define a cutoff threshold.
@@ -59,7 +59,7 @@ public class DrawableText implements CircaTextDrawable {
         while (hi - lo > threshold) {
             float size = (hi + lo) / 2;
             p.setTextSize(size);
-            if (getHeightForPaint(p, lineHeight) >= height)
+            if (getTextHeightForPaint(p, lineHeight) >= height)
                 hi = size;
             else
                 lo = size;
@@ -67,9 +67,19 @@ public class DrawableText implements CircaTextDrawable {
         return p.getTextSize();
     }
 
-    private static float getHeightForPaint(Paint p, float lineHeight) {
+    private static float getTextHeightForPaint(Paint p, float lineHeight) {
         Paint.FontMetrics fm = p.getFontMetrics();
         return (-fm.ascent + fm.descent) * lineHeight;
+    }
+
+    private float getCurrentHeight() {
+        if (this.hidden) return 0;
+        return getTextHeightForPaint(this.textPaint, this.lineHeight);
+    }
+
+    private float getCurrentWidth() {
+        if (this.hidden) return 0;
+        return this.textPaint.measureText(getTextFromSource());
     }
 
     private TextPaint createTextPaint(Typeface t) {
@@ -81,12 +91,15 @@ public class DrawableText implements CircaTextDrawable {
     }
 
     public void onDraw(Canvas canvas, Rect b) {
-        setTextFromSource();
-        if (this.currentText == "") return;
+        if (this.hidden) {
+            this.drawnBounds = new Rect(b.left, b.top, b.left, b.top);
+            return;
+        }
 
+        String currentText = getTextFromSource();
         this.drawnBounds = b;
 
-        float targetWidth = this.getWidth();
+        float targetWidth = this.getCurrentWidth();
         Paint.FontMetrics fm = this.textPaint.getFontMetrics();
 
         float x = 0;
@@ -100,7 +113,7 @@ public class DrawableText implements CircaTextDrawable {
         }
 
         float y = drawnBounds.top + (-fm.ascent * lineHeight);
-        this.drawnBounds.bottom = this.drawnBounds.top + (int) getHeight();
+        this.drawnBounds.bottom = this.drawnBounds.top + (int)getTextHeightForPaint(this.textPaint, this.lineHeight);
 
         /**
          * Some comments are in order:
@@ -148,38 +161,30 @@ public class DrawableText implements CircaTextDrawable {
         }
     }
 
-    private void setTextFromSource() {
-        if (this.textSource != null && this.textSource.get(this.textSourceName) != null && !hidden) {
-            this.currentText = this.textSource.get(this.textSourceName);
-        } else {
-            this.currentText = "";
-        }
+    private String getTextFromSource() {
+        return this.textSource.get(this.textSourceName);
     }
 
+    @Override
     public float getHeight() {
-        if (this.hidden) return 0;
-        return getHeightForPaint(this.textPaint, this.lineHeight);
+        return this.drawnBounds.height();
     }
 
     @Override
     public float getWidth() {
-        if (this.hidden) return 0;
-        setTextFromSource();
-        if (this.currentText == "")
-            return 0;
-        else
-            return textPaint.measureText(currentText);
+        return this.drawnBounds.width();
     }
 
     public void setTextSize(float s) {
         this.textPaint.setTextSize(s);
     }
 
+    @Override
     public void setAmbientMode(boolean inAmbientMode) {
-        this.isInAmbientMode = inAmbientMode;
         this.textPaint.setAntiAlias(!inAmbientMode);
     }
 
+    @Override
     public void setAlpha(int a) {
         this.textPaint.setAlpha(a);
     }
