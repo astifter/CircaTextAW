@@ -37,6 +37,7 @@ public abstract class BaseWatchFace implements WatchFace {
     private Date mDate;
     private SimpleDateFormat mDayFormat;
     private SimpleDateFormat mDateFormat;
+    private SimpleDateFormat mShortDateFormat;
     private BatteryHelper.BatteryInfo mBatteryInfo;
     private CalendarHelper.EventInfo[] mMeetings;
     private Weather mWeather = null;
@@ -61,6 +62,8 @@ public abstract class BaseWatchFace implements WatchFace {
         mDayFormat.setCalendar(mCalendar);
         mDateFormat = new SimpleDateFormat("MMM d yyyy", Locale.getDefault());
         mDateFormat.setCalendar(mCalendar);
+        mShortDateFormat = new SimpleDateFormat("MMM d", Locale.getDefault());
+        mShortDateFormat.setCalendar(mCalendar);
     }
 
     @Override
@@ -147,6 +150,7 @@ public abstract class BaseWatchFace implements WatchFace {
         }
         mTexts.put(eTF.DAY_OF_WEEK, mDayFormat.format(mDate));
         mTexts.put(eTF.DATE, mDateFormat.format(mDate));
+        mTexts.put(eTF.SHORTDATE, mShortDateFormat.format(mDate));
         if (mBatteryInfo != null) {
             mTexts.put(eTF.BATTERY, String.format("%3.0f%%", mBatteryInfo.getPercent() * 100));
         } else {
@@ -212,7 +216,8 @@ public abstract class BaseWatchFace implements WatchFace {
     protected class eTF {
         public static final int DAY_OF_WEEK = 0;
         public static final int DATE = DAY_OF_WEEK + 1;
-        public static final int CALENDAR_1 = DATE + 1;
+        public static final int SHORTDATE = DATE + 1;
+        public static final int CALENDAR_1 = SHORTDATE + 1;
         public static final int CALENDAR_2 = CALENDAR_1 + 1;
         public static final int BATTERY = CALENDAR_2 + 1;
         public static final int HOUR = BATTERY + 1;

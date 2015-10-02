@@ -1,5 +1,6 @@
 package com.astifter.circatext.datahelpers;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class CircaTextStringerV2 implements CircaTextStringer {
@@ -34,7 +35,7 @@ public class CircaTextStringerV2 implements CircaTextStringer {
     }
 
     public String[] getStringFromTime(int hour, int minute) {
-        String returnvalue[] = {"", "", ""};
+        ArrayList<String> returnvalue = new ArrayList<>();
 
         // To make things easier the first 13 minutes of the new hour are
         // handled together with the previous hour. For this the minutes are
@@ -55,28 +56,29 @@ public class CircaTextStringerV2 implements CircaTextStringer {
         // Prepare string for returning, reset used and free counters.
 
         if (section % 6 == 1)
-            returnvalue[0] = "zehn vor";
+            returnvalue.add("zehn vor");
         if (section % 6 == 2)
-            returnvalue[0] = "fünf vor";
+            returnvalue.add("fünf vor");
         if (section % 6 == 4)
-            returnvalue[0] = "fünf nach";
+            returnvalue.add("fünf nach");
         if (section % 6 == 5)
-            returnvalue[0] = "zehn nach";
+            returnvalue.add("zehn nach");
 
         // Use the sections again to fetch the next part of the string.
         if (section == 0)
-            returnvalue[1] = "viertel";
+            returnvalue.add("viertel");
         if (section > 0 && section < 6)
-            returnvalue[1] = "halb";
+            returnvalue.add("halb");
         if (section == 6)
-            returnvalue[1] = "dreiviertel";
+            returnvalue.add("dreiviertel");
         // (section % 4 == 3) is the full hour.
 
         // This format is inherently 12 hour based, make sure hour is corrected and
         // printed accordingly.
         if (hour >= 12) hour -= 12;
-        returnvalue[2] = german_numbers[hour + 1];
+        returnvalue.add(german_numbers[hour + 1]);
 
-        return returnvalue;
+        String[] r = new String[returnvalue.size()]; returnvalue.toArray(r);
+        return r;
     }
 }
