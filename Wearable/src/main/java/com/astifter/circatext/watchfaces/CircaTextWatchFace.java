@@ -6,16 +6,18 @@ import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
+import com.astifter.circatext.graphicshelpers.Animatable;
 import com.astifter.circatext.graphicshelpers.AnimatableText;
 import com.astifter.circatext.graphicshelpers.CircaTextDrawable;
+import com.astifter.circatext.graphicshelpers.DrawableText;
 
 public class CircaTextWatchFace extends BaseWatchFace {
-    private final AnimatableText topDrawable;
+    private final Animatable topDrawable;
     private CircaTextDrawable.Configurations currentConfig;
 
     public CircaTextWatchFace(CanvasWatchFaceService.Engine parent) {
         super(parent);
-        topDrawable = new AnimatableText(this.parent, eTF.HOUR, mTexts);
+        topDrawable = new AnimatableText(this.parent, new DrawableText(eTF.HOUR, mTexts));
     }
 
     @Override

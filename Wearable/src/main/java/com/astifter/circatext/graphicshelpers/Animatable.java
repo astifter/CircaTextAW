@@ -13,13 +13,13 @@ import java.util.HashMap;
  * Created by astifter on 01.10.15.
  */
 public class Animatable implements CircaTextDrawable, CircaTextAnimatable {
-    private final CircaTextDrawable drawable;
-    private final CanvasWatchFaceService.Engine parent;
+    protected final CircaTextDrawable drawable;
+    protected final CanvasWatchFaceService.Engine parent;
 
-    HashMap<CircaTextDrawable.Configurations, Rect> configs;
-    private CircaTextDrawable.Configurations currentConfig;
+    protected HashMap<CircaTextDrawable.Configurations, Rect> configs;
+    protected CircaTextDrawable.Configurations currentConfig;
 
-    private Rect currentPosition;
+    protected Rect currentPosition;
     private boolean hidden;
 
     public Animatable(CanvasWatchFaceService.Engine p, CircaTextDrawable d) {
@@ -45,14 +45,11 @@ public class Animatable implements CircaTextDrawable, CircaTextAnimatable {
     public void animateToConfig(Configurations c, Rect bounds) {
         Rect oldPosition = this.currentPosition;
         Rect newPosition = DrawingHelpers.percentageToRect(configs.get(c), bounds);
-        float currentSize = drawable.getMaximumTextHeight(oldPosition);
-        float targetSize = drawable.getMaximumTextHeight(newPosition);
 
-        PropertyValuesHolder animateSize = PropertyValuesHolder.ofFloat("TextSize", new float[]{currentSize, targetSize});
         PropertyValuesHolder animateLeft = PropertyValuesHolder.ofInt("Left", oldPosition.left, newPosition.left);
         PropertyValuesHolder animateTop = PropertyValuesHolder.ofInt("Top", oldPosition.top, newPosition.top);
 
-        ValueAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, animateSize, animateLeft, animateTop);
+        ValueAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, animateLeft, animateTop);
         anim.setDuration(250);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -63,10 +60,6 @@ public class Animatable implements CircaTextDrawable, CircaTextAnimatable {
         anim.start();
 
         currentConfig = c;
-    }
-
-    public void setTextSize(float t) {
-        drawable.setTextSize(t);
     }
 
     public void setLeft(int l) {
