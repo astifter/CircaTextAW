@@ -39,7 +39,7 @@ public class VerticalStack extends AbstractStack {
             heigth += t.getHeight();
 
             if (t.getWidth() > width)
-                width = (int)t.getWidth();
+                width = (int) t.getWidth();
         }
         this.bounds.bottom = Math.min(this.bounds.bottom, this.bounds.top + heigth);
         this.bounds.right = Math.min(this.bounds.right, this.bounds.left + width);
@@ -57,14 +57,14 @@ public class VerticalStack extends AbstractStack {
 
         int heigthAbove = 0;
         for (CircaTextDrawable t : this.aboveStack) {
-            int currentHeight = (int)t.getHeight();
+            int currentHeight = (int) t.getHeight();
             Rect newBounds = new Rect(this.bounds.left, yCenter - heigthAbove - currentHeight,
                                       this.bounds.right, yCenter - heigthAbove);
             t.onDraw(canvas, newBounds);
             heigthAbove += currentHeight;
 
             if (t.getWidth() > width)
-                width = (int)t.getWidth();
+                width = (int) t.getWidth();
         }
         int heigthBelow = 0;
         for (CircaTextDrawable t : this.belowStack) {
@@ -74,7 +74,7 @@ public class VerticalStack extends AbstractStack {
             heigthBelow += t.getHeight();
 
             if (t.getWidth() > width)
-                width = (int)t.getWidth();
+                width = (int) t.getWidth();
         }
 
         this.bounds.bottom = Math.min(this.bounds.bottom, yCenter + heigthBelow);

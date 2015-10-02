@@ -8,7 +8,6 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.graphicshelpers.AnimatableText;
 import com.astifter.circatext.graphicshelpers.CircaTextDrawable;
-import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 
 public class CircaTextWatchFace extends BaseWatchFace {
     private final AnimatableText topDrawable;

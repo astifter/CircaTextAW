@@ -59,7 +59,7 @@ public class DrawableText implements CircaTextDrawable {
         while (hi - lo > threshold) {
             float size = (hi + lo) / 2;
             p.setTextSize(size);
-            if(getHeightForPaint(p, lineHeight) >= height)
+            if (getHeightForPaint(p, lineHeight) >= height)
                 hi = size;
             else
                 lo = size;

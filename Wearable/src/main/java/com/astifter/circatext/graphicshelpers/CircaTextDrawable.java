@@ -22,10 +22,6 @@ public interface CircaTextDrawable {
         LEFT, RIGHT, CENTER
     }
 
-    enum Positions {
-        REGULAR, AMBIENT, PEEKCARD, AMBIENTPEEKCARD
-    }
-
     enum Configurations {
         PLAIN, PEEK
     }

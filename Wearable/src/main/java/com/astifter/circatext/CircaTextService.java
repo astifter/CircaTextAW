@@ -82,13 +82,12 @@ public class CircaTextService extends CanvasWatchFaceService {
                       implements DataApi.DataListener,
                                  GoogleApiClient.ConnectionCallbacks,
                                  GoogleApiClient.OnConnectionFailedListener {
-        WatchFace wtf;
-
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
         final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
+        WatchFace wtf;
         long lastInvalidated = 0;
         long nonUpdate = 0;
         @SuppressLint({"Java", "HandlerLeak"})

@@ -5,11 +5,9 @@ import android.graphics.Rect;
 import java.util.ArrayList;
 
 abstract class AbstractStack implements CircaTextDrawable {
-    Rect bounds;
-
-    ArrayList<CircaTextDrawable> stack;
-
     protected boolean hidden = false;
+    Rect bounds;
+    ArrayList<CircaTextDrawable> stack;
     private boolean inAmbientMode = false;
 
     protected AbstractStack() {

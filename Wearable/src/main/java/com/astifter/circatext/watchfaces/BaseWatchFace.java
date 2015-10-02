@@ -25,13 +25,13 @@ import java.util.TimeZone;
 
 public abstract class BaseWatchFace implements WatchFace {
     protected final HashMap<Integer, String> mTexts = new HashMap<>();
+    protected final CanvasWatchFaceService.Engine parent;
     protected Paint mBackgroundPaint;
     protected Rect mBounds;
     protected Rect peekCardPosition = new Rect();
     protected boolean ambientMode;
     protected boolean mLowBitAmbient;
     protected boolean mMute;
-    protected final CanvasWatchFaceService.Engine parent;
     private int mInteractiveBackgroundColor = CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
     private Calendar mCalendar;
     private Date mDate;

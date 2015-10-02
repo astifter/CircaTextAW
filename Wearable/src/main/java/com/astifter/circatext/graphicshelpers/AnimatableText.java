@@ -1,6 +1,5 @@
 package com.astifter.circatext.graphicshelpers;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
@@ -13,7 +12,7 @@ import java.util.HashMap;
 /**
  * Created by astifter on 01.10.15.
  */
-public class AnimatableText implements CircaTextDrawable {
+public class AnimatableText implements CircaTextDrawable, CircaTextAnimatable {
     private final DrawableText drawableText;
     private final CanvasWatchFaceService.Engine parent;
     HashMap<CircaTextDrawable.Configurations, Rect> configs;
@@ -26,6 +25,7 @@ public class AnimatableText implements CircaTextDrawable {
         drawableText = new DrawableText(i, t);
     }
 
+    @Override
     public void setPosition(Configurations c, Rect position, Rect bounds) {
         this.currentConfig = c;
         configs.put(c, position);
@@ -33,10 +33,12 @@ public class AnimatableText implements CircaTextDrawable {
         this.currentPosition = DrawingHelpers.percentageToRect(position, bounds);
     }
 
+    @Override
     public void setConfiguration(Configurations c, Rect position) {
         configs.put(c, position);
     }
 
+    @Override
     public void animateToConfig(Configurations c, Rect bounds) {
         Rect oldPosition = this.currentPosition;
         Rect newPosition = DrawingHelpers.percentageToRect(configs.get(c), bounds);
@@ -63,9 +65,11 @@ public class AnimatableText implements CircaTextDrawable {
     public void setTextSize(float t) {
         drawableText.setTextSize(t);
     }
+
     public void setLeft(int l) {
         this.currentPosition.left = l;
     }
+
     public void setTop(int t) {
         this.currentPosition.top = t;
     }

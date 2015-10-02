@@ -22,7 +22,7 @@ public class HorizontalStack extends AbstractStack {
             width += t.getWidth();
 
             if (t.getHeight() > height)
-                height = (int)t.getHeight();
+                height = (int) t.getHeight();
         }
         this.bounds.right = Math.min(this.bounds.right, this.bounds.left + width);
         this.bounds.bottom = Math.min(this.bounds.bottom, this.bounds.top + height);
@@ -44,7 +44,7 @@ public class HorizontalStack extends AbstractStack {
         int height = 0;
         for (CircaTextDrawable t : stack) {
             if (t.getHeight() > height)
-                height = (int)t.getHeight();
+                height = (int) t.getHeight();
         }
         return height;
     }
