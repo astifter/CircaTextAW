@@ -11,8 +11,8 @@ import com.astifter.circatextutils.CircaTextConsts;
 
 import java.util.HashMap;
 
-public class DrawableText implements CircaTextDrawable {
-    private static final String TAG = "CircaTextDrawable";
+public class DrawableText implements Drawable {
+    private static final String TAG = "Drawable";
 
     private final Paint textPaint;
     private Rect drawnBounds = new Rect(0, 0, 0, 0);

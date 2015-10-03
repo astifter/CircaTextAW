@@ -12,7 +12,7 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
-import com.astifter.circatext.graphicshelpers.CircaTextDrawable;
+import com.astifter.circatext.graphicshelpers.Drawable;
 import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.Weather;
 
@@ -88,7 +88,7 @@ public abstract class BaseWatchFace implements WatchFace {
         updateVisibilty();
     }
 
-    protected void startAnimation(CircaTextDrawable t, String attribute, int start, int stop,
+    protected void startAnimation(Drawable t, String attribute, int start, int stop,
                                   int duration, Animator.AnimatorListener a) {
         ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
         anim.setDuration(duration);
@@ -208,7 +208,7 @@ public abstract class BaseWatchFace implements WatchFace {
         return mWeather != null;
     }
 
-    protected void startTapHighlight(CircaTextDrawable ct) {
+    protected void startTapHighlight(Drawable ct) {
         Animator.AnimatorListener listener = new ReverseListener(ct);
         startAnimation(ct, "alpha", 255, 0, 100, listener);
     }
@@ -229,9 +229,9 @@ public abstract class BaseWatchFace implements WatchFace {
     }
 
     private class ReverseListener implements Animator.AnimatorListener {
-        private final CircaTextDrawable drawable;
+        private final Drawable drawable;
 
-        public ReverseListener(CircaTextDrawable d) {
+        public ReverseListener(Drawable d) {
             this.drawable = d;
         }
 

@@ -4,13 +4,13 @@ import android.graphics.Rect;
 
 import java.util.ArrayList;
 
-abstract class AbstractStack implements CircaTextDrawable {
+abstract class Stack implements Drawable {
     protected boolean hidden = false;
     Rect bounds = new Rect(0, 0, 0, 0);;
-    ArrayList<CircaTextDrawable> stack;
+    ArrayList<Drawable> stack;
     private boolean inAmbientMode = false;
 
-    protected AbstractStack() {
+    protected Stack() {
         stack = new ArrayList<>();
     }
 
@@ -27,14 +27,14 @@ abstract class AbstractStack implements CircaTextDrawable {
     @Override
     public void setAmbientMode(boolean inAmbientMode) {
         this.inAmbientMode = inAmbientMode;
-        for (CircaTextDrawable t : stack) {
+        for (Drawable t : stack) {
             t.setAmbientMode(inAmbientMode);
         }
     }
 
     @Override
     public void setAlpha(int a) {
-        for (CircaTextDrawable t : stack) {
+        for (Drawable t : stack) {
             t.setAlpha(a);
         }
     }

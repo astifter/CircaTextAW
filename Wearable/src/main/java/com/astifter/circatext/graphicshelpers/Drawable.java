@@ -3,9 +3,9 @@ package com.astifter.circatext.graphicshelpers;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
-public interface CircaTextDrawable {
+public interface Drawable {
     /**
-     * Draws the @ref CircaTextDrawable on the canvas inside the bounds.
+     * Draws the @ref Drawable on the canvas inside the bounds.
      * @param canvas
      * @param bounds
      */
@@ -24,7 +24,7 @@ public interface CircaTextDrawable {
     float getWidth();
 
     /**
-     * Make sure @{CircaTextDrawable} is playing nicely with ambient mode.
+     * Make sure @{Drawable} is playing nicely with ambient mode.
      * @param inAmbientMode
      */
     void setAmbientMode(boolean inAmbientMode);
@@ -32,12 +32,12 @@ public interface CircaTextDrawable {
     void setAlpha(int a);
 
     /**
-     * Disable drawing of @CircaTextDrawable.
+     * Disable drawing of @Drawable.
      */
     void hide();
 
     /**
-     * Enable drawing of @CircaTextDrawable.
+     * Enable drawing of @Drawable.
      */
     void show();
 
@@ -46,7 +46,7 @@ public interface CircaTextDrawable {
         TOP, MIDDLE, BOTTOM
     }
 
-    enum Configurations {
+    enum Config {
         PLAIN, PEEK
     }
 }

@@ -9,13 +9,13 @@ import com.astifter.circatextutils.CircaTextConsts;
 
 import java.util.ArrayList;
 
-public class VerticalStack extends AbstractStack {
+public class StackVertical extends Stack {
     int yCenter = -1;
 
-    ArrayList<CircaTextDrawable> aboveStack;
-    ArrayList<CircaTextDrawable> belowStack;
+    ArrayList<Drawable> aboveStack;
+    ArrayList<Drawable> belowStack;
 
-    public VerticalStack() {
+    public StackVertical() {
         aboveStack = new ArrayList<>();
         belowStack = new ArrayList<>();
     }
@@ -35,7 +35,7 @@ public class VerticalStack extends AbstractStack {
 
         int width = 0;
         int heigth = 0;
-        for (CircaTextDrawable t : this.belowStack) {
+        for (Drawable t : this.belowStack) {
             Rect newBounds = new Rect(this.bounds.left, this.bounds.top + heigth,
                                       this.bounds.right, this.bounds.bottom);
             t.onDraw(canvas, newBounds);
@@ -59,7 +59,7 @@ public class VerticalStack extends AbstractStack {
         int width = 0;
 
         int heigthAbove = 0;
-        for (CircaTextDrawable t : this.aboveStack) {
+        for (Drawable t : this.aboveStack) {
             int currentHeight = (int) t.getHeight();
             Rect newBounds = new Rect(this.bounds.left, yCenter - heigthAbove - currentHeight,
                                       this.bounds.right, yCenter - heigthAbove);
@@ -70,7 +70,7 @@ public class VerticalStack extends AbstractStack {
                 width = (int) t.getWidth();
         }
         int heigthBelow = 0;
-        for (CircaTextDrawable t : this.belowStack) {
+        for (Drawable t : this.belowStack) {
             Rect newBounds = new Rect(this.bounds.left, yCenter + heigthBelow,
                                       this.bounds.right, this.bounds.bottom);
             t.onDraw(canvas, newBounds);
@@ -91,12 +91,12 @@ public class VerticalStack extends AbstractStack {
         }
     }
 
-    public void addBelow(CircaTextDrawable d) {
+    public void addBelow(Drawable d) {
         this.stack.add(d);
         this.belowStack.add(d);
     }
 
-    public void addAbove(CircaTextDrawable d) {
+    public void addAbove(Drawable d) {
         this.stack.add(0, d);
         this.aboveStack.add(d);
     }

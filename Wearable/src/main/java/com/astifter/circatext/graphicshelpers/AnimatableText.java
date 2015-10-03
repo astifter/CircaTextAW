@@ -3,16 +3,13 @@ package com.astifter.circatext.graphicshelpers;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
-import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
-
-import java.util.HashMap;
 
 /**
  * Created by astifter on 01.10.15.
  */
-public class AnimatableText extends Animatable {
+public class AnimatableText extends AnimatableImpl {
     private final DrawableText drawable;
 
     public AnimatableText(CanvasWatchFaceService.Engine p, DrawableText d) {
@@ -21,7 +18,7 @@ public class AnimatableText extends Animatable {
     }
 
     @Override
-    public void animateToConfig(Configurations c, Rect bounds) {
+    public void animateToConfig(Config c, Rect bounds) {
         Rect oldPosition = this.currentPosition;
         Rect newPosition = DrawingHelpers.percentageToRect(configs.get(c), bounds);
         float currentSize = drawable.getMaximumTextHeight(oldPosition);
