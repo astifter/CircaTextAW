@@ -1,6 +1,6 @@
 package com.astifter.circatext.datahelpers;
 
-public class CircaTextStringerTest {
+class CircaTextStringerTest {
     public static void main(String[] args) {
         CircaTextStringer cs = new CircaTextStringerV2();
 

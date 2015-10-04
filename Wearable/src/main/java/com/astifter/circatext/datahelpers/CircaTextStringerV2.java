@@ -19,7 +19,7 @@ public class CircaTextStringerV2 implements CircaTextStringer {
             "elf",
             "zwölf"
     };
-    Calendar calendar;
+    private Calendar calendar;
 
     public CircaTextStringerV2() {
         calendar = Calendar.getInstance();
@@ -78,7 +78,8 @@ public class CircaTextStringerV2 implements CircaTextStringer {
         if (hour >= 12) hour -= 12;
         returnvalue.add(german_numbers[hour + 1]);
 
-        String[] r = new String[returnvalue.size()]; returnvalue.toArray(r);
+        String[] r = new String[returnvalue.size()];
+        returnvalue.toArray(r);
         return r;
     }
 }

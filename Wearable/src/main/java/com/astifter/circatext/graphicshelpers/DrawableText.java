@@ -34,7 +34,7 @@ public class DrawableText implements Drawable {
             throw new IllegalArgumentException();
     }
 
-    public static float getMaximumTextHeight(Typeface f, Rect bounds, float lineHeight) {
+    private static float getMaximumTextHeight(Typeface f, Rect bounds, float lineHeight) {
         Paint p = new Paint();
         p.setTypeface(f);
         p.setAntiAlias(true);
@@ -108,7 +108,7 @@ public class DrawableText implements Drawable {
     }
 
     @Override
-    public float getCurrentHeight() {
+    public float getFutureHeight() {
         if (this.hidden) return 0;
         return getTextHeightForPaint(this.textPaint, this.lineHeight);
     }
@@ -149,7 +149,7 @@ public class DrawableText implements Drawable {
         }
 
         float y = drawnBounds.top + (-fm.ascent * lineHeight);
-        this.drawnBounds.bottom = this.drawnBounds.top + (int)getTextHeightForPaint(this.textPaint, this.lineHeight);
+        this.drawnBounds.bottom = this.drawnBounds.top + (int) getTextHeightForPaint(this.textPaint, this.lineHeight);
 
         /**
          * Some comments are in order:
@@ -258,11 +258,11 @@ public class DrawableText implements Drawable {
         return getMaximumTextHeight(this.textPaint.getTypeface(), pos, this.lineHeight);
     }
 
-    public void setDefaultTextSize(float defaultTextSize) {
-        this.defaultTextSize = defaultTextSize;
-    }
-
     public float getDefaultTextSize() {
         return defaultTextSize;
+    }
+
+    public void setDefaultTextSize(float defaultTextSize) {
+        this.defaultTextSize = defaultTextSize;
     }
 }

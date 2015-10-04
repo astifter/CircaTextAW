@@ -134,7 +134,7 @@ public class CalendarHelper {
             try {
                 cursor = context.getContentResolver().query(builder.build(), EVENT_FIELDS, null, null, null);
 
-                while (cursor.moveToNext()) {
+                while (cursor != null && cursor.moveToNext()) {
                     String cal_name = cursor.getString(3);
 
                     boolean useThisCalendar = true;

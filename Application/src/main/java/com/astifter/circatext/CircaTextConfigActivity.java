@@ -73,9 +73,6 @@ public class CircaTextConfigActivity extends Activity
                 getIntent().getParcelableExtra(WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): name=" + name);
 
-        TextView label = (TextView) findViewById(R.id.label);
-        label.setText(label.getText() + " (" + name.getClassName() + ")");
-
         TextView htmlText = (TextView) findViewById(R.id.attributions);
         htmlText.setText(Html.fromHtml(getResources().getString(R.string.digital_config_attribution_text)));
     }

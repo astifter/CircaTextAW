@@ -10,10 +10,10 @@ import com.astifter.circatextutils.CircaTextConsts;
 import java.util.ArrayList;
 
 public class StackVertical extends Stack {
-    int yCenter = -1;
+    private int yCenter = -1;
 
-    ArrayList<Drawable> aboveStack;
-    ArrayList<Drawable> belowStack;
+    private ArrayList<Drawable> aboveStack;
+    private ArrayList<Drawable> belowStack;
 
     public StackVertical() {
         aboveStack = new ArrayList<>();
@@ -60,7 +60,7 @@ public class StackVertical extends Stack {
 
         int heigthAbove = 0;
         for (Drawable t : this.aboveStack) {
-            int currentHeight = (int) t.getCurrentHeight();
+            int currentHeight = (int) t.getFutureHeight();
             Rect newBounds = new Rect(this.bounds.left, yCenter - heigthAbove - currentHeight,
                                       this.bounds.right, yCenter - heigthAbove);
             t.onDraw(canvas, newBounds);

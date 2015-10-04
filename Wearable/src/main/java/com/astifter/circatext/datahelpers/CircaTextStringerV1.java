@@ -18,7 +18,7 @@ public class CircaTextStringerV1 implements CircaTextStringer {
             "elf",
             "zwölf"
     };
-    Calendar calendar;
+    private Calendar calendar;
 
     public CircaTextStringerV1() {
         calendar = Calendar.getInstance();

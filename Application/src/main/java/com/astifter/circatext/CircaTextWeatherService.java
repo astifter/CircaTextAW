@@ -122,8 +122,13 @@ public class CircaTextWeatherService extends WearableListenerService {
             URL url = weatherParser.getURL(city, cityName);
             if (url == null) return null;
 
-            String data = (new WeatherHttpClient()).getWeatherData(url);
-            if (data == null) return null;
+            String data;
+            try {
+                data = (new WeatherHttpClient()).getWeatherData(url);
+                if (data == null) return null;
+            } catch (Throwable t) {
+                return null;
+            }
 
             Weather weather = null;
             try {

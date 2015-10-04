@@ -68,17 +68,24 @@ public class RegularWatchFace extends BaseWatchFace {
     }
 
     private void stackTop(HashMap<Integer, DrawableText> c, StackVertical s, int i, HashMap<Integer, String> t, Drawable.Align a) {
-        DrawableText dt = new DrawableText(i, t); dt.setAlignment(a);
-        s.addAbove(dt); c.put(i, dt);
+        DrawableText dt = new DrawableText(i, t);
+        dt.setAlignment(a);
+        s.addAbove(dt);
+        c.put(i, dt);
     }
+
     private void stackBottom(HashMap<Integer, DrawableText> c, StackVertical s, int i, HashMap<Integer, String> t, Drawable.Align a) {
-        DrawableText dt = new DrawableText(i, t); dt.setAlignment(a);
-        s.addBelow(dt); c.put(i, dt);
+        DrawableText dt = new DrawableText(i, t);
+        dt.setAlignment(a);
+        s.addBelow(dt);
+        c.put(i, dt);
     }
 
     private void stackRight(HashMap<Integer, DrawableText> c, StackHorizontal s, int i, HashMap<Integer, String> t, Drawable.Align a) {
-        DrawableText dt = new DrawableText(i, t); dt.setAlignment(a);
-        s.add(dt); c.put(i, dt);
+        DrawableText dt = new DrawableText(i, t);
+        dt.setAlignment(a);
+        s.add(dt);
+        c.put(i, dt);
     }
 
     private void stackRight(HashMap<Integer, DrawableText> c, StackHorizontal s, int i, HashMap<Integer, String> t) {
@@ -89,10 +96,10 @@ public class RegularWatchFace extends BaseWatchFace {
     public void setMetrics(Resources resources, WindowInsets insets) {
         super.setMetrics(resources, insets);
 
-        int mXOffset = (int) resources.getDimension(R.dimen.digital_x_offset);
+        int left = (int) resources.getDimension(R.dimen.digital_x_offset);
         this.topDrawableBounds =
-                new Rect(mXOffset, mXOffset,
-                         this.mBounds.width() - mXOffset, this.mBounds.width() - mXOffset);
+                new Rect(left, left,
+                         this.mBounds.width() - left, this.mBounds.height() - left);
 
         int mYOffset = (int) resources.getDimension(R.dimen.digital_y_offset);
         topDrawable.setOffset(mYOffset);
@@ -144,12 +151,12 @@ public class RegularWatchFace extends BaseWatchFace {
         }
     }
 
-    protected void createIntAnimation(Drawable t, String attribute, int start, int stop) {
+    private void createIntAnimation(Drawable t, String attribute, int start, int stop) {
         ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
         startAnimation(anim);
     }
 
-    protected void createTextSizeAnimation(Drawable t, float from, float to) {
+    private void createTextSizeAnimation(Drawable t, float from, float to) {
         createFloatAnimation(t, "textSize", from, to);
     }
 

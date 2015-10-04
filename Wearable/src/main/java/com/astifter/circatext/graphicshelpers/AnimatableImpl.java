@@ -9,20 +9,16 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 
 import java.util.HashMap;
 
-/**
- * Created by astifter on 01.10.15.
- */
 public class AnimatableImpl implements Drawable, Animatable {
-    protected final Drawable drawable;
-    protected final CanvasWatchFaceService.Engine parent;
+    private final Drawable drawable;
+    final CanvasWatchFaceService.Engine parent;
 
-    protected HashMap<Config, Rect> configs;
-    protected Config currentConfig;
+    HashMap<Config, Rect> configs;
 
-    protected Rect currentPosition;
+    Rect currentPosition;
     private boolean hidden;
 
-    public AnimatableImpl(CanvasWatchFaceService.Engine p, Drawable d) {
+    AnimatableImpl(CanvasWatchFaceService.Engine p, Drawable d) {
         configs = new HashMap<>();
         this.parent = p;
         drawable = d;
@@ -30,7 +26,6 @@ public class AnimatableImpl implements Drawable, Animatable {
 
     @Override
     public void setPosition(Config c, Rect position, Rect bounds) {
-        this.currentConfig = c;
         configs.put(c, position);
 
         this.currentPosition = DrawingHelpers.percentageToRect(position, bounds);
@@ -57,9 +52,7 @@ public class AnimatableImpl implements Drawable, Animatable {
                 parent.invalidate();
             }
         });
-        anim.start();
-
-        currentConfig = c;
+        anim.start();;
     }
 
     public void setLeft(int l) {
@@ -86,7 +79,7 @@ public class AnimatableImpl implements Drawable, Animatable {
     }
 
     @Override
-    public float getCurrentHeight() {
+    public float getFutureHeight() {
         return getHeight();
     }
 

@@ -24,14 +24,14 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public abstract class BaseWatchFace implements WatchFace {
-    protected final HashMap<Integer, String> mTexts = new HashMap<>();
-    protected final CanvasWatchFaceService.Engine parent;
-    protected Paint mBackgroundPaint;
-    protected Rect mBounds;
-    protected Rect peekCardPosition = new Rect();
-    protected boolean ambientMode;
-    protected boolean mLowBitAmbient;
-    protected boolean mMute;
+    final HashMap<Integer, String> mTexts = new HashMap<>();
+    final CanvasWatchFaceService.Engine parent;
+    Paint mBackgroundPaint;
+    Rect mBounds;
+    Rect peekCardPosition = new Rect();
+    boolean ambientMode;
+    boolean mLowBitAmbient;
+    boolean mMute;
     private int mInteractiveBackgroundColor = CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
     private Calendar mCalendar;
     private Date mDate;
@@ -42,7 +42,7 @@ public abstract class BaseWatchFace implements WatchFace {
     private CalendarHelper.EventInfo[] mMeetings;
     private Weather mWeather = null;
 
-    public BaseWatchFace(CanvasWatchFaceService.Engine parent) {
+    BaseWatchFace(CanvasWatchFaceService.Engine parent) {
         this.parent = parent;
 
         mBackgroundPaint = new Paint();
@@ -88,10 +88,10 @@ public abstract class BaseWatchFace implements WatchFace {
         updateVisibilty();
     }
 
-    protected void startAnimation(Drawable t, String attribute, int start, int stop,
-                                  int duration, Animator.AnimatorListener a) {
-        ValueAnimator anim = ObjectAnimator.ofInt(t, attribute, start, stop);
-        anim.setDuration(duration);
+    private void startAlphaAnimation(Drawable t, int start, int stop,
+                                     Animator.AnimatorListener a) {
+        ValueAnimator anim = ObjectAnimator.ofInt(t, "alpha", start, stop);
+        anim.setDuration(100);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -130,23 +130,19 @@ public abstract class BaseWatchFace implements WatchFace {
         }
     }
 
-    protected void setTexts() {
+    void setTexts() {
         long now = System.currentTimeMillis();
         mCalendar.setTimeInMillis(now);
         mDate.setTime(now);
 
         {
-            StringBuilder sb = new StringBuilder();
-            sb.append(formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY)));
-            sb.append(":");
-            sb.append(formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE)));
-            mTexts.put(eTF.HOUR, sb.toString());
+            String sb = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                        formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
+            mTexts.put(eTF.HOUR, sb);
         }
         {
-            StringBuilder sb = new StringBuilder();
-            sb.append(":");
-            sb.append(formatTwoDigitNumber(mCalendar.get(Calendar.SECOND)));
-            mTexts.put(eTF.SECOND, sb.toString());
+            String sb = ":" + formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
+            mTexts.put(eTF.SECOND, sb);
         }
         mTexts.put(eTF.DAY_OF_WEEK, mDayFormat.format(mDate));
         mTexts.put(eTF.DATE, mDateFormat.format(mDate));
@@ -174,7 +170,8 @@ public abstract class BaseWatchFace implements WatchFace {
                     mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional events");
             }
         } else {
-            mTexts.put(eTF.CALENDAR_1, ""); mTexts.put(eTF.CALENDAR_2, "");
+            mTexts.put(eTF.CALENDAR_1, "");
+            mTexts.put(eTF.CALENDAR_2, "");
         }
         if (mWeather != null) {
             long age = now - mWeather.lastupdate.getTime();
@@ -210,16 +207,16 @@ public abstract class BaseWatchFace implements WatchFace {
         mWeather = weather;
     }
 
-    protected boolean haveWeather() {
+    boolean haveWeather() {
         return mWeather != null;
     }
 
-    protected void startTapHighlight(Drawable ct) {
+    void startTapHighlight(Drawable ct) {
         Animator.AnimatorListener listener = new ReverseListener(ct);
-        startAnimation(ct, "alpha", 255, 0, 100, listener);
+        startAlphaAnimation(ct, 255, 0, listener);
     }
 
-    protected class eTF {
+    class eTF {
         public static final int DAY_OF_WEEK = 0;
         public static final int DATE = DAY_OF_WEEK + 1;
         public static final int SHORTDATE = DATE + 1;
@@ -231,7 +228,7 @@ public abstract class BaseWatchFace implements WatchFace {
         public static final int WEATHER_TEMP = SECOND + 1;
         public static final int WEATHER_AGE = WEATHER_TEMP + 1;
         public static final int WEATHER_DESC = WEATHER_AGE + 1;
-        public static final int SIZE = WEATHER_DESC + 1;
+        //public static final int SIZE = WEATHER_DESC + 1;
     }
 
     private class ReverseListener implements Animator.AnimatorListener {
@@ -247,7 +244,7 @@ public abstract class BaseWatchFace implements WatchFace {
 
         @Override
         public void onAnimationEnd(Animator animator) {
-            startAnimation(drawable, "alpha", 0, 255, 100, null);
+            startAlphaAnimation(drawable, 0, 255, null);
         }
 
         @Override

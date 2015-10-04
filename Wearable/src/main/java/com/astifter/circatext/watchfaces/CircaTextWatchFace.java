@@ -17,18 +17,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CircaTextWatchFace extends BaseWatchFace {
-    protected final HashMap<Integer, String> mCirca = new HashMap<>();
-    protected class eCT {
-        public static final int FIRST = 0;
-        public static final int SECOND = FIRST + 1;
-        public static final int THIRD = SECOND + 1;
-        public static final int SIZE = THIRD + 1;
-    }
-    protected final CircaTextStringer cts = new CircaTextStringerV2();
-
+    private final HashMap<Integer, String> mCirca = new HashMap<>();
+    private final CircaTextStringer cts = new CircaTextStringerV2();
     private final ArrayList<AnimatableImpl> topDrawable;
     private Drawable.Config currentConfig;
-
     public CircaTextWatchFace(CanvasWatchFaceService.Engine parent) {
         super(parent);
         for (int i = eCT.FIRST; i < eCT.SIZE; i++) {
@@ -48,28 +40,32 @@ public class CircaTextWatchFace extends BaseWatchFace {
             topDrawable.add(a);
         }
         {
-            DrawableText dt = new DrawableText(eTF.SHORTDATE, mTexts); dt.setAlignment(Drawable.Align.RIGHT);
+            DrawableText dt = new DrawableText(eTF.SHORTDATE, mTexts);
+            dt.setAlignment(Drawable.Align.RIGHT);
             AnimatableImpl a = new AnimatableText(this.parent, dt);
             a.setPosition(Drawable.Config.PLAIN, new Rect(5, 80, 95, 95), this.mBounds);
             a.setConfiguration(Drawable.Config.PEEK, new Rect(5, 72, 95, 95));
             topDrawable.add(a);
         }
         {
-            DrawableText dt = new DrawableText(eCT.FIRST, mCirca); dt.setAlignment(Drawable.Align.RIGHT);
+            DrawableText dt = new DrawableText(eCT.FIRST, mCirca);
+            dt.setAlignment(Drawable.Align.RIGHT);
             AnimatableImpl a = new AnimatableText(this.parent, dt);
             a.setPosition(Drawable.Config.PLAIN, new Rect(5, 15, 95, 42), this.mBounds);
             a.setConfiguration(Drawable.Config.PEEK, new Rect(5, 5, 95, 28));
             topDrawable.add(a);
         }
         {
-            DrawableText dt = new DrawableText(eCT.SECOND, mCirca); dt.setAlignment(Drawable.Align.RIGHT);
+            DrawableText dt = new DrawableText(eCT.SECOND, mCirca);
+            dt.setAlignment(Drawable.Align.RIGHT);
             AnimatableImpl a = new AnimatableText(this.parent, dt);
             a.setPosition(Drawable.Config.PLAIN, new Rect(5, 36, 95, 63), this.mBounds);
             a.setConfiguration(Drawable.Config.PEEK, new Rect(5, 27, 95, 50));
             topDrawable.add(a);
         }
         {
-            DrawableText dt = new DrawableText(eCT.THIRD, mCirca); dt.setAlignment(Drawable.Align.RIGHT);
+            DrawableText dt = new DrawableText(eCT.THIRD, mCirca);
+            dt.setAlignment(Drawable.Align.RIGHT);
             AnimatableImpl a = new AnimatableText(this.parent, dt);
             a.setPosition(Drawable.Config.PLAIN, new Rect(5, 57, 95, 84), this.mBounds);
             a.setConfiguration(Drawable.Config.PEEK, new Rect(5, 50, 95, 73));
@@ -116,7 +112,9 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     private void fillCircaTexts() {
         String[] circaTexts = cts.getString();
-        for (int i = eCT.FIRST; i < eCT.SIZE; i++) { mCirca.put(i, ""); }
+        for (int i = eCT.FIRST; i < eCT.SIZE; i++) {
+            mCirca.put(i, "");
+        }
         if (circaTexts.length == 1) {
             mCirca.put(eCT.SECOND, circaTexts[0]);
         } else {
@@ -124,5 +122,12 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 mCirca.put(i, circaTexts[i]);
             }
         }
+    }
+
+    class eCT {
+        public static final int FIRST = 0;
+        public static final int SECOND = FIRST + 1;
+        public static final int THIRD = SECOND + 1;
+        public static final int SIZE = THIRD + 1;
     }
 }

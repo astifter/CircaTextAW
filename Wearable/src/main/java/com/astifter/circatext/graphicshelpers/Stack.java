@@ -5,12 +5,11 @@ import android.graphics.Rect;
 import java.util.ArrayList;
 
 abstract class Stack implements Drawable {
-    protected boolean hidden = false;
-    Rect bounds = new Rect(0, 0, 0, 0);;
+    boolean hidden = false;
+    Rect bounds = new Rect(0, 0, 0, 0);
     ArrayList<Drawable> stack;
-    private boolean inAmbientMode = false;
 
-    protected Stack() {
+    Stack() {
         stack = new ArrayList<>();
     }
 
@@ -26,7 +25,6 @@ abstract class Stack implements Drawable {
 
     @Override
     public void setAmbientMode(boolean inAmbientMode) {
-        this.inAmbientMode = inAmbientMode;
         for (Drawable t : stack) {
             t.setAmbientMode(inAmbientMode);
         }
@@ -50,10 +48,10 @@ abstract class Stack implements Drawable {
     }
 
     @Override
-    public float getCurrentHeight() {
+    public float getFutureHeight() {
         int height = 0;
         for (Drawable t : stack) {
-            if (t.getCurrentHeight() > height)
+            if (t.getFutureHeight() > height)
                 height = (int) t.getHeight();
         }
         return height;

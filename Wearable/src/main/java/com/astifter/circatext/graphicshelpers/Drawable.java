@@ -5,46 +5,50 @@ import android.graphics.Rect;
 
 public interface Drawable {
     /**
-     * Draws the @ref Drawable on the canvas inside the bounds.
-     * @param canvas
-     * @param bounds
+     * Draws the {@link Drawable} on the canvas inside the bounds.
+     *
+     * @param canvas The canvas to draw on.
+     * @param bounds The rectangle to draw in.
      */
     void onDraw(Canvas canvas, Rect bounds);
 
     /**
      * Gets the drawn height after the last onDraw() command.
+     *
      * @return The height of the last drawn rectangle.
      */
     float getHeight();
-    float getCurrentHeight();
+
+    float getFutureHeight();
 
     /**
      * As getHeight().
+     *
      * @return The width of the last drawn rectangle.
      */
     float getWidth();
 
     /**
-     * Make sure @{Drawable} is playing nicely with ambient mode.
-     * @param inAmbientMode
+     * Make sure {@link Drawable} is playing nicely with ambient mode.
+     *
+     * @param inAmbientMode Wether or not watch is in ambient mode.
      */
     void setAmbientMode(boolean inAmbientMode);
 
     void setAlpha(int a);
 
     /**
-     * Disable drawing of @Drawable.
+     * Disable drawing of {@link Drawable}.
      */
     void hide();
 
     /**
-     * Enable drawing of @Drawable.
+     * Enable drawing of {@link Drawable}.
      */
     void show();
 
     enum Align {
-        LEFT, RIGHT, CENTER,
-        TOP, MIDDLE, BOTTOM
+        LEFT, RIGHT, CENTER
     }
 
     enum Config {

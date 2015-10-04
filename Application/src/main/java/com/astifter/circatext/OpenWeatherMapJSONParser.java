@@ -1,10 +1,10 @@
 /**
  * This is a tutorial source code
  * provided "as is" and without warranties.
- * <p/>
+ * <p>
  * For any question please visit the web site
  * http://www.survivingwithandroid.com
- * <p/>
+ * <p>
  * or write an email to
  * survivingwithandroid@gmail.com
  */

@@ -6,9 +6,6 @@ import android.animation.ValueAnimator;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 
-/**
- * Created by astifter on 01.10.15.
- */
 public class AnimatableText extends AnimatableImpl {
     private final DrawableText drawable;
 
@@ -24,7 +21,7 @@ public class AnimatableText extends AnimatableImpl {
         float currentSize = drawable.getMaximumTextHeight(oldPosition);
         float targetSize = drawable.getMaximumTextHeight(newPosition);
 
-        PropertyValuesHolder animateSize = PropertyValuesHolder.ofFloat("TextSize", new float[]{currentSize, targetSize});
+        PropertyValuesHolder animateSize = PropertyValuesHolder.ofFloat("TextSize", currentSize, targetSize);
         PropertyValuesHolder animateLeft = PropertyValuesHolder.ofInt("Left", oldPosition.left, newPosition.left);
         PropertyValuesHolder animateTop = PropertyValuesHolder.ofInt("Top", oldPosition.top, newPosition.top);
 
@@ -37,8 +34,6 @@ public class AnimatableText extends AnimatableImpl {
             }
         });
         anim.start();
-
-        currentConfig = c;
     }
 
     void setTextSize(float s) {

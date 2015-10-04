@@ -1,10 +1,10 @@
 /**
  * This is a tutorial source code
  * provided "as is" and without warranties.
- * <p/>
+ * <p>
  * For any question please visit the web site
  * http://www.survivingwithandroid.com
- * <p/>
+ * <p>
  * or write an email to
  * survivingwithandroid@gmail.com
  */
@@ -31,9 +31,9 @@ import java.net.URL;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class WeatherHttpClient {
+class WeatherHttpClient {
 
-    public String getWeatherData(URL url) {
+    public String getWeatherData(URL url) throws java.io.IOException {
         HttpURLConnection con = null;
         InputStream is = null;
 
@@ -62,16 +62,10 @@ public class WeatherHttpClient {
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {
-            try {
-                if (is != null)
-                    is.close();
-            } catch (Throwable t) {
-            }
-            try {
-                if (con != null)
-                    con.disconnect();
-            } catch (Throwable t) {
-            }
+            if (is != null)
+                is.close();
+            if (con != null)
+                con.disconnect();
         }
 
         return null;
