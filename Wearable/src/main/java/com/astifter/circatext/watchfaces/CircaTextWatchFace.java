@@ -21,6 +21,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private final CircaTextStringer cts = new CircaTextStringerV2();
     private final ArrayList<AnimatableImpl> topDrawable;
     private Drawable.Config currentConfig;
+
     public CircaTextWatchFace(CanvasWatchFaceService.Engine parent) {
         super(parent);
         for (int i = eCT.FIRST; i < eCT.SIZE; i++) {

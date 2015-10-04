@@ -64,6 +64,16 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <activity
+            android:name=".CircaTextWearableConfigActivity"
+            android:label="@string/title_activity_config">
+            <intent-filter>
+                <action android:name="com.astifter.circatext.CONFIG_DIGITAL" />
+
+                <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

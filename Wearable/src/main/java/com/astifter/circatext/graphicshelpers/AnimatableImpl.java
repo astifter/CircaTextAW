@@ -10,9 +10,8 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 import java.util.HashMap;
 
 public class AnimatableImpl implements Drawable, Animatable {
-    private final Drawable drawable;
     final CanvasWatchFaceService.Engine parent;
-
+    private final Drawable drawable;
     HashMap<Config, Rect> configs;
 
     Rect currentPosition;
@@ -52,7 +51,7 @@ public class AnimatableImpl implements Drawable, Animatable {
                 parent.invalidate();
             }
         });
-        anim.start();;
+        anim.start();
     }
 
     public void setLeft(int l) {
