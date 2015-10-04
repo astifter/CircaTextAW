@@ -23,6 +23,7 @@ public class DrawableText implements Drawable {
 
     private Integer textSourceName;
     private HashMap<Integer, String> textSource;
+    private float defaultTextSize;
 
     public DrawableText(int where, HashMap<Integer, String> source) {
         this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
@@ -67,12 +68,47 @@ public class DrawableText implements Drawable {
         return p.getTextSize();
     }
 
+    public static float getMaximumTextWidth(Typeface f, Rect bounds, String text) {
+        Paint p = new Paint();
+        p.setTypeface(f);
+        p.setAntiAlias(true);
+
+        if (bounds == null) return 0;
+
+        float width = bounds.width();
+
+        // First double the text size until its too big.
+        p.setTextSize(1);
+        while (p.measureText(text) < width)
+            p.setTextSize(p.getTextSize() * 2);
+
+        // Now determine the high and low borders and define a cutoff threshold.
+        float hi = p.getTextSize();
+        float lo = 1;
+        final float threshold = 0.5f;
+        // When the borders are sufficiently close together, stop otherwise:
+        // - calculate midpoint between borders
+        // - set and measure text size, if:
+        //   - the size is still to big, move upper border to size
+        //   - else move lower border up to size
+        while (hi - lo > threshold) {
+            float size = (hi + lo) / 2;
+            p.setTextSize(size);
+            if (p.measureText(text) >= width)
+                hi = size;
+            else
+                lo = size;
+        }
+        return p.getTextSize();
+    }
+
     private static float getTextHeightForPaint(Paint p, float lineHeight) {
         Paint.FontMetrics fm = p.getFontMetrics();
         return (-fm.ascent + fm.descent) * lineHeight;
     }
 
-    private float getCurrentHeight() {
+    @Override
+    public float getCurrentHeight() {
         if (this.hidden) return 0;
         return getTextHeightForPaint(this.textPaint, this.lineHeight);
     }
@@ -220,5 +256,13 @@ public class DrawableText implements Drawable {
 
     public float getMaximumTextHeight(Rect pos) {
         return getMaximumTextHeight(this.textPaint.getTypeface(), pos, this.lineHeight);
+    }
+
+    public void setDefaultTextSize(float defaultTextSize) {
+        this.defaultTextSize = defaultTextSize;
+    }
+
+    public float getDefaultTextSize() {
+        return defaultTextSize;
     }
 }

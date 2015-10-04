@@ -48,4 +48,14 @@ abstract class Stack implements Drawable {
     public void show() {
         this.hidden = false;
     }
+
+    @Override
+    public float getCurrentHeight() {
+        int height = 0;
+        for (Drawable t : stack) {
+            if (t.getCurrentHeight() > height)
+                height = (int) t.getHeight();
+        }
+        return height;
+    }
 }

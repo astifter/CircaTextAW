@@ -16,6 +16,7 @@ public interface Drawable {
      * @return The height of the last drawn rectangle.
      */
     float getHeight();
+    float getCurrentHeight();
 
     /**
      * As getHeight().

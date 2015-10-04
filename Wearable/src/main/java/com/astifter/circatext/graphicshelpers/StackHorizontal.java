@@ -41,13 +41,4 @@ public class StackHorizontal extends Stack {
     public void add(Drawable d) {
         this.stack.add(d);
     }
-
-    public float getCurrentHeight() {
-        int height = 0;
-        for (Drawable t : stack) {
-            if (t.getHeight() > height)
-                height = (int) t.getHeight();
-        }
-        return height;
-    }
 }

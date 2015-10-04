@@ -86,6 +86,11 @@ public class AnimatableImpl implements Drawable, Animatable {
     }
 
     @Override
+    public float getCurrentHeight() {
+        return getHeight();
+    }
+
+    @Override
     public float getWidth() {
         return this.currentPosition.width();
     }

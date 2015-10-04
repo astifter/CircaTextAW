@@ -60,7 +60,7 @@ public class StackVertical extends Stack {
 
         int heigthAbove = 0;
         for (Drawable t : this.aboveStack) {
-            int currentHeight = (int) t.getHeight();
+            int currentHeight = (int) t.getCurrentHeight();
             Rect newBounds = new Rect(this.bounds.left, yCenter - heigthAbove - currentHeight,
                                       this.bounds.right, yCenter - heigthAbove);
             t.onDraw(canvas, newBounds);

@@ -173,6 +173,8 @@ public abstract class BaseWatchFace implements WatchFace {
                 if (additionalEvents > 1)
                     mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional events");
             }
+        } else {
+            mTexts.put(eTF.CALENDAR_1, ""); mTexts.put(eTF.CALENDAR_2, "");
         }
         if (mWeather != null) {
             long age = now - mWeather.lastupdate.getTime();
@@ -182,6 +184,10 @@ public abstract class BaseWatchFace implements WatchFace {
             mTexts.put(eTF.WEATHER_TEMP, tempText);
             mTexts.put(eTF.WEATHER_AGE, ageText);
             mTexts.put(eTF.WEATHER_DESC, mWeather.currentCondition.getCondition());
+        } else {
+            mTexts.put(eTF.WEATHER_TEMP, "");
+            mTexts.put(eTF.WEATHER_AGE, "");
+            mTexts.put(eTF.WEATHER_DESC, "");
         }
     }
 
