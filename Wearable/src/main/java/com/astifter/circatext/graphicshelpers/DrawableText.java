@@ -24,6 +24,7 @@ public class DrawableText implements Drawable {
     private Integer textSourceName;
     private HashMap<Integer, String> textSource;
     private float defaultTextSize;
+    private boolean strokeInAmbientMode;
 
     public DrawableText(int where, HashMap<Integer, String> source) {
         this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
@@ -123,6 +124,9 @@ public class DrawableText implements Drawable {
         paint.setColor(Color.WHITE);
         paint.setTypeface(t);
         paint.setAntiAlias(true);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeWidth(1.0f);
         return paint;
     }
 
@@ -217,6 +221,11 @@ public class DrawableText implements Drawable {
     @Override
     public void setAmbientMode(boolean inAmbientMode) {
         this.textPaint.setAntiAlias(!inAmbientMode);
+        if (inAmbientMode && this.strokeInAmbientMode) {
+            this.textPaint.setStyle(Paint.Style.STROKE);
+        } else {
+            this.textPaint.setStyle(Paint.Style.FILL);
+        }
     }
 
     @Override
@@ -261,5 +270,9 @@ public class DrawableText implements Drawable {
 
     public void setDefaultTextSize(float defaultTextSize) {
         this.defaultTextSize = defaultTextSize;
+    }
+
+    public void strokeInAmbientMode(boolean s) {
+        this.strokeInAmbientMode = s;
     }
 }

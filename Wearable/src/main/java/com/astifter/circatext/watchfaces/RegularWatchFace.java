@@ -34,6 +34,7 @@ public class RegularWatchFace extends BaseWatchFace {
 
         StackHorizontal hours = new StackHorizontal();
         stackRight(mTF, hours, eTF.HOUR, mTexts);
+        mTF.get(eTF.HOUR).strokeInAmbientMode(true);
         stackRight(mTF, hours, eTF.SECOND, mTexts);
         topDrawable.addAbove(hours);
         stackTop(mTF, topDrawable, eTF.BATTERY, mTexts, DrawableText.Align.RIGHT);
