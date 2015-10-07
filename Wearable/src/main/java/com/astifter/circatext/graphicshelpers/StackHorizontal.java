@@ -11,7 +11,6 @@ public class StackHorizontal extends Stack {
     @Override
     public void onDraw(Canvas canvas, Rect b) {
         if (this.hidden) {
-            this.bounds = new Rect(b.left, b.top, b.left, b.top);
             return;
         }
         this.bounds = b;
@@ -19,6 +18,7 @@ public class StackHorizontal extends Stack {
         int width = 0;
         int height = 0;
         for (Drawable t : stack) {
+            if (t.isHidden()) continue;
             Rect newBounds = new Rect(this.bounds.left + width, this.bounds.top,
                                       this.bounds.right, this.bounds.bottom);
             t.onDraw(canvas, newBounds);

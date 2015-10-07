@@ -40,12 +40,8 @@ public interface Drawable {
     /**
      * Disable drawing of {@link Drawable}.
      */
-    void hide();
-
-    /**
-     * Enable drawing of {@link Drawable}.
-     */
-    void show();
+    void hide(boolean hidden);
+    boolean isHidden();
 
     enum Align {
         LEFT, RIGHT, CENTER

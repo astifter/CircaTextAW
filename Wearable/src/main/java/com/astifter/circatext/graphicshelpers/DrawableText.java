@@ -113,7 +113,7 @@ public class DrawableText implements Drawable {
         return getTextHeightForPaint(this.textPaint, this.lineHeight);
     }
 
-    private float getCurrentWidth() {
+    private float getFutureWidth() {
         if (this.hidden) return 0;
         return this.textPaint.measureText(getTextFromSource());
     }
@@ -128,14 +128,13 @@ public class DrawableText implements Drawable {
 
     public void onDraw(Canvas canvas, Rect b) {
         if (this.hidden) {
-            this.drawnBounds = new Rect(b.left, b.top, b.left, b.top);
             return;
         }
 
         String currentText = getTextFromSource();
         this.drawnBounds = b;
 
-        float targetWidth = this.getCurrentWidth();
+        float targetWidth = this.getFutureWidth();
         Paint.FontMetrics fm = this.textPaint.getFontMetrics();
 
         float x = 0;
@@ -226,14 +225,12 @@ public class DrawableText implements Drawable {
     }
 
     @Override
-    public void hide() {
-        this.hidden = true;
+    public void hide(boolean h) {
+        this.hidden = h;
     }
 
     @Override
-    public void show() {
-        this.hidden = false;
-    }
+    public boolean isHidden() { return this.hidden; }
 
     public void setAlignment(Align a) {
         this.textAlignment = a;

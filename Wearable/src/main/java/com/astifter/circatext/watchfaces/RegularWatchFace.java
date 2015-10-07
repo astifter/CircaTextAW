@@ -183,34 +183,34 @@ public class RegularWatchFace extends BaseWatchFace {
 
     protected void updateVisibilty() {
         for (Integer i : mTF.keySet()) {
-            mTF.get(i).hide();
+            mTF.get(i).hide(true);
         }
 
-        mTF.get(eTF.HOUR).show();
+        mTF.get(eTF.HOUR).hide(false);
 
         // draw the rest only when not in mute mode
         if (mMute) return;
 
         if (this.peekCardPosition.isEmpty()) {
-            mTF.get(eTF.DAY_OF_WEEK).show();
-            mTF.get(eTF.DATE).show();
+            mTF.get(eTF.DAY_OF_WEEK).hide(false);
+            mTF.get(eTF.DATE).hide(false);
         }
 
         // draw the rest only when not in ambient mode
         if (this.ambientMode) return;
 
-        mTF.get(eTF.SECOND).show();
-        mTF.get(eTF.BATTERY).show();
+        mTF.get(eTF.SECOND).hide(false);
+        mTF.get(eTF.BATTERY).hide(false);
 
         // if peek card is shown, exit
         if (this.peekCardPosition.isEmpty()) {
-            mTF.get(eTF.CALENDAR_1).show();
-            mTF.get(eTF.CALENDAR_2).show();
+            mTF.get(eTF.CALENDAR_1).hide(false);
+            mTF.get(eTF.CALENDAR_2).hide(false);
 
             if (haveWeather()) {
-                mTF.get(eTF.WEATHER_TEMP).show();
-                mTF.get(eTF.WEATHER_AGE).show();
-                mTF.get(eTF.WEATHER_DESC).show();
+                mTF.get(eTF.WEATHER_TEMP).hide(false);
+                mTF.get(eTF.WEATHER_AGE).hide(false);
+                mTF.get(eTF.WEATHER_DESC).hide(false);
             }
         }
     }

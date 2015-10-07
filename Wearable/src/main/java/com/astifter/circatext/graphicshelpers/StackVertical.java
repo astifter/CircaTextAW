@@ -23,7 +23,6 @@ public class StackVertical extends Stack {
     @Override
     public void onDraw(Canvas canvas, Rect b) {
         if (this.hidden) {
-            this.bounds = new Rect(b.left, b.top, b.left, b.top);
             return;
         }
         this.bounds = b;
@@ -36,6 +35,7 @@ public class StackVertical extends Stack {
         int width = 0;
         int heigth = 0;
         for (Drawable t : this.belowStack) {
+            if (t.isHidden()) continue;
             Rect newBounds = new Rect(this.bounds.left, this.bounds.top + heigth,
                                       this.bounds.right, this.bounds.bottom);
             t.onDraw(canvas, newBounds);
@@ -60,6 +60,7 @@ public class StackVertical extends Stack {
 
         int heigthAbove = 0;
         for (Drawable t : this.aboveStack) {
+            if (t.isHidden()) continue;
             int currentHeight = (int) t.getFutureHeight();
             Rect newBounds = new Rect(this.bounds.left, yCenter - heigthAbove - currentHeight,
                                       this.bounds.right, yCenter - heigthAbove);
@@ -71,6 +72,7 @@ public class StackVertical extends Stack {
         }
         int heigthBelow = 0;
         for (Drawable t : this.belowStack) {
+            if (t.isHidden()) continue;
             Rect newBounds = new Rect(this.bounds.left, yCenter + heigthBelow,
                                       this.bounds.right, this.bounds.bottom);
             t.onDraw(canvas, newBounds);
@@ -80,8 +82,12 @@ public class StackVertical extends Stack {
                 width = (int) t.getWidth();
         }
 
-        this.bounds.bottom = Math.min(this.bounds.bottom, yCenter + heigthBelow);
-        this.bounds.right = Math.min(this.bounds.right, this.bounds.left + width);
+        Rect newBounds = new Rect();
+        newBounds.left = this.bounds.left;
+        newBounds.right = Math.min(this.bounds.right, this.bounds.left + width);
+        newBounds.top = Math.max(this.bounds.top, this.yCenter - heigthAbove);
+        newBounds.bottom = Math.min(this.bounds.bottom, this.yCenter + heigthBelow);
+        this.bounds = newBounds;
 
         if (CircaTextConsts.DEBUG) {
             Paint p = new Paint();

@@ -65,8 +65,6 @@ public class AnimatableImpl implements Drawable, Animatable {
     @Override
     public void onDraw(Canvas canvas, Rect b) {
         if (this.hidden) {
-            this.currentPosition.bottom = this.currentPosition.top;
-            this.currentPosition.right = this.currentPosition.left;
             return;
         }
         drawable.onDraw(canvas, currentPosition);
@@ -98,13 +96,12 @@ public class AnimatableImpl implements Drawable, Animatable {
     }
 
     @Override
-    public void hide() {
-        this.hidden = true;
+    public void hide(boolean h) {
+        this.hidden = h;
     }
 
     @Override
-    public void show() {
-        this.hidden = false;
-
+    public boolean isHidden() {
+        return this.hidden;
     }
 }

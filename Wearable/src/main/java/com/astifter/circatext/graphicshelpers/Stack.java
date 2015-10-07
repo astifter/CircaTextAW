@@ -38,13 +38,13 @@ abstract class Stack implements Drawable {
     }
 
     @Override
-    public void hide() {
-        this.hidden = true;
+    public void hide(boolean h) {
+        this.hidden = h;
     }
 
     @Override
-    public void show() {
-        this.hidden = false;
+    public boolean isHidden() {
+        return this.hidden;
     }
 
     @Override
