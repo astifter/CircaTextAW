@@ -255,15 +255,18 @@ public class CircaTextService extends CanvasWatchFaceService {
             CircaTextService.this.unregisterReceiver(mBatteryHelper.mPowerReceiver);
         }
 
+        WindowInsets currentWindowInsets;
         @Override // WatchFaceService.Engine
         public void onApplyWindowInsets(WindowInsets insets) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onApplyWindowInsets()");
 
             super.onApplyWindowInsets(insets);
+            currentWindowInsets = insets;
 
             wtf.setMetrics(getResources(), insets);
         }
 
+        boolean lowBitAmbientMode;
         @Override // WatchFaceService.Engine
         public void onPropertiesChanged(Bundle properties) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onPropertiesChanged()");
@@ -272,7 +275,8 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             // TODO make sure we conform to the burn-in-protectoin guidelines
             //boolean burnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
-            wtf.setLowBitAmbientMode(properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false));
+            lowBitAmbientMode = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
+            wtf.setLowBitAmbientMode(lowBitAmbientMode);
         }
 
         @Override // WatchFaceService.Engine
@@ -303,13 +307,14 @@ public class CircaTextService extends CanvasWatchFaceService {
             updateTimer();
         }
 
+        boolean inMuteMode;
         @Override // WatchFaceService.Engine
         public void onInterruptionFilterChanged(int interruptionFilter) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onInterruptionFilterChanged()");
 
             super.onInterruptionFilterChanged(interruptionFilter);
 
-            boolean inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
+            inMuteMode = interruptionFilter == WatchFaceService.INTERRUPTION_FILTER_NONE;
             wtf.setMuteMode(inMuteMode);
         }
 
@@ -336,6 +341,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             wtf.onDraw(canvas, bounds);
         }
 
+        Weather mWeather;
         @Override // DataApi.DataListener
         public void onDataChanged(DataEventBuffer dataEvents) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDataChanged()");
@@ -354,7 +360,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 if (dataItem.getUri().getPath().equals(CircaTextConsts.SEND_WEATHER_MESSAGE)) {
                     if (config.containsKey("weather")) {
                         try {
-                            Weather mWeather = (Weather) Serializer.deserialize(config.getByteArray("weather"));
+                            mWeather = (Weather) Serializer.deserialize(config.getByteArray("weather"));
                             wtf.setWeatherInfo(mWeather);
                             if (Log.isLoggable(TAG, Log.DEBUG))
                                 Log.d(TAG, "onDataChanged(): weather=" + mWeather.toString());
@@ -409,6 +415,26 @@ public class CircaTextService extends CanvasWatchFaceService {
                     case CircaTextConsts.KEY_BACKGROUND_COLOR:
                         wtf.setBackgroundColor(config.getInt(configKey));
                         uiUpdated = true;
+                        break;
+                    case CircaTextConsts.KEY_WATCHFACE:
+                        CircaTextConsts.WatchFaces wf;
+                        try {
+                            wf = CircaTextConsts.WatchFaces.valueOf(config.getString(configKey));
+                        } catch (Throwable t) {
+                            wf = CircaTextConsts.WatchFaces.CIRCATEXTv1;
+
+                        }
+                        switch (wf) {
+                            case REGULAR:
+                                wtf = new RegularWatchFace(this); break;
+                            case CIRCATEXTv1:
+                                wtf = new CircaTextWatchFace(this); break;
+                        }
+                        wtf.localeChanged();
+                        wtf.setMetrics(getResources(), currentWindowInsets);
+                        wtf.setLowBitAmbientMode(lowBitAmbientMode);
+                        wtf.setMuteMode(inMuteMode);
+                        wtf.setWeatherInfo(mWeather);
                         break;
                 }
             }
