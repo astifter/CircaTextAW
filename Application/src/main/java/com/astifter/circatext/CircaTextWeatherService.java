@@ -15,6 +15,7 @@ import android.util.Log;
 import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.Serializer;
 import com.astifter.circatextutils.Weather;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataMap;
@@ -169,7 +170,7 @@ public class CircaTextWeatherService extends WearableListenerService {
                         @Override
                         public void onResult(MessageApi.SendMessageResult sendMessageResult) {
                             if (Log.isLoggable(TAG, Log.DEBUG))
-                                Log.d(TAG, "onMessageReceived(): " + sendMessageResult.toString());
+                                Log.d(TAG, "onPostExecute(): " + sendMessageResult.toString());
                         }
                     });
         }

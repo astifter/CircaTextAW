@@ -41,6 +41,8 @@ public final class CircaTextUtil {
             Context c,
             GoogleApiClient.ConnectionCallbacks cl,
             GoogleApiClient.OnConnectionFailedListener cfl) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildGoogleApiClient()");
+
         return new GoogleApiClient.Builder(c)
                 .addConnectionCallbacks(cl)
                 .addOnConnectionFailedListener(cfl)
@@ -65,6 +67,8 @@ public final class CircaTextUtil {
                                 .path(CircaTextConsts.PATH_WITH_FEATURE)
                                 .authority(localNode)
                                 .build();
+
+                        Log.d(TAG, "fetching data with Wearable.DataApi.getDataItem(" + uri.toString() + ")");
                         Wearable.DataApi.getDataItem(client, uri)
                                 .setResultCallback(new DataItemResultCallback(callback));
                     }
@@ -118,14 +122,14 @@ public final class CircaTextUtil {
         private final FetchConfigDataMapCallback mCallback;
 
         public DataItemResultCallback(FetchConfigDataMapCallback callback) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "DataItemResultCallback()");
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "DataItemResultCallback.DataItemResultCallback()");
 
             mCallback = callback;
         }
 
         @Override // ResultCallback<DataApi.DataItemResult>
         public void onResult(DataApi.DataItemResult dataItemResult) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onResult()");
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "DataItemResultCallback.onResult()");
 
             if (dataItemResult.getStatus().isSuccess()) {
                 if (dataItemResult.getDataItem() != null) {

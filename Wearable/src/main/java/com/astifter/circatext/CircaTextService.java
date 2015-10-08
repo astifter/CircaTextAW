@@ -282,6 +282,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
             if (mWeatherRequested == null || (now - mWeatherRequested.getTime() > 15 * 60 * 1000)) {
                 mWeatherRequested = new Date(now);
+
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick() requesting weather update");
                 Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
             }
 
@@ -378,8 +380,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                             if (Log.isLoggable(TAG, Log.DEBUG))
                                 Log.d(TAG, "onConnected().onConfigDataMapFetched()");
 
-                            // If the DataItem hasn't been created yet or some keys are missing,
-                            // use the default values.
                             CircaTextConsts.setDefaultValuesForMissingConfigKeys(startupConfig);
                             CircaTextUtil.putConfigDataItem(mGoogleApiClient, CircaTextConsts.PATH_WITH_FEATURE, startupConfig);
 
@@ -425,6 +425,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         @Override  // GoogleApiClient.OnConnectionFailedListener
         public void onConnectionFailed(ConnectionResult result) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
+            if (result.getErrorCode() == ConnectionResult.API_UNAVAILABLE)
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed(): API_UNAVAILABLE");
         }
 
         @Override
