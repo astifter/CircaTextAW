@@ -239,7 +239,9 @@ public class DrawableText implements Drawable {
     }
 
     @Override
-    public boolean isHidden() { return this.hidden; }
+    public boolean isHidden() {
+        return this.hidden;
+    }
 
     public void setAlignment(Align a) {
         this.textAlignment = a;

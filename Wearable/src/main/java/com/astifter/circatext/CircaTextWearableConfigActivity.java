@@ -20,22 +20,16 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.wearable.view.BoxInsetLayout;
 import android.support.wearable.view.CircledImageView;
 import android.support.wearable.view.WearableListView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.astifter.circatext.R;
 import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.CircaTextUtil;
 import com.google.android.gms.common.ConnectionResult;
@@ -133,10 +127,12 @@ public class CircaTextWearableConfigActivity extends Activity implements
     }
 
     @Override // WearableListView.ClickListener
-    public void onTopEmptyRegionClick() {}
+    public void onTopEmptyRegionClick() {
+    }
 
     @Override // WearableListView.OnScrollListener
-    public void onScroll(int scroll) {}
+    public void onScroll(int scroll) {
+    }
 
     @Override // WearableListView.OnScrollListener
     public void onAbsoluteScrollChange(int scroll) {
@@ -145,10 +141,12 @@ public class CircaTextWearableConfigActivity extends Activity implements
     }
 
     @Override // WearableListView.OnScrollListener
-    public void onScrollStateChanged(int scrollState) {}
+    public void onScrollStateChanged(int scrollState) {
+    }
 
     @Override // WearableListView.OnScrollListener
-    public void onCentralPositionChanged(int centralPosition) {}
+    public void onCentralPositionChanged(int centralPosition) {
+    }
 
     private void updateConfigDataItem(final String backgroundColor) {
         DataMap configKeysToOverwrite = new DataMap();
@@ -156,75 +154,33 @@ public class CircaTextWearableConfigActivity extends Activity implements
         CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
     }
 
-    private class ColorListAdapter extends WearableListView.Adapter {
-        private final String[] mColors;
-
-        public ColorListAdapter(String[] colors) {
-            mColors = colors;
-        }
-
-        @Override
-        public ColorItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ColorItemViewHolder(new ColorItem(parent.getContext()));
-        }
-
-        @Override
-        public void onBindViewHolder(WearableListView.ViewHolder holder, int position) {
-            ColorItemViewHolder colorItemViewHolder = (ColorItemViewHolder) holder;
-            String colorName = mColors[position];
-            colorItemViewHolder.mColorItem.setColor(colorName);
-
-            RecyclerView.LayoutParams layoutParams =
-                    new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT);
-            int colorPickerItemMargin = (int) getResources()
-                    .getDimension(R.dimen.digital_config_color_picker_item_margin);
-            // Add margins to first and last item to make it possible for user to tap on them.
-            if (position == 0) {
-                layoutParams.setMargins(0, colorPickerItemMargin, 0, 0);
-            } else if (position == mColors.length - 1) {
-                layoutParams.setMargins(0, 0, 0, colorPickerItemMargin);
-            } else {
-                layoutParams.setMargins(0, 0, 0, 0);
-            }
-            colorItemViewHolder.itemView.setLayoutParams(layoutParams);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mColors.length;
-        }
-
-        public String[] getColors() {
-            return mColors;
-        }
-    }
-
-    /** The layout of a color item including image and label. */
+    /**
+     * The layout of a color item including image and label.
+     */
     private static class ColorItem extends LinearLayout implements
             WearableListView.OnCenterProximityListener {
-        /** The duration of the expand/shrink animation. */
+        /**
+         * The duration of the expand/shrink animation.
+         */
         private static final int ANIMATION_DURATION_MS = 150;
-        /** The ratio for the size of a circle in shrink state. */
+        /**
+         * The ratio for the size of a circle in shrink state.
+         */
         private static final float SHRINK_CIRCLE_RATIO = .75f;
 
         private static final float SHRINK_LABEL_ALPHA = .5f;
         private static final float EXPAND_LABEL_ALPHA = 1f;
-
-        private String mLabelText;
         private final TextView mLabel;
         private final CircledImageView mColor;
-
         private final float mExpandCircleRadius;
         private final float mShrinkCircleRadius;
-
         private final ObjectAnimator mExpandCircleAnimator;
         private final ObjectAnimator mExpandLabelAnimator;
         private final AnimatorSet mExpandAnimator;
-
         private final ObjectAnimator mShrinkCircleAnimator;
         private final ObjectAnimator mShrinkLabelAnimator;
         private final AnimatorSet mShrinkAnimator;
+        private String mLabelText;
 
         public ColorItem(Context context) {
             super(context);
@@ -284,13 +240,13 @@ public class CircaTextWearableConfigActivity extends Activity implements
             }
         }
 
+        private int getColor() {
+            return mColor.getDefaultCircleColor();
+        }
+
         private void setColor(String colorName) {
             mLabelText = colorName;
             mLabel.setText(colorName);
-        }
-
-        private int getColor() {
-            return mColor.getDefaultCircleColor();
         }
 
         public String getLabel() {
@@ -304,6 +260,50 @@ public class CircaTextWearableConfigActivity extends Activity implements
         public ColorItemViewHolder(ColorItem colorItem) {
             super(colorItem);
             mColorItem = colorItem;
+        }
+    }
+
+    private class ColorListAdapter extends WearableListView.Adapter {
+        private final String[] mColors;
+
+        public ColorListAdapter(String[] colors) {
+            mColors = colors;
+        }
+
+        @Override
+        public ColorItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ColorItemViewHolder(new ColorItem(parent.getContext()));
+        }
+
+        @Override
+        public void onBindViewHolder(WearableListView.ViewHolder holder, int position) {
+            ColorItemViewHolder colorItemViewHolder = (ColorItemViewHolder) holder;
+            String colorName = mColors[position];
+            colorItemViewHolder.mColorItem.setColor(colorName);
+
+            RecyclerView.LayoutParams layoutParams =
+                    new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+            int colorPickerItemMargin = (int) getResources()
+                    .getDimension(R.dimen.digital_config_color_picker_item_margin);
+            // Add margins to first and last item to make it possible for user to tap on them.
+            if (position == 0) {
+                layoutParams.setMargins(0, colorPickerItemMargin, 0, 0);
+            } else if (position == mColors.length - 1) {
+                layoutParams.setMargins(0, 0, 0, colorPickerItemMargin);
+            } else {
+                layoutParams.setMargins(0, 0, 0, 0);
+            }
+            colorItemViewHolder.itemView.setLayoutParams(layoutParams);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mColors.length;
+        }
+
+        public String[] getColors() {
+            return mColors;
         }
     }
 }

@@ -41,6 +41,7 @@ public interface Drawable {
      * Disable drawing of {@link Drawable}.
      */
     void hide(boolean hidden);
+
     boolean isHidden();
 
     enum Align {

@@ -12,15 +12,16 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="14dp"
-        android:textSize="24sp"
-        android:textColor="@color/config_activity_header_text_color"
-        android:text="@string/digital_background_color"
         android:fontFamily="sans-serif-condensed-light"
-        app:layout_box="left|top"/>
+        android:text="@string/digital_background_color"
+        android:textColor="@color/config_activity_header_text_color"
+        android:textSize="24sp"
+        app:layout_box="left|top" />
+
     <android.support.wearable.view.WearableListView
         android:id="@+id/color_picker"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
-        app:layout_box="left|right"/>
+        app:layout_box="left|right" />
 </android.support.wearable.view.BoxInsetLayout>

@@ -91,6 +91,13 @@ public class CircaTextService extends CanvasWatchFaceService {
         WatchFace wtf;
         long lastInvalidated = 0;
         long nonUpdate = 0;
+        boolean mRegisteredReceiver = false;
+        WindowInsets currentWindowInsets;
+        boolean lowBitAmbientMode;
+        boolean inMuteMode;
+        Weather mWeather;
+        private Date mWeatherRequested = null;
+        private boolean updateEnabled = true;
         @SuppressLint({"Java", "HandlerLeak"})
         final Handler mUpdateHandler = new Handler() {
             @Override
@@ -128,9 +135,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                 invalidate();
             }
         };
-        boolean mRegisteredReceiver = false;
-        private Date mWeatherRequested = null;
-        private boolean updateEnabled = true;
 
         Engine() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
@@ -145,7 +149,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             wtf = new RegularWatchFace(this);
             wtf.localeChanged();
         }
-
 
         @Override
         public synchronized void invalidate() {
@@ -260,7 +263,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             CircaTextService.this.unregisterReceiver(mBatteryHelper.mPowerReceiver);
         }
 
-        WindowInsets currentWindowInsets;
         @Override // WatchFaceService.Engine
         public void onApplyWindowInsets(WindowInsets insets) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onApplyWindowInsets()");
@@ -271,7 +273,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             wtf.setMetrics(getResources(), insets);
         }
 
-        boolean lowBitAmbientMode;
         @Override // WatchFaceService.Engine
         public void onPropertiesChanged(Bundle properties) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onPropertiesChanged()");
@@ -292,7 +293,8 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (mWeatherRequested == null || (now - mWeatherRequested.getTime() > 15 * 60 * 1000)) {
                 mWeatherRequested = new Date(now);
 
-                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick() requesting weather update");
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "onTimeTick() requesting weather update");
                 Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
             }
 
@@ -312,7 +314,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             updateTimer();
         }
 
-        boolean inMuteMode;
         @Override // WatchFaceService.Engine
         public void onInterruptionFilterChanged(int interruptionFilter) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onInterruptionFilterChanged()");
@@ -346,7 +347,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             wtf.onDraw(canvas, bounds);
         }
 
-        Weather mWeather;
         @Override // DataApi.DataListener
         public void onDataChanged(DataEventBuffer dataEvents) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDataChanged()");
@@ -432,9 +432,11 @@ public class CircaTextService extends CanvasWatchFaceService {
                         updateEnabled = false;
                         switch (wf) {
                             case REGULAR:
-                                wtf = new RegularWatchFace(this); break;
+                                wtf = new RegularWatchFace(this);
+                                break;
                             case CIRCATEXTv1:
-                                wtf = new CircaTextWatchFace(this); break;
+                                wtf = new CircaTextWatchFace(this);
+                                break;
                         }
                         wtf.localeChanged();
                         wtf.setMetrics(getResources(), currentWindowInsets);
@@ -461,7 +463,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         public void onConnectionFailed(ConnectionResult result) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
             if (result.getErrorCode() == ConnectionResult.API_UNAVAILABLE)
-                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed(): API_UNAVAILABLE");
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "onConnectionFailed(): API_UNAVAILABLE");
         }
 
         @Override

@@ -21,10 +21,6 @@ public class CircaTextConsts {
     public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND =
             parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_BACKGROUND);
 
-    public enum WatchFaces {
-        REGULAR, CIRCATEXTv1
-    }
-
     private static int parseColor(String colorName) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "parseColor()");
 
@@ -47,5 +43,9 @@ public class CircaTextConsts {
         if (!config.containsKey(key)) {
             config.putString(key, value);
         }
+    }
+
+    public enum WatchFaces {
+        REGULAR, CIRCATEXTv1
     }
 }

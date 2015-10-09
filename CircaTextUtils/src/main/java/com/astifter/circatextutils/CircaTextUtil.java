@@ -122,7 +122,8 @@ public final class CircaTextUtil {
         private final FetchConfigDataMapCallback mCallback;
 
         public DataItemResultCallback(FetchConfigDataMapCallback callback) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "DataItemResultCallback.DataItemResultCallback()");
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "DataItemResultCallback.DataItemResultCallback()");
 
             mCallback = callback;
         }
