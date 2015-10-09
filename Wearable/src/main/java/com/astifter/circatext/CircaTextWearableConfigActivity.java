@@ -49,6 +49,8 @@ public class CircaTextWearableConfigActivity extends Activity implements
 
     private GoogleApiClient mGoogleApiClient;
     private TextView mHeader;
+    private ColorListAdapter colorListAdapter;
+    private WearableListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,16 +58,16 @@ public class CircaTextWearableConfigActivity extends Activity implements
         setContentView(R.layout.activity_config);
 
         mHeader = (TextView) findViewById(R.id.header);
-        WearableListView listView = (WearableListView) findViewById(R.id.color_picker);
-        BoxInsetLayout content = (BoxInsetLayout) findViewById(R.id.content);
 
+        listView = (WearableListView) findViewById(R.id.color_picker);
         listView.setHasFixedSize(true);
         listView.setClickListener(this);
         listView.addOnScrollListener(this);
 
         String[] colors = { CircaTextConsts.WatchFaces.CIRCATEXTv1.toString(),
                             CircaTextConsts.WatchFaces.REGULAR.toString() };
-        listView.setAdapter(new ColorListAdapter(colors));
+        colorListAdapter = new ColorListAdapter(colors);
+        listView.setAdapter(colorListAdapter);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -99,6 +101,20 @@ public class CircaTextWearableConfigActivity extends Activity implements
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
+
+        CircaTextUtil.fetchConfigDataMap(mGoogleApiClient, new CircaTextUtil.FetchConfigDataMapCallback() {
+            @Override
+            public void onConfigDataMapFetched(DataMap config) {
+                String selectedWatchface = config.getString(CircaTextConsts.KEY_WATCHFACE);
+                String[] colors = colorListAdapter.getColors();
+                for (int i = 0; i < colors.length; i++) {
+                    if (colors[i].equals(selectedWatchface)) {
+                        listView.scrollToPosition(i);
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -178,6 +194,10 @@ public class CircaTextWearableConfigActivity extends Activity implements
         public int getItemCount() {
             return mColors.length;
         }
+
+        public String[] getColors() {
+            return mColors;
+        }
     }
 
     /** The layout of a color item including image and label. */
@@ -256,7 +276,7 @@ public class CircaTextWearableConfigActivity extends Activity implements
         }
 
         public String getLabel() {
-            return mLabelText;
+            return this.mLabelText;
         }
     }
 
