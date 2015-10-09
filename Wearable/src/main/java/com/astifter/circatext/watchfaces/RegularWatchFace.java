@@ -107,7 +107,7 @@ public class RegularWatchFace extends BaseWatchFace {
         topDrawable.setOffset(mYOffset);
 
         float textSize = DrawableText.getMaximumTextWidth(DrawingHelpers.NORMAL_TYPEFACE, this.topDrawableBounds, "00:00:00");
-        float biggerTextSize = DrawableText.getMaximumTextWidth(DrawingHelpers.NORMAL_TYPEFACE, this.topDrawableBounds, "00:00");
+        float biggerTextSize = DrawableText.getMaximumTextWidth(DrawingHelpers.BOLD_TYPEFACE, this.topDrawableBounds, "00:00");
         textScaleFactor = biggerTextSize / textSize;
 
         for (Integer i : mTF.keySet()) {
