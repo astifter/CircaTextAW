@@ -206,6 +206,7 @@ public class CircaTextWearableConfigActivity extends Activity implements
         /** The duration of the expand/shrink animation. */
         private static final int ANIMATION_DURATION_MS = 150;
         /** The ratio for the size of a circle in shrink state. */
+        private static final float SHRINK_CIRCLE_RATIO = .75f;
 
         private static final float SHRINK_LABEL_ALPHA = .5f;
         private static final float EXPAND_LABEL_ALPHA = 1f;
@@ -214,9 +215,14 @@ public class CircaTextWearableConfigActivity extends Activity implements
         private final TextView mLabel;
         private final CircledImageView mColor;
 
+        private final float mExpandCircleRadius;
+        private final float mShrinkCircleRadius;
+
+        private final ObjectAnimator mExpandCircleAnimator;
         private final ObjectAnimator mExpandLabelAnimator;
         private final AnimatorSet mExpandAnimator;
 
+        private final ObjectAnimator mShrinkCircleAnimator;
         private final ObjectAnimator mShrinkLabelAnimator;
         private final AnimatorSet mShrinkAnimator;
 
@@ -228,13 +234,22 @@ public class CircaTextWearableConfigActivity extends Activity implements
             mLabel = (TextView) findViewById(R.id.label);
             mColor = (CircledImageView) findViewById(R.id.color);
 
+            mExpandCircleRadius = mColor.getCircleRadius();
+            mShrinkCircleRadius = mExpandCircleRadius * SHRINK_CIRCLE_RATIO;
+
+            mShrinkCircleAnimator = ObjectAnimator.ofFloat(mColor, "circleRadius",
+                    mExpandCircleRadius, mShrinkCircleRadius);
             mShrinkLabelAnimator = ObjectAnimator.ofFloat(mLabel, "alpha",
                     EXPAND_LABEL_ALPHA, SHRINK_LABEL_ALPHA);
             mShrinkAnimator = new AnimatorSet().setDuration(ANIMATION_DURATION_MS);
+            mShrinkAnimator.playTogether(mShrinkCircleAnimator, mShrinkLabelAnimator);
 
+            mExpandCircleAnimator = ObjectAnimator.ofFloat(mColor, "circleRadius",
+                    mShrinkCircleRadius, mExpandCircleRadius);
             mExpandLabelAnimator = ObjectAnimator.ofFloat(mLabel, "alpha",
                     SHRINK_LABEL_ALPHA, EXPAND_LABEL_ALPHA);
             mExpandAnimator = new AnimatorSet().setDuration(ANIMATION_DURATION_MS);
+            mExpandAnimator.playTogether(mExpandCircleAnimator, mExpandLabelAnimator);
         }
 
         @Override
@@ -242,11 +257,13 @@ public class CircaTextWearableConfigActivity extends Activity implements
             if (animate) {
                 mShrinkAnimator.cancel();
                 if (!mExpandAnimator.isRunning()) {
+                    mExpandCircleAnimator.setFloatValues(mColor.getCircleRadius(), mExpandCircleRadius);
                     mExpandLabelAnimator.setFloatValues(mLabel.getAlpha(), EXPAND_LABEL_ALPHA);
                     mExpandAnimator.start();
                 }
             } else {
                 mExpandAnimator.cancel();
+                mColor.setCircleRadius(mExpandCircleRadius);
                 mLabel.setAlpha(EXPAND_LABEL_ALPHA);
             }
         }
@@ -256,11 +273,13 @@ public class CircaTextWearableConfigActivity extends Activity implements
             if (animate) {
                 mExpandAnimator.cancel();
                 if (!mShrinkAnimator.isRunning()) {
+                    mShrinkCircleAnimator.setFloatValues(mColor.getCircleRadius(), mShrinkCircleRadius);
                     mShrinkLabelAnimator.setFloatValues(mLabel.getAlpha(), SHRINK_LABEL_ALPHA);
                     mShrinkAnimator.start();
                 }
             } else {
                 mShrinkAnimator.cancel();
+                mColor.setCircleRadius(mShrinkCircleRadius);
                 mLabel.setAlpha(SHRINK_LABEL_ALPHA);
             }
         }
@@ -268,7 +287,6 @@ public class CircaTextWearableConfigActivity extends Activity implements
         private void setColor(String colorName) {
             mLabelText = colorName;
             mLabel.setText(colorName);
-            // TODO mColor.setCircleColor(Color.parseColor(colorName));
         }
 
         private int getColor() {
