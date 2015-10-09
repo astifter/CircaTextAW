@@ -33,4 +33,6 @@ public interface WatchFace {
     void setWeatherInfo(Weather mWeather);
 
     void onDraw(Canvas canvas, Rect bounds);
+
+    void updateVisibilty();
 }

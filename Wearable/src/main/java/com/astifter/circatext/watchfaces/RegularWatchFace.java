@@ -183,7 +183,7 @@ public class RegularWatchFace extends BaseWatchFace {
         startTapHighlight(topDrawable);
     }
 
-    protected void updateVisibilty() {
+    public void updateVisibilty() {
         for (Integer i : mTF.keySet()) {
             mTF.get(i).hide(true);
         }

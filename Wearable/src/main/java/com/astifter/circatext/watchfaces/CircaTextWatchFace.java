@@ -75,7 +75,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     }
 
     @Override
-    protected void updateVisibilty() {
+    public void updateVisibilty() {
         for (AnimatableImpl a : topDrawable) {
             a.setAmbientMode(this.ambientMode);
         }

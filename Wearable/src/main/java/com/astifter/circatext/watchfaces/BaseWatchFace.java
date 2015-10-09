@@ -103,8 +103,6 @@ public abstract class BaseWatchFace implements WatchFace {
         anim.start();
     }
 
-    abstract protected void updateVisibilty();
-
     @Override
     public void setBackgroundColor(int color) {
         mInteractiveBackgroundColor = color;
