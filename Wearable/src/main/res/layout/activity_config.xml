@@ -19,7 +19,7 @@
         app:layout_box="left|top" />
 
     <android.support.wearable.view.WearableListView
-        android:id="@+id/color_picker"
+        android:id="@+id/watchface_picker"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"

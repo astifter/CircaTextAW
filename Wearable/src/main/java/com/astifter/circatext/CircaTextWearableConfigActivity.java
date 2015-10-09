@@ -43,7 +43,7 @@ public class CircaTextWearableConfigActivity extends Activity implements
 
     private GoogleApiClient mGoogleApiClient;
     private TextView mHeader;
-    private ColorListAdapter colorListAdapter;
+    private WatchFaceListAdapter watchFaceListAdapter;
     private WearableListView listView;
 
     @Override
@@ -53,15 +53,15 @@ public class CircaTextWearableConfigActivity extends Activity implements
 
         mHeader = (TextView) findViewById(R.id.header);
 
-        listView = (WearableListView) findViewById(R.id.color_picker);
+        listView = (WearableListView) findViewById(R.id.watchface_picker);
         listView.setHasFixedSize(true);
         listView.setClickListener(this);
         listView.addOnScrollListener(this);
 
-        String[] colors = { CircaTextConsts.WatchFaces.CIRCATEXTv1.toString(),
-                            CircaTextConsts.WatchFaces.REGULAR.toString() };
-        colorListAdapter = new ColorListAdapter(colors);
-        listView.setAdapter(colorListAdapter);
+        String[] watchfaces = { CircaTextConsts.WatchFaces.CIRCATEXTv1.toString(),
+                                CircaTextConsts.WatchFaces.REGULAR.toString() };
+        watchFaceListAdapter = new WatchFaceListAdapter(watchfaces);
+        listView.setAdapter(watchFaceListAdapter);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -100,9 +100,9 @@ public class CircaTextWearableConfigActivity extends Activity implements
             @Override
             public void onConfigDataMapFetched(DataMap config) {
                 String selectedWatchface = config.getString(CircaTextConsts.KEY_WATCHFACE);
-                String[] colors = colorListAdapter.getColors();
-                for (int i = 0; i < colors.length; i++) {
-                    if (colors[i].equals(selectedWatchface)) {
+                String[] watchfaces = watchFaceListAdapter.getWatchFaces();
+                for (int i = 0; i < watchfaces.length; i++) {
+                    if (watchfaces[i].equals(selectedWatchface)) {
                         listView.scrollToPosition(i);
                         break;
                     }
@@ -121,8 +121,8 @@ public class CircaTextWearableConfigActivity extends Activity implements
 
     @Override // WearableListView.ClickListener
     public void onClick(WearableListView.ViewHolder viewHolder) {
-        ColorItemViewHolder colorItemViewHolder = (ColorItemViewHolder) viewHolder;
-        updateConfigDataItem(colorItemViewHolder.mColorItem.getLabel());
+        WatchFaceViewHolder watchFaceViewHolder = (WatchFaceViewHolder) viewHolder;
+        updateConfigDataItem(watchFaceViewHolder.mWatchFace.getLabel());
         finish();
     }
 
@@ -148,30 +148,21 @@ public class CircaTextWearableConfigActivity extends Activity implements
     public void onCentralPositionChanged(int centralPosition) {
     }
 
-    private void updateConfigDataItem(final String backgroundColor) {
+    private void updateConfigDataItem(final String watchFace) {
         DataMap configKeysToOverwrite = new DataMap();
-        configKeysToOverwrite.putString(CircaTextConsts.KEY_WATCHFACE, backgroundColor);
+        configKeysToOverwrite.putString(CircaTextConsts.KEY_WATCHFACE, watchFace);
         CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
     }
 
-    /**
-     * The layout of a color item including image and label.
-     */
-    private static class ColorItem extends LinearLayout implements
-            WearableListView.OnCenterProximityListener {
-        /**
-         * The duration of the expand/shrink animation.
-         */
+    private static class WatchFaceItem extends LinearLayout implements WearableListView.OnCenterProximityListener {
         private static final int ANIMATION_DURATION_MS = 150;
-        /**
-         * The ratio for the size of a circle in shrink state.
-         */
         private static final float SHRINK_CIRCLE_RATIO = .75f;
 
         private static final float SHRINK_LABEL_ALPHA = .5f;
         private static final float EXPAND_LABEL_ALPHA = 1f;
+
         private final TextView mLabel;
-        private final CircledImageView mColor;
+        private final CircledImageView mCircle;
         private final float mExpandCircleRadius;
         private final float mShrinkCircleRadius;
         private final ObjectAnimator mExpandCircleAnimator;
@@ -182,25 +173,25 @@ public class CircaTextWearableConfigActivity extends Activity implements
         private final AnimatorSet mShrinkAnimator;
         private String mLabelText;
 
-        public ColorItem(Context context) {
+        public WatchFaceItem(Context context) {
             super(context);
-            View.inflate(context, R.layout.color_picker_item, this);
+            View.inflate(context, R.layout.watchface_picker_item, this);
 
             mLabelText = "";
             mLabel = (TextView) findViewById(R.id.label);
-            mColor = (CircledImageView) findViewById(R.id.color);
+            mCircle = (CircledImageView)findViewById(R.id.circle);
 
-            mExpandCircleRadius = mColor.getCircleRadius();
+            mExpandCircleRadius = mCircle.getCircleRadius();
             mShrinkCircleRadius = mExpandCircleRadius * SHRINK_CIRCLE_RATIO;
 
-            mShrinkCircleAnimator = ObjectAnimator.ofFloat(mColor, "circleRadius",
+            mShrinkCircleAnimator = ObjectAnimator.ofFloat(mCircle, "circleRadius",
                     mExpandCircleRadius, mShrinkCircleRadius);
             mShrinkLabelAnimator = ObjectAnimator.ofFloat(mLabel, "alpha",
                     EXPAND_LABEL_ALPHA, SHRINK_LABEL_ALPHA);
             mShrinkAnimator = new AnimatorSet().setDuration(ANIMATION_DURATION_MS);
             mShrinkAnimator.playTogether(mShrinkCircleAnimator, mShrinkLabelAnimator);
 
-            mExpandCircleAnimator = ObjectAnimator.ofFloat(mColor, "circleRadius",
+            mExpandCircleAnimator = ObjectAnimator.ofFloat(mCircle, "circleRadius",
                     mShrinkCircleRadius, mExpandCircleRadius);
             mExpandLabelAnimator = ObjectAnimator.ofFloat(mLabel, "alpha",
                     SHRINK_LABEL_ALPHA, EXPAND_LABEL_ALPHA);
@@ -213,13 +204,13 @@ public class CircaTextWearableConfigActivity extends Activity implements
             if (animate) {
                 mShrinkAnimator.cancel();
                 if (!mExpandAnimator.isRunning()) {
-                    mExpandCircleAnimator.setFloatValues(mColor.getCircleRadius(), mExpandCircleRadius);
+                    mExpandCircleAnimator.setFloatValues(mCircle.getCircleRadius(), mExpandCircleRadius);
                     mExpandLabelAnimator.setFloatValues(mLabel.getAlpha(), EXPAND_LABEL_ALPHA);
                     mExpandAnimator.start();
                 }
             } else {
                 mExpandAnimator.cancel();
-                mColor.setCircleRadius(mExpandCircleRadius);
+                mCircle.setCircleRadius(mExpandCircleRadius);
                 mLabel.setAlpha(EXPAND_LABEL_ALPHA);
             }
         }
@@ -229,24 +220,20 @@ public class CircaTextWearableConfigActivity extends Activity implements
             if (animate) {
                 mExpandAnimator.cancel();
                 if (!mShrinkAnimator.isRunning()) {
-                    mShrinkCircleAnimator.setFloatValues(mColor.getCircleRadius(), mShrinkCircleRadius);
+                    mShrinkCircleAnimator.setFloatValues(mCircle.getCircleRadius(), mShrinkCircleRadius);
                     mShrinkLabelAnimator.setFloatValues(mLabel.getAlpha(), SHRINK_LABEL_ALPHA);
                     mShrinkAnimator.start();
                 }
             } else {
                 mShrinkAnimator.cancel();
-                mColor.setCircleRadius(mShrinkCircleRadius);
+                mCircle.setCircleRadius(mShrinkCircleRadius);
                 mLabel.setAlpha(SHRINK_LABEL_ALPHA);
             }
         }
 
-        private int getColor() {
-            return mColor.getDefaultCircleColor();
-        }
-
-        private void setColor(String colorName) {
-            mLabelText = colorName;
-            mLabel.setText(colorName);
+        private void setWatchFace(String watchFaceName) {
+            mLabelText = watchFaceName;
+            mLabel.setText(watchFaceName);
         }
 
         public String getLabel() {
@@ -254,56 +241,47 @@ public class CircaTextWearableConfigActivity extends Activity implements
         }
     }
 
-    private static class ColorItemViewHolder extends WearableListView.ViewHolder {
-        private final ColorItem mColorItem;
+    private static class WatchFaceViewHolder extends WearableListView.ViewHolder {
+        private final WatchFaceItem mWatchFace;
 
-        public ColorItemViewHolder(ColorItem colorItem) {
-            super(colorItem);
-            mColorItem = colorItem;
+        public WatchFaceViewHolder(WatchFaceItem watchFaceItem) {
+            super(watchFaceItem);
+            mWatchFace = watchFaceItem;
         }
     }
 
-    private class ColorListAdapter extends WearableListView.Adapter {
-        private final String[] mColors;
+    private class WatchFaceListAdapter extends WearableListView.Adapter {
+        private final String[] mWatchFaces;
 
-        public ColorListAdapter(String[] colors) {
-            mColors = colors;
+        public WatchFaceListAdapter(String[] wfs) {
+            mWatchFaces = wfs;
         }
 
         @Override
-        public ColorItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ColorItemViewHolder(new ColorItem(parent.getContext()));
+        public WatchFaceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new WatchFaceViewHolder(new WatchFaceItem(parent.getContext()));
         }
 
         @Override
         public void onBindViewHolder(WearableListView.ViewHolder holder, int position) {
-            ColorItemViewHolder colorItemViewHolder = (ColorItemViewHolder) holder;
-            String colorName = mColors[position];
-            colorItemViewHolder.mColorItem.setColor(colorName);
+            WatchFaceViewHolder watchFaceViewHolder = (WatchFaceViewHolder) holder;
+
+            String watchFaceName = mWatchFaces[position];
+            watchFaceViewHolder.mWatchFace.setWatchFace(watchFaceName);
 
             RecyclerView.LayoutParams layoutParams =
                     new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT);
-            int colorPickerItemMargin = (int) getResources()
-                    .getDimension(R.dimen.digital_config_color_picker_item_margin);
-            // Add margins to first and last item to make it possible for user to tap on them.
-            if (position == 0) {
-                layoutParams.setMargins(0, colorPickerItemMargin, 0, 0);
-            } else if (position == mColors.length - 1) {
-                layoutParams.setMargins(0, 0, 0, colorPickerItemMargin);
-            } else {
-                layoutParams.setMargins(0, 0, 0, 0);
-            }
-            colorItemViewHolder.itemView.setLayoutParams(layoutParams);
+                                                  ViewGroup.LayoutParams.WRAP_CONTENT);
+            watchFaceViewHolder.itemView.setLayoutParams(layoutParams);
         }
 
         @Override
         public int getItemCount() {
-            return mColors.length;
+            return mWatchFaces.length;
         }
 
-        public String[] getColors() {
-            return mColors;
+        public String[] getWatchFaces() {
+            return mWatchFaces;
         }
     }
 }
