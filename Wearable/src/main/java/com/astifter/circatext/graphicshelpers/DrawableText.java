@@ -126,7 +126,7 @@ public class DrawableText implements Drawable {
         paint.setAntiAlias(true);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStrokeWidth(1.0f);
+        paint.setStrokeWidth(3.0f);
         return paint;
     }
 
@@ -274,5 +274,9 @@ public class DrawableText implements Drawable {
 
     public void strokeInAmbientMode(boolean s) {
         this.strokeInAmbientMode = s;
+    }
+
+    public void setTextFont(Typeface textFont) {
+        this.textPaint.setTypeface(textFont);
     }
 }

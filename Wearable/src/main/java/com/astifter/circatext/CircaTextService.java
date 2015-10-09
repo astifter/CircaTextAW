@@ -138,7 +138,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             DrawingHelpers.NORMAL_TYPEFACE =
                     Typeface.createFromAsset(getResources().getAssets(),
                                              "fonts/RobotoCondensed-Light.ttf");
-            DrawingHelpers.NORMAL_TYPEFACE =
+            DrawingHelpers.BOLD_TYPEFACE =
                     Typeface.createFromAsset(getResources().getAssets(),
                                              "fonts/RobotoCondensed-Bold.ttf");
 
