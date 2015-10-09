@@ -130,6 +130,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         };
         boolean mRegisteredReceiver = false;
         private Date mWeatherRequested = null;
+        private boolean updateEnabled = true;
 
         Engine() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
@@ -137,17 +138,21 @@ public class CircaTextService extends CanvasWatchFaceService {
             DrawingHelpers.NORMAL_TYPEFACE =
                     Typeface.createFromAsset(getResources().getAssets(),
                                              "fonts/RobotoCondensed-Light.ttf");
+            DrawingHelpers.NORMAL_TYPEFACE =
+                    Typeface.createFromAsset(getResources().getAssets(),
+                                             "fonts/RobotoCondensed-Bold.ttf");
 
             wtf = new RegularWatchFace(this);
             wtf.localeChanged();
         }
+
 
         @Override
         public synchronized void invalidate() {
             final int FPS = 15;
             final int updateRate = 1000 / FPS;
             long timeMs = System.currentTimeMillis();
-            if ((lastInvalidated + updateRate) < timeMs) {
+            if (((lastInvalidated + updateRate) < timeMs) && updateEnabled) {
                 if (lastInvalidated == 0)
                     lastInvalidated = timeMs;
                 else
@@ -424,6 +429,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                             wf = CircaTextConsts.WatchFaces.CIRCATEXTv1;
 
                         }
+                        updateEnabled = false;
                         switch (wf) {
                             case REGULAR:
                                 wtf = new RegularWatchFace(this); break;
@@ -435,6 +441,9 @@ public class CircaTextService extends CanvasWatchFaceService {
                         wtf.setLowBitAmbientMode(lowBitAmbientMode);
                         wtf.setMuteMode(inMuteMode);
                         wtf.setWeatherInfo(mWeather);
+                        wtf.updateVisibilty();
+                        uiUpdated = true;
+                        updateEnabled = true;
                         break;
                 }
             }
