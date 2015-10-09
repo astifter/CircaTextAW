@@ -57,9 +57,12 @@ public class CircaTextWearableConfigActivity extends Activity implements
         listView.setHasFixedSize(true);
         listView.setClickListener(this);
         listView.addOnScrollListener(this);
-
-        String[] watchfaces = { CircaTextConsts.WatchFaces.CIRCATEXTv1.toString(),
-                                CircaTextConsts.WatchFaces.REGULAR.toString() };
+        
+        WatchFaceConfig ctf = new WatchFaceConfig(CircaTextConsts.WatchFaces.CIRCATEXTv1.toString(),
+                                                  "CircaText", "Textual time representation.");
+        WatchFaceConfig rwf = new WatchFaceConfig(CircaTextConsts.WatchFaces.REGULAR.toString(),
+                                                  "Regular", "Conventional time.");
+        WatchFaceConfig[] watchfaces = { ctf, rwf };
         watchFaceListAdapter = new WatchFaceListAdapter(watchfaces);
         listView.setAdapter(watchFaceListAdapter);
 
@@ -100,7 +103,7 @@ public class CircaTextWearableConfigActivity extends Activity implements
             @Override
             public void onConfigDataMapFetched(DataMap config) {
                 String selectedWatchface = config.getString(CircaTextConsts.KEY_WATCHFACE);
-                String[] watchfaces = watchFaceListAdapter.getWatchFaces();
+                WatchFaceConfig[] watchfaces = watchFaceListAdapter.getWatchFaces();
                 for (int i = 0; i < watchfaces.length; i++) {
                     if (watchfaces[i].equals(selectedWatchface)) {
                         listView.scrollToPosition(i);
@@ -161,7 +164,10 @@ public class CircaTextWearableConfigActivity extends Activity implements
         private static final float SHRINK_LABEL_ALPHA = .5f;
         private static final float EXPAND_LABEL_ALPHA = 1f;
 
+        private final TextView mSubTitle;
         private final TextView mLabel;
+        private WatchFaceConfig watchFaceConfig;
+
         private final CircledImageView mCircle;
         private final float mExpandCircleRadius;
         private final float mShrinkCircleRadius;
@@ -171,14 +177,13 @@ public class CircaTextWearableConfigActivity extends Activity implements
         private final ObjectAnimator mShrinkCircleAnimator;
         private final ObjectAnimator mShrinkLabelAnimator;
         private final AnimatorSet mShrinkAnimator;
-        private String mLabelText;
 
         public WatchFaceItem(Context context) {
             super(context);
             View.inflate(context, R.layout.watchface_picker_item, this);
 
-            mLabelText = "";
             mLabel = (TextView) findViewById(R.id.label);
+            mSubTitle = (TextView) findViewById(R.id.sublabel);
             mCircle = (CircledImageView)findViewById(R.id.circle);
 
             mExpandCircleRadius = mCircle.getCircleRadius();
@@ -231,13 +236,14 @@ public class CircaTextWearableConfigActivity extends Activity implements
             }
         }
 
-        private void setWatchFace(String watchFaceName) {
-            mLabelText = watchFaceName;
-            mLabel.setText(watchFaceName);
+        private void setWatchFace(WatchFaceConfig watchFaceName) {
+            watchFaceConfig = watchFaceName;
+            mLabel.setText(watchFaceName.getName());
+            mSubTitle.setText(watchFaceName.getSubTitle());
         }
 
         public String getLabel() {
-            return this.mLabelText;
+            return this.watchFaceConfig.getObjectName();
         }
     }
 
@@ -251,9 +257,9 @@ public class CircaTextWearableConfigActivity extends Activity implements
     }
 
     private class WatchFaceListAdapter extends WearableListView.Adapter {
-        private final String[] mWatchFaces;
+        private final WatchFaceConfig[] mWatchFaces;
 
-        public WatchFaceListAdapter(String[] wfs) {
+        public WatchFaceListAdapter(WatchFaceConfig[] wfs) {
             mWatchFaces = wfs;
         }
 
@@ -266,7 +272,7 @@ public class CircaTextWearableConfigActivity extends Activity implements
         public void onBindViewHolder(WearableListView.ViewHolder holder, int position) {
             WatchFaceViewHolder watchFaceViewHolder = (WatchFaceViewHolder) holder;
 
-            String watchFaceName = mWatchFaces[position];
+            WatchFaceConfig watchFaceName = mWatchFaces[position];
             watchFaceViewHolder.mWatchFace.setWatchFace(watchFaceName);
 
             RecyclerView.LayoutParams layoutParams =
@@ -280,8 +286,34 @@ public class CircaTextWearableConfigActivity extends Activity implements
             return mWatchFaces.length;
         }
 
-        public String[] getWatchFaces() {
+        public WatchFaceConfig[] getWatchFaces() {
             return mWatchFaces;
+        }
+    }
+
+    private class WatchFaceConfig {
+        private final String object;
+        private final String name;
+        private final String subtitle;
+
+        public WatchFaceConfig(String o, String n, String s) {
+            this.object = o; this.name = n; this.subtitle = s;
+        }
+
+        public String getObjectName() {
+            return object;
+        }
+
+        public String getSubTitle() {
+            return subtitle;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean equals(String o) {
+            return this.object.equals(o);
         }
     }
 }
