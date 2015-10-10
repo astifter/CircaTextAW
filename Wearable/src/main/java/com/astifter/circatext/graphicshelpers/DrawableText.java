@@ -25,6 +25,7 @@ public class DrawableText implements Drawable {
     private HashMap<Integer, String> textSource;
     private float defaultTextSize;
     private boolean strokeInAmbientMode;
+    private boolean ensureMaxWidth;
 
     public DrawableText(int where, HashMap<Integer, String> source) {
         this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
@@ -137,9 +138,8 @@ public class DrawableText implements Drawable {
 
         String currentText = getTextFromSource();
         this.drawnBounds = b;
-
+        float maxWidth = b.width();
         float targetWidth = this.getFutureWidth();
-        Paint.FontMetrics fm = this.textPaint.getFontMetrics();
 
         float x = 0;
         if (this.textAlignment == DrawableText.Align.LEFT) {
@@ -151,6 +151,7 @@ public class DrawableText implements Drawable {
             x = (drawnBounds.left + drawnBounds.right) / 2;
         }
 
+        Paint.FontMetrics fm = this.textPaint.getFontMetrics();
         float y = drawnBounds.top + (-fm.ascent * lineHeight);
         this.drawnBounds.bottom = this.drawnBounds.top + (int) getTextHeightForPaint(this.textPaint, this.lineHeight);
 
@@ -166,8 +167,7 @@ public class DrawableText implements Drawable {
          * - Adjust the actually used size (drawnSize) to the maxWidth.
          */
         boolean hasSavedState = false;
-        int maxWidth = b.width();
-        if (targetWidth > maxWidth && this.textAlignment == Align.LEFT) {
+        if (targetWidth > maxWidth && this.textAlignment == Align.LEFT && ensureMaxWidth) {
             float ellipsisSize = textPaint.measureText("...");
             canvas.drawText("...", x + maxWidth - ellipsisSize, y, textPaint);
 
@@ -280,5 +280,9 @@ public class DrawableText implements Drawable {
 
     public void setTextFont(Typeface textFont) {
         this.textPaint.setTypeface(textFont);
+    }
+
+    public void ensureMaximumWidth(boolean m) {
+        this.ensureMaxWidth = m;
     }
 }

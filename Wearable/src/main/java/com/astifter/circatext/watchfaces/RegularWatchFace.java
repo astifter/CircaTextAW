@@ -50,6 +50,8 @@ public class RegularWatchFace extends BaseWatchFace {
         stackRight(mTF, weather, eTF.WEATHER_AGE, mTexts);
         stackRight(mTF, weather, eTF.WEATHER_DESC, mTexts, DrawableText.Align.RIGHT);
         topDrawable.addBelow(weather);
+        mTF.get(eTF.CALENDAR_1).ensureMaximumWidth(true);
+        mTF.get(eTF.CALENDAR_2).ensureMaximumWidth(true);
 
         int fadeList[] = {eTF.CALENDAR_1, eTF.CALENDAR_2, eTF.SECOND,
                           eTF.BATTERY, eTF.WEATHER_TEMP, eTF.WEATHER_AGE, eTF.WEATHER_DESC};
