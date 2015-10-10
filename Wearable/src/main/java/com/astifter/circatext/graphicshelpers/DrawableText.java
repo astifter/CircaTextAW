@@ -147,8 +147,14 @@ public class DrawableText implements Drawable {
             this.drawnBounds.right = this.drawnBounds.left + (int) targetWidth;
         } else if (this.textAlignment == DrawableText.Align.RIGHT) {
             x = drawnBounds.right;
+            this.drawnBounds.left = this.drawnBounds.right - (int) targetWidth;
         } else if (this.textAlignment == DrawableText.Align.CENTER) {
             x = (drawnBounds.left + drawnBounds.right) / 2;
+            if (targetWidth < this.drawnBounds.width()) {
+                float inset = (this.drawnBounds.width() - targetWidth) / 2;
+                this.drawnBounds.left += (int) inset;
+                this.drawnBounds.right -= (int) inset;
+            }
         }
 
         Paint.FontMetrics fm = this.textPaint.getFontMetrics();

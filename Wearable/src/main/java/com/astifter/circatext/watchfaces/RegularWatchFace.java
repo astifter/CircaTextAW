@@ -38,23 +38,21 @@ public class RegularWatchFace extends BaseWatchFace {
         mTF.get(eTF.HOUR).setTextFont(DrawingHelpers.BOLD_TYPEFACE);
         stackRight(mTF, hours, eTF.SECOND, mTexts);
         topDrawable.addAbove(hours);
-        stackTop(mTF, topDrawable, eTF.BATTERY, mTexts, DrawableText.Align.RIGHT);
+        StackHorizontal toprow = new StackHorizontal();
+        stackRight(mTF, toprow, eTF.BATTERY, mTexts);
+        stackRight(mTF, toprow, eTF.WEATHER_TEMP, mTexts, DrawableText.Align.RIGHT);
+        topDrawable.addAbove(toprow);
         StackHorizontal date = new StackHorizontal();
         stackRight(mTF, date, eTF.DAY_OF_WEEK, mTexts);
         stackRight(mTF, date, eTF.DATE, mTexts, DrawableText.Align.RIGHT);
         topDrawable.addBelow(date);
         stackBottom(mTF, topDrawable, eTF.CALENDAR_1, mTexts);
         stackBottom(mTF, topDrawable, eTF.CALENDAR_2, mTexts);
-        StackHorizontal weather = new StackHorizontal();
-        stackRight(mTF, weather, eTF.WEATHER_TEMP, mTexts);
-        stackRight(mTF, weather, eTF.WEATHER_AGE, mTexts);
-        stackRight(mTF, weather, eTF.WEATHER_DESC, mTexts, DrawableText.Align.RIGHT);
-        topDrawable.addBelow(weather);
         mTF.get(eTF.CALENDAR_1).ensureMaximumWidth(true);
         mTF.get(eTF.CALENDAR_2).ensureMaximumWidth(true);
 
         int fadeList[] = {eTF.CALENDAR_1, eTF.CALENDAR_2, eTF.SECOND,
-                          eTF.BATTERY, eTF.WEATHER_TEMP, eTF.WEATHER_AGE, eTF.WEATHER_DESC};
+                          eTF.BATTERY};
         addToUIList(mTF, mTFFading, fadeList);
 
         int animList[] = {eTF.HOUR};
@@ -128,8 +126,6 @@ public class RegularWatchFace extends BaseWatchFace {
         mTF.get(eTF.CALENDAR_2).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
         mTF.get(eTF.BATTERY).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
         mTF.get(eTF.WEATHER_TEMP).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-        mTF.get(eTF.WEATHER_AGE).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size) / 1.5f);
-        mTF.get(eTF.WEATHER_DESC).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
     }
 
     @Override
@@ -205,17 +201,14 @@ public class RegularWatchFace extends BaseWatchFace {
 
         mTF.get(eTF.SECOND).hide(false);
         mTF.get(eTF.BATTERY).hide(false);
+        if (haveWeather()) {
+            mTF.get(eTF.WEATHER_TEMP).hide(false);
+        }
 
         // if peek card is shown, exit
         if (this.peekCardPosition.isEmpty()) {
             mTF.get(eTF.CALENDAR_1).hide(false);
             mTF.get(eTF.CALENDAR_2).hide(false);
-
-            if (haveWeather()) {
-                mTF.get(eTF.WEATHER_TEMP).hide(false);
-                mTF.get(eTF.WEATHER_AGE).hide(false);
-                mTF.get(eTF.WEATHER_DESC).hide(false);
-            }
         }
     }
 
