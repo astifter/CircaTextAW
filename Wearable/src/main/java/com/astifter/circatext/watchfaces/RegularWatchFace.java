@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
@@ -210,6 +211,20 @@ public class RegularWatchFace extends BaseWatchFace {
             mTF.get(eTF.CALENDAR_1).hide(false);
             mTF.get(eTF.CALENDAR_2).hide(false);
         }
+    }
+
+    @Override
+    public int getTouchedText(int x, int y) {
+        int idx = topDrawable.getTouchedText(x, y);
+        if (idx != -1) {
+            DrawableText dt = mTF.get(idx);
+            if (dt.getColor() == Color.GREEN) {
+                dt.setColor(Color.WHITE);
+            } else {
+                dt.setColor(Color.GREEN);
+            }
+        }
+        return idx;
     }
 
     @Override

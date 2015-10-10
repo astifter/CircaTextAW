@@ -44,6 +44,8 @@ public interface Drawable {
 
     boolean isHidden();
 
+    int getTouchedText(int x, int y);
+
     enum Align {
         LEFT, RIGHT, CENTER
     }

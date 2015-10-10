@@ -249,6 +249,15 @@ public class DrawableText implements Drawable {
         return this.hidden;
     }
 
+    @Override
+    public int getTouchedText(int x, int y) {
+        if (this.drawnBounds.contains(x, y)) {
+            return this.textSourceName;
+        } else {
+            return -1;
+        }
+    }
+
     public void setAlignment(Align a) {
         this.textAlignment = a;
         switch (a) {
@@ -286,6 +295,14 @@ public class DrawableText implements Drawable {
 
     public void setTextFont(Typeface textFont) {
         this.textPaint.setTypeface(textFont);
+    }
+
+    public void setColor(int color) {
+        this.textPaint.setColor(color);
+    }
+
+    public int getColor() {
+        return this.textPaint.getColor();
     }
 
     public void ensureMaximumWidth(boolean m) {

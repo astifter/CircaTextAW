@@ -97,8 +97,18 @@ public class CircaTextWatchFace extends BaseWatchFace {
     }
 
     @Override
-    public void startTapHighlight() {
+    public int getTouchedText(int x, int y) {
+        for (Drawable a : topDrawable) {
+            int idx = a.getTouchedText(x, y);
+            if (idx != -1)
+                return idx;
+        }
+        return -1;
+    }
 
+    @Override
+    public void startTapHighlight() {
+        // TODO
     }
 
     @Override

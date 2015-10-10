@@ -91,7 +91,7 @@ public abstract class BaseWatchFace implements WatchFace {
     private void startAlphaAnimation(Drawable t, int start, int stop,
                                      Animator.AnimatorListener a) {
         ValueAnimator anim = ObjectAnimator.ofInt(t, "alpha", start, stop);
-        anim.setDuration(100);
+        anim.setDuration(50);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -211,7 +211,7 @@ public abstract class BaseWatchFace implements WatchFace {
 
     void startTapHighlight(Drawable ct) {
         Animator.AnimatorListener listener = new ReverseListener(ct);
-        startAlphaAnimation(ct, 255, 0, listener);
+        startAlphaAnimation(ct, 255, 192, listener);
     }
 
     class eTF {

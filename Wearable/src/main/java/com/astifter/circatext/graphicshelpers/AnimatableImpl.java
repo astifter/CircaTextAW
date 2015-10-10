@@ -104,4 +104,9 @@ public class AnimatableImpl implements Drawable, Animatable {
     public boolean isHidden() {
         return this.hidden;
     }
+
+    @Override
+    public int getTouchedText(int x, int y) {
+        return drawable.getTouchedText(x, y);
+    }
 }

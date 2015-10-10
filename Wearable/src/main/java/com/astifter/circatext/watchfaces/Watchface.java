@@ -35,4 +35,6 @@ public interface WatchFace {
     void onDraw(Canvas canvas, Rect bounds);
 
     void updateVisibilty();
+
+    int getTouchedText(int x, int y);
 }
