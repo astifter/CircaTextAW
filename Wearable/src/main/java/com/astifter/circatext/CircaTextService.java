@@ -32,6 +32,7 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
@@ -148,6 +149,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             wtf = new RegularWatchFace(this);
             wtf.localeChanged();
+            wtf.setPeekCardPosition(getPeekCardPosition());
         }
 
         @Override
@@ -173,6 +175,15 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(CircaTextService.this)
                     .setAcceptsTapEvents(true)
+                    .setAmbientPeekMode(WatchFaceStyle.AMBIENT_PEEK_MODE_VISIBLE)
+                    .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
+                    .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
+                    .setHotwordIndicatorGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL)
+                    .setPeekOpacityMode(WatchFaceStyle.PEEK_OPACITY_MODE_OPAQUE)
+                    .setShowSystemUiTime(false)
+                    .setShowUnreadCountIndicator(true)
+                    .setStatusBarGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL)
+                    .setViewProtectionMode(WatchFaceStyle.PROTECT_WHOLE_SCREEN)
                     .build());
 
             mUpdateHandler.sendEmptyMessage(MSG_LOAD_MEETINGS);
