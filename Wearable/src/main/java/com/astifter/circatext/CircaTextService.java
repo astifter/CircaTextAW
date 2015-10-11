@@ -149,7 +149,6 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             wtf = new RegularWatchFace(this);
             wtf.localeChanged();
-            wtf.setPeekCardPosition(getPeekCardPosition());
         }
 
         @Override
