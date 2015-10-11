@@ -226,7 +226,7 @@ public abstract class BaseWatchFace implements WatchFace {
         public static final int WEATHER_TEMP = SECOND + 1;
         public static final int WEATHER_AGE = WEATHER_TEMP + 1;
         public static final int WEATHER_DESC = WEATHER_AGE + 1;
-        //public static final int SIZE = WEATHER_DESC + 1;
+        public static final int SIZE = WEATHER_DESC + 1;
     }
 
     private class ReverseListener implements Animator.AnimatorListener {
