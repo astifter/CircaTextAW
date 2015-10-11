@@ -166,8 +166,6 @@ public class CircaTextWearableConfigActivity extends Activity implements
 
         private final TextView mSubTitle;
         private final TextView mLabel;
-        private WatchFaceConfig watchFaceConfig;
-
         private final CircledImageView mCircle;
         private final float mExpandCircleRadius;
         private final float mShrinkCircleRadius;
@@ -177,6 +175,7 @@ public class CircaTextWearableConfigActivity extends Activity implements
         private final ObjectAnimator mShrinkCircleAnimator;
         private final ObjectAnimator mShrinkLabelAnimator;
         private final AnimatorSet mShrinkAnimator;
+        private WatchFaceConfig watchFaceConfig;
 
         public WatchFaceItem(Context context) {
             super(context);
@@ -184,7 +183,7 @@ public class CircaTextWearableConfigActivity extends Activity implements
 
             mLabel = (TextView) findViewById(R.id.label);
             mSubTitle = (TextView) findViewById(R.id.sublabel);
-            mCircle = (CircledImageView)findViewById(R.id.circle);
+            mCircle = (CircledImageView) findViewById(R.id.circle);
 
             mExpandCircleRadius = mCircle.getCircleRadius();
             mShrinkCircleRadius = mExpandCircleRadius * SHRINK_CIRCLE_RATIO;
@@ -297,7 +296,9 @@ public class CircaTextWearableConfigActivity extends Activity implements
         private final String subtitle;
 
         public WatchFaceConfig(String o, String n, String s) {
-            this.object = o; this.name = n; this.subtitle = s;
+            this.object = o;
+            this.name = n;
+            this.subtitle = s;
         }
 
         public String getObjectName() {

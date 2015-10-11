@@ -297,12 +297,14 @@ public class DrawableText implements Drawable {
         this.textPaint.setTypeface(textFont);
     }
 
-    public void setColor(int color) {
-        this.textPaint.setColor(color);
-    }
-
+    @Override
     public int getColor() {
         return this.textPaint.getColor();
+    }
+
+    @Override
+    public void setColor(int color) {
+        this.textPaint.setColor(color);
     }
 
     public void ensureMaximumWidth(boolean m) {

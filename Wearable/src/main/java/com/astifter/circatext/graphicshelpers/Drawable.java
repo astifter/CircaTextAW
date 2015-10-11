@@ -46,6 +46,10 @@ public interface Drawable {
 
     int getTouchedText(int x, int y);
 
+    int getColor();
+
+    void setColor(int c);
+
     enum Align {
         LEFT, RIGHT, CENTER
     }

@@ -80,10 +80,19 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public int getTouchedText(int x, int y) {
+        int idx = -1;
         for (Drawable a : topDrawable.values()) {
-            int idx = a.getTouchedText(x, y);
+            idx = a.getTouchedText(x, y);
             if (idx != -1)
-                return idx;
+                break;
+        }
+        if (idx != -1) {
+            AnimatableImpl dt = topDrawable.get(idx);
+            if (dt.getColor() == Color.GREEN) {
+                dt.setColor(Color.WHITE);
+            } else {
+                dt.setColor(Color.GREEN);
+            }
         }
         return -1;
     }

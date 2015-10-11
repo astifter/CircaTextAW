@@ -66,4 +66,17 @@ abstract class Stack implements Drawable {
         }
         return -1;
     }
+
+    @Override
+    public int getColor() {
+        // TODO how to implement
+        return -1;
+    }
+
+    @Override
+    public void setColor(int c) {
+        for (Drawable t : this.stack) {
+            t.setColor(c);
+        }
+    }
 }

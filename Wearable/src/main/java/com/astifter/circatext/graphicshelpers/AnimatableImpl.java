@@ -109,4 +109,14 @@ public class AnimatableImpl implements Drawable, Animatable {
     public int getTouchedText(int x, int y) {
         return drawable.getTouchedText(x, y);
     }
+
+    @Override
+    public int getColor() {
+        return drawable.getColor();
+    }
+
+    @Override
+    public void setColor(int c) {
+        drawable.setColor(c);
+    }
 }
