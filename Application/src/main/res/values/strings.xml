@@ -17,33 +17,14 @@
     <string name="app_name">CircaText</string>
 
     <string name="digital_config_text">CircaText Configuration</string>
-    <string name="digital_config_background">Background</string>
     <string name="digital_config_calendars">Exclude Calendars</string>
     <string name="digital_config_attribution">Attribution</string>
 
     <string name="title_no_device_connected">No wearable device is currently connected.</string>
     <string name="ok_no_device_connected">Connected.</string>
 
-    <string name="color_black">Black</string>
-    <string name="color_blue">Blue</string>
-    <string name="color_gray">Gray</string>
-    <string name="color_green">Green</string>
-    <string name="color_navy">Navy</string>
-    <string name="color_red">Red</string>
-    <string name="color_white">White</string>
-
-    <string-array name="color_array">
-        <item>@string/color_black</item>
-        <item>@string/color_blue</item>
-        <item>@string/color_gray</item>
-        <item>@string/color_green</item>
-        <item>@string/color_navy</item>
-        <item>@string/color_red</item>
-        <item>@string/color_white</item>
-    </string-array>
-
     <string name="excluded_calendar_hint">Comma separated calendar names.</string>
     <string name="digital_config_attribution_text">
-        Calendar icon made by SimpleIcon (http://www.simpleicon.com). Weather from OpenWeatherMap (http://openweathermap.org).
+        Icons by Aaron K. Kim from the Noun Project.
     </string>
 </resources>

@@ -160,35 +160,8 @@ public class CircaTextConfigActivity extends Activity
     private void setUpAllPickers(DataMap config) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpAllPickers()");
 
-        setUpColorPickerSelection(R.id.background, CircaTextConsts.KEY_BACKGROUND_COLOR, config, R.string.color_black);
         setUpEditTextContent(R.id.exclude_calendars, CircaTextConsts.KEY_EXCLUDED_CALENDARS, config, "");
-
-        setUpColorPickerListener(R.id.background, CircaTextConsts.KEY_BACKGROUND_COLOR);
         setUpEditTextListener(R.id.exclude_calendars, CircaTextConsts.KEY_EXCLUDED_CALENDARS);
-    }
-
-    private void setUpColorPickerSelection(int spinnerId, final String configKey, DataMap config,
-                                           int defaultColorNameResId) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpColorPickerSelection()");
-
-        String defaultColorName = getString(defaultColorNameResId);
-        int defaultColor = Color.parseColor(defaultColorName);
-        int color;
-
-        if (config != null) {
-            color = config.getInt(configKey, defaultColor);
-        } else {
-            color = defaultColor;
-        }
-
-        Spinner spinner = (Spinner) findViewById(spinnerId);
-        String[] colorNames = getResources().getStringArray(R.array.color_array);
-        for (int i = 0; i < colorNames.length; i++) {
-            if (Color.parseColor(colorNames[i]) == color) {
-                spinner.setSelection(i);
-                break;
-            }
-        }
     }
 
     private void setUpEditTextContent(int editTextId, final String configKey, DataMap config,
@@ -204,27 +177,6 @@ public class CircaTextConfigActivity extends Activity
 
         EditText editText = (EditText) findViewById(editTextId);
         editText.setText(content);
-    }
-
-    private void setUpColorPickerListener(int spinnerId, final String configKey) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpColorPickerListener()");
-
-        Spinner spinner = (Spinner) findViewById(spinnerId);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-                if (Log.isLoggable(TAG, Log.DEBUG))
-                    Log.d(TAG, "setUpColorPickerListener().onItemSelected()");
-                final String colorName = (String) adapterView.getItemAtPosition(pos);
-                sendConfigUpdateMessage(configKey, Color.parseColor(colorName));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                if (Log.isLoggable(TAG, Log.DEBUG))
-                    Log.d(TAG, "setUpColorPickerListener().onNothingSelected()");
-            }
-        });
     }
 
     private void setUpEditTextListener(final int editTextId, final String configKey) {

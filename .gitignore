@@ -2,6 +2,7 @@
 *.orig
 *~
 .*.un~
+.DS_Store
 
 # android studio
 /local.properties
