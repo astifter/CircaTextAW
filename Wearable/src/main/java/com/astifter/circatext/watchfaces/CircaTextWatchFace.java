@@ -48,7 +48,8 @@ public class CircaTextWatchFace extends BaseWatchFace {
         tl.setAlignment(Drawable.Align.RIGHT);
 
         DrawableText hr = createAnimatable(eTF.HOUR,      new Rect(5, 80, 95, 95), new Rect(2, 10, 95, 55));
-        DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(35, 80, 95, 95), new Rect(2, 57, 95, 90));
+        DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), new Rect(2, 57, 47, 90));
+        sd.setAlignment(Drawable.Align.RIGHT);
     }
 
     private DrawableText createAnimatable(int textid, Rect fp, Rect sp, Resources res, int drawableid, boolean debug) {
