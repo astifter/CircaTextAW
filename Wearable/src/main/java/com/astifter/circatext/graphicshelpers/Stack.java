@@ -8,6 +8,7 @@ abstract class Stack implements Drawable {
     boolean hidden = false;
     Rect bounds = new Rect(0, 0, 0, 0);
     ArrayList<Drawable> stack;
+    private int color;
 
     Stack() {
         stack = new ArrayList<>();
@@ -69,12 +70,12 @@ abstract class Stack implements Drawable {
 
     @Override
     public int getColor() {
-        // TODO how to implement
-        return -1;
+        return color;
     }
 
     @Override
     public void setColor(int c) {
+        this.color = c;
         for (Drawable t : this.stack) {
             t.setColor(c);
         }

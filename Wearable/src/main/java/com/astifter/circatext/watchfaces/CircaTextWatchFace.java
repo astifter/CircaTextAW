@@ -11,7 +11,6 @@ import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.CircaTextStringer;
 import com.astifter.circatext.datahelpers.CircaTextStringerV2;
 import com.astifter.circatext.graphicshelpers.AnimatableImpl;
-import com.astifter.circatext.graphicshelpers.AnimatableText;
 import com.astifter.circatext.graphicshelpers.Drawable;
 import com.astifter.circatext.graphicshelpers.DrawableIcon;
 import com.astifter.circatext.graphicshelpers.DrawableText;
@@ -36,36 +35,53 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void setMetrics(Resources resources, WindowInsets insets) {
         super.setMetrics(resources, insets);
 
-        DrawableText hr = createAnimatable(eTF.HOUR,      new Rect(5, 80, 95, 95), new Rect(5, 25, 95, 75));
+        DrawableText hr = createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95), new Rect(5, 25, 95, 75));
         DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), new Rect(5, 72, 95, 95));
         sd.setAlignment(Drawable.Align.RIGHT);
-        DrawableText fl = createAnimatable(eCT.FIRST,     new Rect(5, 15, 95, 42), new Rect(5, 5, 95, 28));
+
+        DrawableText fl = createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, 5, 95, 28));
         fl.setAlignment(Drawable.Align.RIGHT);
-        DrawableText sl = createAnimatable(eCT.SECOND,    new Rect(5, 36, 95, 63), new Rect(5, 27, 95, 50));
+        DrawableText sl = createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, 27, 95, 50));
         sl.setAlignment(Drawable.Align.RIGHT);
-        DrawableText tl = createAnimatable(eCT.THIRD,     new Rect(5, 57, 95, 84), new Rect(5, 50, 95, 73));
+        DrawableText tl = createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, 50, 95, 73));
         tl.setAlignment(Drawable.Align.RIGHT);
-        DrawableText bt = createAnimatable(eTF.BATTERY,      new Rect(5, 5, 95, 20), new Rect(5, -20, 5, -5));
+
+        DrawableText bt = createAnimatable(eTF.BATTERY, new Rect(5, 5, 95, 20), new Rect(95, -20, 95, -5), true);
         bt.setAlignment(Drawable.Align.RIGHT);
 
-        StackHorizontal tempstack = new StackHorizontal();
-        DrawableText temp = new DrawableText(eTF.WEATHER_TEMP, mTexts);
-        DrawableIcon icon = new DrawableIcon(resources.getDrawable(R.drawable.thermometer, resources.newTheme()));
-        tempstack.add(icon); tempstack.add(temp);
-
-        AnimatableImpl adi = new AnimatableImpl(this.parent, tempstack);
-        adi.setPosition(Drawable.Config.PLAIN, new Rect(5, 5, 95, 20), this.mBounds);
-        adi.setConfiguration(Drawable.Config.PEEK, new Rect(5, -20, 95, -20));
-        topDrawable.put(-3, adi);
+        createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), new Rect(5, -20, 95, -20), resources, R.drawable.thermometer, false);
     }
 
-    private DrawableText createAnimatable(int idx, Rect fp, Rect sp) {
-        DrawableText dt = new DrawableText(idx, mTexts);
-        AnimatableImpl a = new AnimatableText(this.parent, dt);
-        a.setPosition(Drawable.Config.PLAIN, fp, this.mBounds);
-        a.setConfiguration(Drawable.Config.PEEK, sp);
-        topDrawable.put(idx, a);
+    private DrawableText createAnimatable(int textid, Rect fp, Rect sp, Resources res, int drawableid, boolean debug) {
+        DrawableText dt = new DrawableText(textid, mTexts);
+        dt.autoSize(true);
+
+        Drawable d;
+        if (drawableid >= 0) {
+            StackHorizontal tempstack = new StackHorizontal();
+            DrawableIcon icon = new DrawableIcon(textid, res.getDrawable(drawableid, res.newTheme()));
+            tempstack.add(icon);
+            tempstack.add(dt);
+            d = tempstack;
+        } else {
+            d = dt;
+        }
+
+        AnimatableImpl adi = new AnimatableImpl(this.parent, d);
+        adi.setPosition(Drawable.Config.PLAIN, fp, this.mBounds);
+        adi.setConfiguration(Drawable.Config.PEEK, sp);
+        adi.enableDebug(debug);
+        topDrawable.put(textid, adi);
+
         return dt;
+    }
+
+    private DrawableText createAnimatable(int textid, Rect fp, Rect sp, boolean debug) {
+        return createAnimatable(textid, fp, sp, null, -1, debug);
+    }
+
+    private DrawableText createAnimatable(int textid, Rect fp, Rect sp) {
+        return createAnimatable(textid, fp, sp, null, -1, false);
     }
 
     @Override

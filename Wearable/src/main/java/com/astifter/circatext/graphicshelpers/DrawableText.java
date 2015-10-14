@@ -26,6 +26,7 @@ public class DrawableText implements Drawable {
     private float defaultTextSize;
     private boolean strokeInAmbientMode;
     private boolean ensureMaxWidth;
+    private boolean autoSize;
 
     public DrawableText(int where, HashMap<Integer, String> source) {
         this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
@@ -137,6 +138,11 @@ public class DrawableText implements Drawable {
         }
 
         String currentText = getTextFromSource();
+        if (this.autoSize) {
+            float ts = this.getMaximumTextHeight(b);
+            this.textPaint.setTextSize(ts);
+        }
+
         this.drawnBounds = b;
         float maxWidth = b.width();
         float targetWidth = this.getFutureWidth();
@@ -309,5 +315,9 @@ public class DrawableText implements Drawable {
 
     public void ensureMaximumWidth(boolean m) {
         this.ensureMaxWidth = m;
+    }
+
+    public void autoSize(boolean b) {
+        this.autoSize = b;
     }
 }

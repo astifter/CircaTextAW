@@ -7,17 +7,20 @@ import android.graphics.Rect;
  * Created by astifter on 13.10.15.
  */
 public class DrawableIcon implements Drawable {
+    private final int index;
     private android.graphics.drawable.Drawable icon;
     private Rect dimensions;
     private Rect currentBounds;
     private Drawable.Align alignment;
     private boolean hidden;
 
-    public DrawableIcon(android.graphics.drawable.Drawable drawable) {
+    public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable) {
+        this.index = idx;
         create(drawable, Align.LEFT);
     }
 
-    public DrawableIcon(android.graphics.drawable.Drawable drawable, Align a) {
+    public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable, Align a) {
+        this.index = idx;
         create(drawable, a);
     }
 
@@ -90,6 +93,8 @@ public class DrawableIcon implements Drawable {
 
     @Override
     public int getTouchedText(int x, int y) {
+        if (this.currentBounds.contains(x, y))
+            return index;
         return -1;
     }
 
