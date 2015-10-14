@@ -5,8 +5,8 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 /**
  * Created by astifter on 13.10.15.
  */
-public class AnimatableIcon extends AnimatableImpl implements Animatable {
-    AnimatableIcon(CanvasWatchFaceService.Engine p, AnimatableIcon d) {
+public class AnimatableIcon extends AnimatableImpl {
+    AnimatableIcon(CanvasWatchFaceService.Engine p, DrawableIcon d) {
         super(p, d);
     }
 }

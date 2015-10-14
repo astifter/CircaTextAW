@@ -7,12 +7,15 @@ import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
+import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.CircaTextStringer;
 import com.astifter.circatext.datahelpers.CircaTextStringerV2;
 import com.astifter.circatext.graphicshelpers.AnimatableImpl;
 import com.astifter.circatext.graphicshelpers.AnimatableText;
 import com.astifter.circatext.graphicshelpers.Drawable;
+import com.astifter.circatext.graphicshelpers.DrawableIcon;
 import com.astifter.circatext.graphicshelpers.DrawableText;
+import com.astifter.circatext.graphicshelpers.StackHorizontal;
 
 import java.util.HashMap;
 
@@ -43,8 +46,17 @@ public class CircaTextWatchFace extends BaseWatchFace {
         DrawableText tl = createAnimatable(eCT.THIRD,     new Rect(5, 57, 95, 84), new Rect(5, 50, 95, 73));
         tl.setAlignment(Drawable.Align.RIGHT);
         DrawableText bt = createAnimatable(eTF.BATTERY,      new Rect(5, 5, 95, 20), new Rect(5, -20, 5, -5));
-        DrawableText wt = createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), new Rect(95, -20, 95, -5));
-        wt.setAlignment(Drawable.Align.RIGHT);
+        bt.setAlignment(Drawable.Align.RIGHT);
+
+        StackHorizontal tempstack = new StackHorizontal();
+        DrawableText temp = new DrawableText(eTF.WEATHER_TEMP, mTexts);
+        DrawableIcon icon = new DrawableIcon(resources.getDrawable(R.drawable.thermometer, resources.newTheme()));
+        tempstack.add(icon); tempstack.add(temp);
+
+        AnimatableImpl adi = new AnimatableImpl(this.parent, tempstack);
+        adi.setPosition(Drawable.Config.PLAIN, new Rect(5, 5, 95, 20), this.mBounds);
+        adi.setConfiguration(Drawable.Config.PEEK, new Rect(5, -20, 95, -20));
+        topDrawable.put(-3, adi);
     }
 
     private DrawableText createAnimatable(int idx, Rect fp, Rect sp) {

@@ -17,7 +17,7 @@ public class AnimatableImpl implements Drawable, Animatable {
     Rect currentPosition;
     private boolean hidden;
 
-    AnimatableImpl(CanvasWatchFaceService.Engine p, Drawable d) {
+    public AnimatableImpl(CanvasWatchFaceService.Engine p, Drawable d) {
         configs = new HashMap<>();
         this.parent = p;
         drawable = d;
@@ -42,8 +42,10 @@ public class AnimatableImpl implements Drawable, Animatable {
 
         PropertyValuesHolder animateLeft = PropertyValuesHolder.ofInt("Left", oldPosition.left, newPosition.left);
         PropertyValuesHolder animateTop = PropertyValuesHolder.ofInt("Top", oldPosition.top, newPosition.top);
+        PropertyValuesHolder animateRight = PropertyValuesHolder.ofInt("Right", oldPosition.right, newPosition.right);
+        PropertyValuesHolder animateBottom = PropertyValuesHolder.ofInt("Bottom", oldPosition.bottom, newPosition.bottom);
 
-        ValueAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, animateLeft, animateTop);
+        ValueAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, animateLeft, animateTop, animateRight, animateBottom);
         anim.setDuration(250);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -60,6 +62,14 @@ public class AnimatableImpl implements Drawable, Animatable {
 
     public void setTop(int t) {
         this.currentPosition.top = t;
+    }
+
+    public void setRight(int l) {
+        this.currentPosition.right = l;
+    }
+
+    public void setBottom(int l) {
+        this.currentPosition.bottom = l;
     }
 
     @Override
