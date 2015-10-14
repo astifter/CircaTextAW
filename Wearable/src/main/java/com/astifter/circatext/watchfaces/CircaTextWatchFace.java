@@ -35,21 +35,20 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void setMetrics(Resources resources, WindowInsets insets) {
         super.setMetrics(resources, insets);
 
-        DrawableText hr = createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95), new Rect(5, 25, 95, 75));
-        DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), new Rect(5, 72, 95, 95));
-        sd.setAlignment(Drawable.Align.RIGHT);
-
-        DrawableText fl = createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, 5, 95, 28));
-        fl.setAlignment(Drawable.Align.RIGHT);
-        DrawableText sl = createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, 27, 95, 50));
-        sl.setAlignment(Drawable.Align.RIGHT);
-        DrawableText tl = createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, 50, 95, 73));
-        tl.setAlignment(Drawable.Align.RIGHT);
-
         DrawableText bt = createAnimatable(eTF.BATTERY, new Rect(5, 5, 95, 20), new Rect(95, -20, 95, -5), true);
         bt.setAlignment(Drawable.Align.RIGHT);
-
         createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), new Rect(5, -20, 95, -20), resources, R.drawable.thermometer, false);
+
+        int offset = 12; int height = (100-(2*offset))/3; int io = 2;
+        DrawableText fl = createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, offset-io, 98, offset + height+io));
+        fl.setAlignment(Drawable.Align.RIGHT);
+        DrawableText sl = createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, offset+height-io, 98, offset+(height*2)+io));
+        sl.setAlignment(Drawable.Align.RIGHT);
+        DrawableText tl = createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, offset+(height*2)-io, 98, 100-offset+io));
+        tl.setAlignment(Drawable.Align.RIGHT);
+
+        DrawableText hr = createAnimatable(eTF.HOUR,      new Rect(5, 80, 95, 95), new Rect(2, 10, 95, 55));
+        DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(35, 80, 95, 95), new Rect(2, 57, 95, 90));
     }
 
     private DrawableText createAnimatable(int textid, Rect fp, Rect sp, Resources res, int drawableid, boolean debug) {

@@ -58,11 +58,12 @@ public abstract class BaseWatchFace implements WatchFace {
     @Override
     public void localeChanged() {
         mCalendar.setTimeZone(TimeZone.getDefault());
-        mDayFormat = new SimpleDateFormat("EEE", Locale.getDefault());
+        Locale de = Locale.GERMANY;
+        mDayFormat = new SimpleDateFormat("EEE", de);
         mDayFormat.setCalendar(mCalendar);
-        mDateFormat = new SimpleDateFormat("MMM d yyyy", Locale.getDefault());
+        mDateFormat = new SimpleDateFormat("d. MMM yyyy", de);
         mDateFormat.setCalendar(mCalendar);
-        mShortDateFormat = new SimpleDateFormat("MMM d", Locale.getDefault());
+        mShortDateFormat = new SimpleDateFormat("d. MMM", de);
         mShortDateFormat.setCalendar(mCalendar);
     }
 
