@@ -5,15 +5,16 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
+import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.graphicshelpers.Drawable;
-import com.astifter.circatextutils.CircaTextConsts;
 import com.astifter.circatextutils.Weather;
 
 import java.text.SimpleDateFormat;
@@ -27,12 +28,12 @@ public abstract class BaseWatchFace implements WatchFace {
     final HashMap<Integer, String> mTexts = new HashMap<>();
     final CanvasWatchFaceService.Engine parent;
     Paint mBackgroundPaint;
+    int mBackgroundPaintColor;
     Rect mBounds;
     Rect peekCardPosition = new Rect();
     boolean ambientMode;
     boolean mLowBitAmbient;
     boolean mMute;
-    private int mInteractiveBackgroundColor = CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND;
     private Calendar mCalendar;
     private Date mDate;
     private SimpleDateFormat mDayFormat;
@@ -46,7 +47,6 @@ public abstract class BaseWatchFace implements WatchFace {
         this.parent = parent;
 
         mBackgroundPaint = new Paint();
-        mBackgroundPaint.setColor(mInteractiveBackgroundColor);
 
         mCalendar = Calendar.getInstance();
         mDate = new Date();
@@ -71,6 +71,9 @@ public abstract class BaseWatchFace implements WatchFace {
         int width = resources.getDisplayMetrics().widthPixels;
         int height = resources.getDisplayMetrics().heightPixels;
         mBounds = new Rect(0, 0, width, height);
+
+        mBackgroundPaintColor = resources.getColor(R.color.transparent);
+        mBackgroundPaint.setColor(mBackgroundPaintColor);
     }
 
     @Override
@@ -83,8 +86,8 @@ public abstract class BaseWatchFace implements WatchFace {
         this.ambientMode = inAmbientMode;
 
         mBackgroundPaint.setColor(this.ambientMode ?
-                mInteractiveBackgroundColor :
-                CircaTextConsts.COLOR_VALUE_DEFAULT_AND_AMBIENT_BACKGROUND);
+                Color.BLACK :
+                mBackgroundPaintColor);
         updateVisibilty();
     }
 
@@ -101,15 +104,6 @@ public abstract class BaseWatchFace implements WatchFace {
         if (a != null)
             anim.addListener(a);
         anim.start();
-    }
-
-    @Override
-    public void setBackgroundColor(int color) {
-        mInteractiveBackgroundColor = color;
-        if (this.ambientMode && mBackgroundPaint != null) {
-            mBackgroundPaint.setColor(color);
-        }
-        parent.invalidate();
     }
 
     @Override

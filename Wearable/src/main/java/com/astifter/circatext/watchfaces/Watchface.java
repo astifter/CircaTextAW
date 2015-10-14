@@ -22,8 +22,6 @@ public interface WatchFace {
 
     void setMuteMode(boolean inMuteMode);
 
-    void setBackgroundColor(int color);
-
     void startTapHighlight();
 
     void setBatteryInfo(BatteryHelper.BatteryInfo batteryInfo);

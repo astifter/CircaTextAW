@@ -216,7 +216,7 @@ public class RegularWatchFace extends BaseWatchFace {
     @Override
     public int getTouchedText(int x, int y) {
         int idx = topDrawable.getTouchedText(x, y);
-        if (idx != -1) {
+        if (idx >= 0) {
             DrawableText dt = mTF.get(idx);
             if (dt.getColor() == Color.GREEN) {
                 dt.setColor(Color.WHITE);

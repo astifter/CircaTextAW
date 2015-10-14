@@ -427,10 +427,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                         mCalendarHelper.setExcludedCalendars(config.getString(CircaTextConsts.KEY_EXCLUDED_CALENDARS));
                         uiUpdated = true;
                         break;
-                    case CircaTextConsts.KEY_BACKGROUND_COLOR:
-                        wtf.setBackgroundColor(config.getInt(configKey));
-                        uiUpdated = true;
-                        break;
                     case CircaTextConsts.KEY_WATCHFACE:
                         CircaTextConsts.WatchFaces wf;
                         try {

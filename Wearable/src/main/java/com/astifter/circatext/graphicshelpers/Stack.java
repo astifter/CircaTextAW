@@ -61,7 +61,7 @@ abstract class Stack implements Drawable {
     public int getTouchedText(int x, int y) {
         for (Drawable t : this.stack) {
             int idx = t.getTouchedText(x, y);
-            if (idx != -1)
+            if (idx >= 0)
                 return idx;
         }
         return -1;
