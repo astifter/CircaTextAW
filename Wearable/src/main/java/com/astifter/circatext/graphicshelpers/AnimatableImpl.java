@@ -93,18 +93,22 @@ public class AnimatableImpl implements Drawable, Animatable {
         anim.start();
     }
 
+    @Override
     public void setLeft(int l) {
         this.currentPosition.left = l;
     }
 
+    @Override
     public void setTop(int t) {
         this.currentPosition.top = t;
     }
 
+    @Override
     public void setRight(int l) {
         this.currentPosition.right = l;
     }
 
+    @Override
     public void setBottom(int l) {
         if (Log.isLoggable(TAG, Log.DEBUG) && debugging) {
             Log.d(TAG, String.format("AnimatableImpl: setBottom(int %d)", l));

@@ -10,6 +10,7 @@ interface Animatable {
     void animateToConfig(Drawable.Config c, Rect bounds);
 
     void setLeft(int l);
-
     void setTop(int t);
-}
+    void setRight(int l);
+    void setBottom(int t);
+}   
