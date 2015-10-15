@@ -16,7 +16,7 @@ public class DrawableText implements Drawable {
 
     private final Paint textPaint;
     private Rect drawnBounds = new Rect(0, 0, 0, 0);
-    private Align textAlignment = Align.LEFT;
+    private int textAlignment = Drawable.Align.LEFT;
     private float lineHeight = 1.0f;
 
     private boolean hidden = false;
@@ -264,16 +264,16 @@ public class DrawableText implements Drawable {
         }
     }
 
-    public void setAlignment(Align a) {
+    public void setAlignment(int a) {
         this.textAlignment = a;
         switch (a) {
-            case LEFT:
+            case Drawable.Align.LEFT:
                 textPaint.setTextAlign(Paint.Align.LEFT);
                 break;
-            case RIGHT:
+            case Drawable.Align.RIGHT:
                 textPaint.setTextAlign(Paint.Align.RIGHT);
                 break;
-            case CENTER:
+            case Drawable.Align.CENTER:
                 textPaint.setTextAlign(Paint.Align.CENTER);
                 break;
         }

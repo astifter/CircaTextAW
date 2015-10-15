@@ -11,7 +11,7 @@ public class DrawableIcon implements Drawable {
     private android.graphics.drawable.Drawable icon;
     private Rect dimensions;
     private Rect currentBounds;
-    private Drawable.Align alignment;
+    private int alignment;
     private boolean hidden;
 
     public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable) {
@@ -19,12 +19,12 @@ public class DrawableIcon implements Drawable {
         create(drawable, Align.LEFT);
     }
 
-    public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable, Align a) {
+    public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable, int a) {
         this.index = idx;
         create(drawable, a);
     }
 
-    private void create(android.graphics.drawable.Drawable drawable, Align a) {
+    private void create(android.graphics.drawable.Drawable drawable, int a) {
         icon = drawable;
         dimensions = new Rect(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         alignment = a;
@@ -38,12 +38,12 @@ public class DrawableIcon implements Drawable {
         if (hidden)
             targetWidth = 0;
         switch (this.alignment) {
-            case CENTER:
+            case Drawable.Align.CENTER:
                 break;
-            case LEFT:
+            case Drawable.Align.LEFT:
                 currentBounds.right = currentBounds.left + targetWidth;
                 break;
-            case RIGHT:
+            case Drawable.Align.RIGHT:
                 currentBounds.left = currentBounds.right - targetWidth;
                 break;
         }

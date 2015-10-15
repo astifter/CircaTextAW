@@ -70,21 +70,21 @@ public class RegularWatchFace extends BaseWatchFace {
         stackBottom(c, s, i, t, Drawable.Align.LEFT);
     }
 
-    private void stackTop(HashMap<Integer, DrawableText> c, StackVertical s, int i, HashMap<Integer, String> t, Drawable.Align a) {
+    private void stackTop(HashMap<Integer, DrawableText> c, StackVertical s, int i, HashMap<Integer, String> t, int a) {
         DrawableText dt = new DrawableText(i, t);
         dt.setAlignment(a);
         s.addAbove(dt);
         c.put(i, dt);
     }
 
-    private void stackBottom(HashMap<Integer, DrawableText> c, StackVertical s, int i, HashMap<Integer, String> t, Drawable.Align a) {
+    private void stackBottom(HashMap<Integer, DrawableText> c, StackVertical s, int i, HashMap<Integer, String> t, int a) {
         DrawableText dt = new DrawableText(i, t);
         dt.setAlignment(a);
         s.addBelow(dt);
         c.put(i, dt);
     }
 
-    private void stackRight(HashMap<Integer, DrawableText> c, StackHorizontal s, int i, HashMap<Integer, String> t, Drawable.Align a) {
+    private void stackRight(HashMap<Integer, DrawableText> c, StackHorizontal s, int i, HashMap<Integer, String> t, int a) {
         DrawableText dt = new DrawableText(i, t);
         dt.setAlignment(a);
         s.add(dt);

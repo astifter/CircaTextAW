@@ -37,6 +37,10 @@ public interface Drawable {
 
     void setAlpha(int a);
 
+    int getColor();
+
+    void setColor(int c);
+
     /**
      * Disable drawing of {@link Drawable}.
      */
@@ -46,12 +50,10 @@ public interface Drawable {
 
     int getTouchedText(int x, int y);
 
-    int getColor();
-
-    void setColor(int c);
-
-    enum Align {
-        LEFT, RIGHT, CENTER
+    interface Align {
+        int LEFT = 0;
+        int CENTER = 1;
+        int RIGHT = 2;
     }
 
     enum Config {
