@@ -9,6 +9,7 @@ abstract class Stack implements Drawable {
     Rect bounds = new Rect(0, 0, 0, 0);
     ArrayList<Drawable> stack;
     private int color;
+    private int alignment;
 
     Stack() {
         stack = new ArrayList<>();
@@ -79,5 +80,11 @@ abstract class Stack implements Drawable {
         for (Drawable t : this.stack) {
             t.setColor(c);
         }
+    }
+
+    @Override
+    public void setAlignment(int a) {
+        // TODO implement aligning
+        this.alignment = a;
     }
 }

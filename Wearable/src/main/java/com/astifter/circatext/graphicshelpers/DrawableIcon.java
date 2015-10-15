@@ -107,4 +107,9 @@ public class DrawableIcon implements Drawable {
     public void setColor(int c) {
 
     }
+
+    @Override
+    public void setAlignment(int a) {
+        // TODO not implemented
+    }
 }

@@ -20,6 +20,7 @@ public class AnimatableImpl implements Drawable, Animatable {
     HashMap<Config, Rect> configs;
 
     MyRect currentPosition;
+    int alignment;
     private boolean hidden;
     private boolean debugging;
 
@@ -27,6 +28,7 @@ public class AnimatableImpl implements Drawable, Animatable {
         configs = new HashMap<>();
         this.parent = p;
         drawable = d;
+        alignment = Drawable.Align.LEFT;
     }
 
     @Override
@@ -114,6 +116,11 @@ public class AnimatableImpl implements Drawable, Animatable {
             Log.d(TAG, String.format("AnimatableImpl: setBottom(int %d)", l));
         }
         this.currentPosition.bottom = l;
+    }
+
+    @Override
+    void int setAlignment(int a) {
+        drawable.setAlignment(a);
     }
 
     @Override

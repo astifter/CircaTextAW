@@ -41,6 +41,8 @@ public interface Drawable {
 
     void setColor(int c);
 
+    void setAlignment(int a);
+
     /**
      * Disable drawing of {@link Drawable}.
      */
