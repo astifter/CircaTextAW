@@ -450,8 +450,9 @@ public class CircaTextService extends CanvasWatchFaceService {
                         wtf.setMuteMode(inMuteMode);
                         wtf.setWeatherInfo(mWeather);
                         wtf.updateVisibilty();
-                        uiUpdated = true;
+                        wtf.setPeekCardPosition(getPeekCardPosition());
                         updateEnabled = true;
+                        uiUpdated = true;
                         break;
                 }
             }
