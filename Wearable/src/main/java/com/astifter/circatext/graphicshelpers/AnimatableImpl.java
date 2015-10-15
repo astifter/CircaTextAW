@@ -17,48 +17,44 @@ public class AnimatableImpl implements Drawable, Animatable {
 
     final CanvasWatchFaceService.Engine parent;
     private final Drawable drawable;
-    HashMap<Config, Rect> configs;
+    HashMap<Config, Position> configs;
 
-    MyRect currentPosition;
-    int alignment;
+    Position currentPosition;
     private boolean hidden;
-    private boolean debugging;
 
     public AnimatableImpl(CanvasWatchFaceService.Engine p, Drawable d) {
         configs = new HashMap<>();
         this.parent = p;
         drawable = d;
-        alignment = Drawable.Align.LEFT;
     }
 
     @Override
-    public void setPosition(Config c, Rect position, Rect bounds) {
-        configs.put(c, position);
-        this.currentPosition = new MyRect(DrawingHelpers.percentageToRect(position, bounds));
-        if (Log.isLoggable(TAG, Log.DEBUG) && debugging) {
-            Log.d(TAG, String.format("AnimatableImpl: setPosition: %s", currentPosition.toString()));
-        }
+    public void setPosition(Config c, Rect position, int alignment, Rect bounds) {
+        Position p = new Position(position, alignment);
+        configs.put(c, p);
+        this.currentPosition = Position.percentagePosition(p, bounds);
     }
 
     @Override
-    public void setConfiguration(Config c, Rect position) {
-        configs.put(c, position);
+    public void setConfiguration(Config c, Rect position, int alignment) {
+        configs.put(c, new Position(position, alignment));
     }
 
     @Override
     public void animateToConfig(Config c, Rect bounds) {
-        Rect oldPosition = this.currentPosition.toRect();
-        Rect newPosition = DrawingHelpers.percentageToRect(configs.get(c), bounds);
+        Position op = this.currentPosition;
+        Position np = Position.percentagePosition(configs.get(c), bounds);
 
-        if (Log.isLoggable(TAG, Log.DEBUG) && debugging) {
-            Log.d(TAG, String.format("AnimatableImpl: from %s to %s", oldPosition.toString(), newPosition.toString()));
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, String.format("AnimatableImpl: from %s to %s", op.toString(), np.toString()));
         }
-        PropertyValuesHolder animateLeft = PropertyValuesHolder.ofInt("Left", oldPosition.left, newPosition.left);
-        PropertyValuesHolder animateTop = PropertyValuesHolder.ofInt("Top", oldPosition.top, newPosition.top);
-        PropertyValuesHolder animateRight = PropertyValuesHolder.ofInt("Right", oldPosition.right, newPosition.right);
-        PropertyValuesHolder animateBottom = PropertyValuesHolder.ofInt("Bottom", oldPosition.bottom, newPosition.bottom);
+        PropertyValuesHolder animateLeft = PropertyValuesHolder.ofInt("Left", op.left(), np.left());
+        PropertyValuesHolder animateTop = PropertyValuesHolder.ofInt("Top", op.top(), np.top());
+        PropertyValuesHolder animateRight = PropertyValuesHolder.ofInt("Right", op.right(), np.right());
+        PropertyValuesHolder animateBottom = PropertyValuesHolder.ofInt("Bottom", op.bottom(), np.bottom());
+        PropertyValuesHolder animateAlign = PropertyValuesHolder.ofInt("Alignment", op.align(), np.align());
 
-        ValueAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, animateLeft, animateTop, animateRight, animateBottom);
+        ValueAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, animateLeft, animateTop, animateRight, animateBottom, animateAlign);
         anim.setDuration(100);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -69,14 +65,14 @@ public class AnimatableImpl implements Drawable, Animatable {
         anim.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-                if (Log.isLoggable(TAG, Log.DEBUG) && debugging) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
                     Log.d(TAG, String.format("AnimatableImpl: -- started"));
                 }
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (Log.isLoggable(TAG, Log.DEBUG) && debugging) {
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
                     Log.d(TAG, String.format("AnimatableImpl: -- ended"));
                 }
             }
@@ -97,29 +93,27 @@ public class AnimatableImpl implements Drawable, Animatable {
 
     @Override
     public void setLeft(int l) {
-        this.currentPosition.left = l;
+        this.currentPosition.setLeft(l);
     }
 
     @Override
-    public void setTop(int t) {
-        this.currentPosition.top = t;
+    public void setTop(int l) {
+        this.currentPosition.setTop(l);
     }
 
     @Override
     public void setRight(int l) {
-        this.currentPosition.right = l;
+        this.currentPosition.setRight(l);
     }
 
     @Override
     public void setBottom(int l) {
-        if (Log.isLoggable(TAG, Log.DEBUG) && debugging) {
-            Log.d(TAG, String.format("AnimatableImpl: setBottom(int %d)", l));
-        }
-        this.currentPosition.bottom = l;
+        this.currentPosition.setBottom(l);
     }
 
     @Override
-    void int setAlignment(int a) {
+    public void setAlignment(int a) {
+        this.currentPosition.setAlign(a);
         drawable.setAlignment(a);
     }
 
@@ -128,7 +122,7 @@ public class AnimatableImpl implements Drawable, Animatable {
         if (this.hidden) {
             return;
         }
-        if (Log.isLoggable(TAG, Log.DEBUG) && debugging) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, String.format("AnimatableImpl: onDraw: %s", currentPosition.toString()));
         }
         drawable.onDraw(canvas, currentPosition.toRect());
@@ -182,39 +176,5 @@ public class AnimatableImpl implements Drawable, Animatable {
     @Override
     public void setColor(int c) {
         drawable.setColor(c);
-    }
-
-    public void enableDebug(boolean debug) {
-        this.debugging = debug;
-    }
-
-    private class MyRect {
-        private int right;
-        private int top;
-        private int bottom;
-        private int left;
-
-        public MyRect(Rect rect) {
-            this.left = rect.left;
-            this.right = rect.right;
-            this.top = rect.top;
-            this.bottom = rect.bottom;
-        }
-
-        public Rect toRect() {
-            return new Rect(left, top, right, bottom);
-        }
-
-        public int height() {
-            return bottom - top;
-        }
-
-        public int width() {
-            return right - left;
-        }
-
-        public String toString() {
-            return String.format("MyRect(%d,%d - %d,%d)", left, top, right, bottom);
-        }
     }
 }

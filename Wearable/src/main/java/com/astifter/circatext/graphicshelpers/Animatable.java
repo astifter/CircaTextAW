@@ -3,9 +3,9 @@ package com.astifter.circatext.graphicshelpers;
 import android.graphics.Rect;
 
 interface Animatable {
-    void setPosition(Drawable.Config c, Rect position, Rect bounds);
+    void setPosition(Drawable.Config c, Rect position, int alignment, Rect bounds);
 
-    void setConfiguration(Drawable.Config c, Rect position);
+    void setConfiguration(Drawable.Config c, Rect position, int alignment);
 
     void animateToConfig(Drawable.Config c, Rect bounds);
 
@@ -13,4 +13,4 @@ interface Animatable {
     void setTop(int t);
     void setRight(int l);
     void setBottom(int t);
-}   
+}
