@@ -38,20 +38,38 @@ public class CircaTextWatchFace extends BaseWatchFace {
     @Override
     public void setMetrics(Resources resources, WindowInsets insets) {
         super.setMetrics(resources, insets);
+        if (this.roundemulation) {
+            this.mBounds.bottom = 280;
+            DrawableText bt = createAnimatable(eTF.BATTERY, new Rect(55, 5, 95, 20),
+                                                            new Rect(95, -20, 95, -5));
+            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 45, 20), Drawable.Align.RIGHT,
+                                               new Rect(5, -20, 5, -20), Drawable.Align.RIGHT,
+                                               resources, R.drawable.thermometer);
 
-        DrawableText bt = createAnimatable(eTF.BATTERY, new Rect(5, 5, 95, 20), new Rect(95, -20, 95, -5), Drawable.Align.RIGHT);
-        createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT,
-                                           new Rect(5, -20, 95, -20), Drawable.Align.LEFT,
-                         resources, R.drawable.thermometer);
+            int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
+            DrawableText fl = createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.CENTER);
+            DrawableText sl = createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.CENTER);
+            DrawableText tl = createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.CENTER);
 
-        int offset = 12; int height = (100-(2*offset))/3; int io = 2;
-        DrawableText fl = createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, offset-io, 98, offset + height+io), Drawable.Align.RIGHT);
-        DrawableText sl = createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, offset+height-io, 98, offset+(height*2)+io), Drawable.Align.RIGHT);
-        DrawableText tl = createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, offset+(height*2)-io, 98, 100-offset+io), Drawable.Align.RIGHT);
+            DrawableText hr = createAnimatable(eTF.HOUR, new Rect(5, 80, 45, 95), new Rect(2, 10, 95, 55), Drawable.Align.RIGHT);
+            DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(55, 80, 95, 95), Drawable.Align.LEFT,
+                    new Rect(2, 57, 47, 90), Drawable.Align.LEFT);
+        } else {
+            DrawableText bt = createAnimatable(eTF.BATTERY, new Rect(5, 5, 95, 20),
+                                                            new Rect(95, -20, 95, -5), Drawable.Align.RIGHT);
+            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT,
+                                               new Rect(5, -20, 5, -20), Drawable.Align.LEFT,
+                                               resources, R.drawable.thermometer);
 
-        DrawableText hr = createAnimatable(eTF.HOUR,      new Rect(5, 80, 95, 95), new Rect(2, 10, 95, 55));
-        DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.RIGHT,
-                                                          new Rect(2, 57, 47, 90), Drawable.Align.LEFT);
+            int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
+            DrawableText fl = createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT);
+            DrawableText sl = createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT);
+            DrawableText tl = createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
+
+            DrawableText hr = createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95), new Rect(2, 10, 95, 55));
+            DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.RIGHT,
+                                                              new Rect(2, 57, 47, 90), Drawable.Align.LEFT);
+        }
     }
 
     private DrawableText createAnimatable(int textid, Rect fp, int fpa, Rect sp, int spa, Resources res, int drawableid) {
