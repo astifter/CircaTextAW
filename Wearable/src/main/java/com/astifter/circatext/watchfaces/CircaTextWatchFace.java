@@ -3,7 +3,10 @@ package com.astifter.circatext.watchfaces;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.Region;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
@@ -22,6 +25,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private final CircaTextStringer cts = new CircaTextStringerV2();
     private final HashMap<Integer, AnimatableImpl> topDrawable;
     private Drawable.Config currentConfig;
+    private boolean roundemulation = true;
 
     public CircaTextWatchFace(CanvasWatchFaceService.Engine parent) {
         super(parent);
@@ -131,11 +135,20 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
-        canvas.drawRect(this.mBounds, this.mBackgroundPaint);
+        Paint c = new Paint(); c.setColor(Color.BLACK); c.setAntiAlias(true);
+        canvas.drawRect(bounds, c);
+        if (this.roundemulation){
+            Path clippingpath = new Path();
+            clippingpath.addCircle(160, 160, 160, Path.Direction.CW);
+            canvas.clipPath(clippingpath);
+            canvas.clipRect(this.mBounds, Region.Op.INTERSECT);
+        }
+
+        canvas.drawRect(bounds, this.mBackgroundPaint);
         setTexts();
         fillCircaTexts();
         for (AnimatableImpl a : topDrawable.values()) {
-            a.onDraw(canvas, bounds);
+            a.onDraw(canvas, this.mBounds);
         }
     }
 
