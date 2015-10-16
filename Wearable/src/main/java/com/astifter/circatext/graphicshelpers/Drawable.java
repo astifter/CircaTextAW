@@ -28,6 +28,8 @@ public interface Drawable {
      */
     float getWidth();
 
+    float getFutureWidth();
+
     /**
      * Make sure {@link Drawable} is playing nicely with ambient mode.
      *

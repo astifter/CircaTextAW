@@ -58,17 +58,23 @@ public class DrawableIcon implements Drawable {
 
     @Override
     public float getHeight() {
+        if (currentBounds == null) return 0;
         return currentBounds.height();
     }
 
     @Override
     public float getFutureHeight() {
-        return 0;
+        return getHeight();
     }
 
     @Override
     public float getWidth() {
+        if (currentBounds == null) return 0;
         return currentBounds.width();
+    }
+
+    public float getFutureWidth() {
+        return getWidth();
     }
 
     @Override

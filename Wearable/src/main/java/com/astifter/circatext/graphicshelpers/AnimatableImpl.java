@@ -129,9 +129,7 @@ public class AnimatableImpl implements Drawable, Animatable {
     }
 
     @Override
-    public float getHeight() {
-        return this.currentPosition.height();
-    }
+    public float getHeight() { return this.currentPosition.height(); }
 
     @Override
     public float getFutureHeight() {
@@ -139,9 +137,10 @@ public class AnimatableImpl implements Drawable, Animatable {
     }
 
     @Override
-    public float getWidth() {
-        return this.currentPosition.width();
-    }
+    public float getWidth() { return this.currentPosition.width(); }
+
+    @Override
+    public float getFutureWidth() { return getWidth(); }
 
     @Override
     public void setAmbientMode(boolean inAmbientMode) {

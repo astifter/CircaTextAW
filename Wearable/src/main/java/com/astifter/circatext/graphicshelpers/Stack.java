@@ -9,7 +9,7 @@ abstract class Stack implements Drawable {
     Rect bounds = new Rect(0, 0, 0, 0);
     ArrayList<Drawable> stack;
     private int color;
-    private int alignment;
+    int alignment;
 
     Stack() {
         stack = new ArrayList<>();
@@ -60,6 +60,15 @@ abstract class Stack implements Drawable {
     }
 
     @Override
+    public float getFutureWidth() {
+        int height = 0;
+        for (Drawable t : stack) {
+            height += t.getFutureWidth();
+        }
+        return height;
+    }
+
+    @Override
     public int getTouchedText(int x, int y) {
         for (Drawable t : this.stack) {
             int idx = t.getTouchedText(x, y);
@@ -84,7 +93,6 @@ abstract class Stack implements Drawable {
 
     @Override
     public void setAlignment(int a) {
-        // TODO implement aligning
         this.alignment = a;
     }
 }

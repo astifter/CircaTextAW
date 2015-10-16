@@ -116,7 +116,8 @@ public class DrawableText implements Drawable {
         return getTextHeightForPaint(this.textPaint, this.lineHeight);
     }
 
-    private float getFutureWidth() {
+    @Override
+    public float getFutureWidth() {
         if (this.hidden) return 0;
         return this.textPaint.measureText(getTextFromSource());
     }
