@@ -15,6 +15,20 @@ public class StackHorizontal extends Stack {
         }
         this.bounds = b;
 
+        int futureWidth = 0;
+        for (Drawable t : stack) {
+            futureWidth += t.getFutureWidth();
+        }
+        switch (this.alignment) {
+            case Align.CENTER:
+                int offset = (this.bounds.width() - futureWidth) / 2;
+                this.bounds.left += offset;
+                break;
+            case Align.RIGHT:
+                this.bounds.left = this.bounds.right - futureWidth;
+                break;
+        }
+
         int width = 0;
         int height = 0;
         for (Drawable t : stack) {
