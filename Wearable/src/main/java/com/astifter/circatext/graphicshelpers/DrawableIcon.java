@@ -8,6 +8,7 @@ import android.graphics.Rect;
  */
 public class DrawableIcon implements Drawable {
     private final int index;
+    private final int scale;
     private android.graphics.drawable.Drawable icon;
     private Rect dimensions;
     private Rect currentBounds;
@@ -16,18 +17,20 @@ public class DrawableIcon implements Drawable {
 
     public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable) {
         this.index = idx;
+        this.scale = 100;
         create(drawable, Align.LEFT);
     }
 
-    public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable, int a) {
+    public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable, int align, int scale) {
         this.index = idx;
-        create(drawable, a);
+        this.scale = scale;
+        create(drawable, align);
     }
 
-    private void create(android.graphics.drawable.Drawable drawable, int a) {
+    private void create(android.graphics.drawable.Drawable drawable, int align) {
         icon = drawable;
         dimensions = new Rect(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        alignment = a;
+        alignment = align;
     }
 
     @Override
@@ -49,7 +52,13 @@ public class DrawableIcon implements Drawable {
             currentBounds.bottom = currentBounds.top;
             return;
         }
-        icon.setBounds(currentBounds);
+        Rect scaledbounds = new Rect(currentBounds);
+        if (scale != 100) {
+            int verticalinset   = currentBounds.height() * scale/200;
+            int horizontalinset = currentBounds.width() * scale/200;
+            scaledbounds.inset(horizontalinset, verticalinset);
+        }
+        icon.setBounds(scaledbounds);
         icon.draw(canvas);
     }
 
