@@ -16,7 +16,6 @@
 
 package com.astifter.circatext;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -99,7 +98,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         Weather mWeather;
         private Date mWeatherRequested = null;
         private boolean updateEnabled = true;
-        @SuppressLint({"Java", "HandlerLeak"})
         final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {

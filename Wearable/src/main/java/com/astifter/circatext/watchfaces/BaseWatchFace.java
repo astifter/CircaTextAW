@@ -3,7 +3,6 @@ package com.astifter.circatext.watchfaces;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -153,7 +152,7 @@ public abstract class BaseWatchFace implements WatchFace {
                 mTexts.put(eTF.CALENDAR_1, "no meetings");
                 mTexts.put(eTF.CALENDAR_2, "");
             } else {
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+                SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
                 mTexts.put(eTF.CALENDAR_1, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
 
                 int additionalEvents = mMeetings.length - 1 - i;
