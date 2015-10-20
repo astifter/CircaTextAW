@@ -38,8 +38,6 @@ public class DrawableIcon implements Drawable {
         if (hidden)
             targetWidth = 0;
         switch (this.alignment) {
-            case Drawable.Align.CENTER:
-                break;
             case Drawable.Align.LEFT:
                 currentBounds.right = currentBounds.left + targetWidth;
                 break;
@@ -51,7 +49,6 @@ public class DrawableIcon implements Drawable {
             currentBounds.bottom = currentBounds.top;
             return;
         }
-
         icon.setBounds(currentBounds);
         icon.draw(canvas);
     }

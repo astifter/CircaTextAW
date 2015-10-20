@@ -60,7 +60,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
             createAnimatable(eTF.SHORTCAL,       new Rect(5, 5, 95, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
                 .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -5), Drawable.Align.RIGHT)
                 .setConfig(Drawable.Config.TIME, Drawable.Config.PEEK);
-            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
+            createAnimatable(eTF.WEATHER_TEMP,   new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
                 .setConfig(Drawable.Config.PEEK, new Rect(5, -20, 5, -20))
                 .setConfig(Drawable.Config.TIME, Drawable.Config.PEEK);
             createAnimatable(eCT.FIRST,          new Rect(5, 20, 95, 40), Drawable.Align.RIGHT)
@@ -89,8 +89,13 @@ public class CircaTextWatchFace extends BaseWatchFace {
         if (drawableid >= 0) {
             StackHorizontal tempstack = new StackHorizontal();
             DrawableIcon icon = new DrawableIcon(textid, res.getDrawable(drawableid, res.newTheme()));
-            tempstack.add(icon);
-            tempstack.add(dt);
+            if (fpa == Drawable.Align.LEFT) {
+                tempstack.add(icon);
+                tempstack.add(dt);
+            } else {
+                tempstack.add(dt);
+                tempstack.add(icon);
+            }
             d = tempstack;
         } else {
             d = dt;
