@@ -58,19 +58,26 @@ public class CircaTextWatchFace extends BaseWatchFace {
             int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
 
             createAnimatable(eTF.BATTERY,        new Rect(5, 5, 95, 20), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -5), Drawable.Align.RIGHT);
-            createAnimatable(eTF.WEATHER_TEMP,   new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
-                .setConfig(Drawable.Config.PEEK, new Rect(5, -20, 5, -20));
+                .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -5), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.TIME, Drawable.Config.PEEK);
+            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
+                .setConfig(Drawable.Config.PEEK, new Rect(5, -20, 5, -20))
+                .setConfig(Drawable.Config.TIME, Drawable.Config.PEEK);
             createAnimatable(eCT.FIRST,          new Rect(5, 20, 95, 40), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.PEEK, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT);
+                .setConfig(Drawable.Config.PEEK, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.TIME, new Rect(105, 20, 105, 20), Drawable.Align.RIGHT);
             createAnimatable(eCT.SECOND,         new Rect(5, 40, 95, 60), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.PEEK, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT);
+                .setConfig(Drawable.Config.PEEK, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.TIME, new Rect(105, 40, 105, 40), Drawable.Align.RIGHT);
             createAnimatable(eCT.THIRD,          new Rect(5, 60, 95, 80), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
+                .setConfig(Drawable.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.TIME, new Rect(105, 60, 105, 60), Drawable.Align.RIGHT);
             createAnimatable(eTF.HOUR,           new Rect(5, 80, 95, 95))
-                .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 95, 55));
+                .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 95, 55))
+                .setConfig(Drawable.Config.TIME, new Rect(5, 26, 95, 74), Drawable.Align.CENTER);
             createAnimatable(eTF.SHORTDATE,      new Rect(5, 80, 95, 95), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.PEEK, new Rect(2, 57, 47, 90));
+                .setConfig(Drawable.Config.PEEK, new Rect(2, 57, 47, 90))
+                .setConfig(Drawable.Config.TIME, Drawable.Config.PEEK);
         }
     }
 
@@ -133,7 +140,18 @@ public class CircaTextWatchFace extends BaseWatchFace {
             if (idx >= 0)
                 break;
         }
-        if (idx >= 0) {
+        if (eCT.FIRST <= idx && idx <= eCT.THIRD || idx == eTF.HOUR) {
+            if (currentConfig == Drawable.Config.PEEK)
+                return -1;
+            if (currentConfig == Drawable.Config.PLAIN)
+                currentConfig = Drawable.Config.TIME;
+            else if (currentConfig == Drawable.Config.TIME)
+                currentConfig = Drawable.Config.PLAIN;
+            for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
+                topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
+            }
+            topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
+        } else if (idx >= 0) {
             AnimatableImpl dt = topDrawable.get(idx);
             if (dt.getColor() == Color.GREEN) {
                 dt.setColor(Color.WHITE);

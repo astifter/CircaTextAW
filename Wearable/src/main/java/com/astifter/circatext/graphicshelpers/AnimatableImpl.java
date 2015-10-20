@@ -35,14 +35,24 @@ public class AnimatableImpl implements Drawable, Animatable {
         this.currentPosition = Position.percentagePosition(p, bounds);
     }
 
-    @Override
-    public void setConfig(Config c, Rect position, int alignment) {
-        configs.put(c, new Position(position, alignment));
+    public Animatable setConfig(Config c, Position p) {
+        configs.put(c, p);
+        return this;
     }
 
     @Override
-    public void setConfig(Config c, Rect position) {
-        configs.put(c, new Position(position, Align.LEFT));
+    public Animatable setConfig(Config c, Rect position, int alignment) {
+        return setConfig(c, new Position(position, alignment));
+    }
+
+    @Override
+    public Animatable setConfig(Config c, Rect position) {
+        return setConfig(c, position, Drawable.Align.LEFT);
+    }
+
+    @Override
+    public Animatable setConfig(Config c, Config o) {
+        return setConfig(c, configs.get(o));
     }
 
     @Override

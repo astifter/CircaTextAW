@@ -5,8 +5,9 @@ import android.graphics.Rect;
 public interface Animatable {
     void setPosition(Drawable.Config c, Rect position, int alignment, Rect bounds);
 
-    void setConfig(Drawable.Config c, Rect position, int alignment);
-    void setConfig(Drawable.Config c, Rect position);
+    Animatable setConfig(Drawable.Config c, Rect position, int alignment);
+    Animatable setConfig(Drawable.Config c, Rect position);
+    Animatable setConfig(Drawable.Config c, Drawable.Config o);
 
     void animateToConfig(Drawable.Config c, Rect bounds);
 

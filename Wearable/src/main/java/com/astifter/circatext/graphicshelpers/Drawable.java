@@ -61,7 +61,7 @@ public interface Drawable {
     }
 
     enum Config {
-        PLAIN, PEEK
+        PLAIN, PEEK, TIME
     }
 }
 
