@@ -18,6 +18,7 @@ import com.astifter.circatext.graphicshelpers.Drawable;
 import com.astifter.circatext.graphicshelpers.DrawableIcon;
 import com.astifter.circatext.graphicshelpers.DrawableText;
 import com.astifter.circatext.graphicshelpers.StackHorizontal;
+import com.astifter.circatext.graphicshelpers.Animatable;
 
 import java.util.HashMap;
 
@@ -25,7 +26,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private final CircaTextStringer cts = new CircaTextStringerV2();
     private final HashMap<Integer, AnimatableImpl> topDrawable;
     private Drawable.Config currentConfig;
-    private boolean roundemulation = true;
+    private boolean roundemulation = false;
 
     public CircaTextWatchFace(CanvasWatchFaceService.Engine parent) {
         super(parent);
@@ -39,40 +40,41 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void setMetrics(Resources resources, WindowInsets insets) {
         super.setMetrics(resources, insets);
         if (this.roundemulation) {
-            this.mBounds.bottom = 280;
-            DrawableText bt = createAnimatable(eTF.BATTERY, new Rect(55, 5, 95, 20),
-                                                            new Rect(95, -20, 95, -5));
-            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 45, 20), Drawable.Align.RIGHT,
-                                               new Rect(5, -20, 5, -20), Drawable.Align.RIGHT,
-                                               resources, R.drawable.thermometer);
-
-            int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
-            DrawableText fl = createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.CENTER);
-            DrawableText sl = createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.CENTER);
-            DrawableText tl = createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.CENTER);
-
-            DrawableText hr = createAnimatable(eTF.HOUR, new Rect(5, 80, 45, 95), new Rect(2, 10, 95, 55), Drawable.Align.RIGHT);
-            DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(55, 80, 95, 95), Drawable.Align.LEFT,
-                    new Rect(2, 57, 47, 90), Drawable.Align.LEFT);
+//            this.mBounds.bottom = 280;
+//            createAnimatable(eTF.BATTERY, new Rect(55, 5, 95, 20), new Rect(95, -20, 95, -5));
+//            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 45, 20), Drawable.Align.RIGHT,
+//                                               new Rect(5, -20, 5, -20), Drawable.Align.RIGHT,
+//                                               resources, R.drawable.thermometer);
+//
+//            int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
+//            createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.CENTER);
+//            createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.CENTER);
+//            createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.CENTER);
+//
+//            createAnimatable(eTF.HOUR, new Rect(5, 80, 45, 95), new Rect(2, 10, 95, 55), Drawable.Align.RIGHT);
+//            createAnimatable(eTF.SHORTDATE, new Rect(55, 80, 95, 95), Drawable.Align.LEFT,
+//                                            new Rect(2, 57, 47, 90), Drawable.Align.LEFT);
         } else {
-            DrawableText bt = createAnimatable(eTF.BATTERY, new Rect(5, 5, 95, 20),
-                                                            new Rect(95, -20, 95, -5), Drawable.Align.RIGHT);
-            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT,
-                                               new Rect(5, -20, 5, -20), Drawable.Align.LEFT,
-                                               resources, R.drawable.thermometer);
-
             int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
-            DrawableText fl = createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT);
-            DrawableText sl = createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT);
-            DrawableText tl = createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
 
-            DrawableText hr = createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95), new Rect(2, 10, 95, 55));
-            DrawableText sd = createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.RIGHT,
-                                                              new Rect(2, 57, 47, 90), Drawable.Align.LEFT);
+            createAnimatable(eTF.BATTERY,        new Rect(5, 5, 95, 20), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -5), Drawable.Align.RIGHT);
+            createAnimatable(eTF.WEATHER_TEMP,   new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
+                .setConfig(Drawable.Config.PEEK, new Rect(5, -20, 5, -20));
+            createAnimatable(eCT.FIRST,          new Rect(5, 20, 95, 40), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.PEEK, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT);
+            createAnimatable(eCT.SECOND,         new Rect(5, 40, 95, 60), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.PEEK, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT);
+            createAnimatable(eCT.THIRD,          new Rect(5, 60, 95, 80), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
+            createAnimatable(eTF.HOUR,           new Rect(5, 80, 95, 95))
+                .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 95, 55));
+            createAnimatable(eTF.SHORTDATE,      new Rect(5, 80, 95, 95), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.PEEK, new Rect(2, 57, 47, 90));
         }
     }
 
-    private DrawableText createAnimatable(int textid, Rect fp, int fpa, Rect sp, int spa, Resources res, int drawableid) {
+    private Animatable createAnimatable(int textid, Rect fp, int fpa, Resources res, int drawableid) {
         DrawableText dt = new DrawableText(textid, mTexts);
         dt.autoSize(true);
 
@@ -89,20 +91,16 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
         AnimatableImpl adi = new AnimatableImpl(this.parent, d);
         adi.setPosition(Drawable.Config.PLAIN, fp, fpa, this.mBounds);
-        adi.setConfiguration(Drawable.Config.PEEK, sp, spa);
         topDrawable.put(textid, adi);
 
-        return dt;
+        return adi;
     }
 
-    private DrawableText createAnimatable(int textid, Rect fp, int fpa, Rect sp, int spa) {
-        return createAnimatable(textid, fp, fpa, sp, spa, null, -1);
+    private Animatable createAnimatable(int textid, Rect fp, int fpa) {
+        return createAnimatable(textid, fp, fpa, null, -1);
     }
-    private DrawableText createAnimatable(int textid, Rect fp, Rect sp, int a) {
-        return createAnimatable(textid, fp, a, sp, a, null, -1);
-    }
-    private DrawableText createAnimatable(int textid, Rect fp, Rect sp) {
-        return createAnimatable(textid, fp, sp, Drawable.Align.LEFT);
+    private Animatable createAnimatable(int textid, Rect fp) {
+        return createAnimatable(textid, fp, Drawable.Align.LEFT);
     }
 
     @Override
@@ -142,6 +140,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
             } else {
                 dt.setColor(Color.GREEN);
             }
+            parent.invalidate();
         }
         return -1;
     }
@@ -153,9 +152,12 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
-        Paint c = new Paint(); c.setColor(Color.BLACK); c.setAntiAlias(true);
-        canvas.drawRect(bounds, c);
         if (this.roundemulation){
+            Paint c = new Paint();
+            c.setColor(Color.BLACK);
+            c.setAntiAlias(true);
+            canvas.drawRect(bounds, c);
+
             Path clippingpath = new Path();
             clippingpath.addCircle(160, 160, 160, Path.Direction.CW);
             canvas.clipPath(clippingpath);

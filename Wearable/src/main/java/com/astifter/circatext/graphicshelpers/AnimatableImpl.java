@@ -36,8 +36,13 @@ public class AnimatableImpl implements Drawable, Animatable {
     }
 
     @Override
-    public void setConfiguration(Config c, Rect position, int alignment) {
+    public void setConfig(Config c, Rect position, int alignment) {
         configs.put(c, new Position(position, alignment));
+    }
+
+    @Override
+    public void setConfig(Config c, Rect position) {
+        configs.put(c, new Position(position, Align.LEFT));
     }
 
     @Override
