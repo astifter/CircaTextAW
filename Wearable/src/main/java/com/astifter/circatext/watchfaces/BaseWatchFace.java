@@ -149,10 +149,12 @@ public abstract class BaseWatchFace implements WatchFace {
             while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
 
             if (i >= mMeetings.length) {
+                mTexts.put(eTF.SHORTCAL, "-");
                 mTexts.put(eTF.CALENDAR_1, "no meetings");
                 mTexts.put(eTF.CALENDAR_2, "");
             } else {
                 SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+                mTexts.put(eTF.SHORTCAL, sdf.format(mMeetings[i].DtStart));
                 mTexts.put(eTF.CALENDAR_1, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
 
                 int additionalEvents = mMeetings.length - 1 - i;
@@ -162,6 +164,7 @@ public abstract class BaseWatchFace implements WatchFace {
                     mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional events");
             }
         } else {
+            mTexts.put(eTF.SHORTCAL, "-");
             mTexts.put(eTF.CALENDAR_1, "");
             mTexts.put(eTF.CALENDAR_2, "");
         }
@@ -212,7 +215,8 @@ public abstract class BaseWatchFace implements WatchFace {
         public static final int DAY_OF_WEEK = 0;
         public static final int DATE = DAY_OF_WEEK + 1;
         public static final int SHORTDATE = DATE + 1;
-        public static final int CALENDAR_1 = SHORTDATE + 1;
+        public static final int SHORTCAL = SHORTDATE + 1;
+        public static final int CALENDAR_1 = SHORTCAL + 1;
         public static final int CALENDAR_2 = CALENDAR_1 + 1;
         public static final int BATTERY = CALENDAR_2 + 1;
         public static final int HOUR = BATTERY + 1;

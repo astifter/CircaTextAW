@@ -57,7 +57,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
         } else {
             int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
 
-            createAnimatable(eTF.BATTERY,        new Rect(5, 5, 95, 20), Drawable.Align.RIGHT)
+            createAnimatable(eTF.SHORTCAL,       new Rect(5, 5, 95, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
                 .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -5), Drawable.Align.RIGHT)
                 .setConfig(Drawable.Config.TIME, Drawable.Config.PEEK);
             createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
