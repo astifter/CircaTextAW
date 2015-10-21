@@ -1,6 +1,5 @@
 package com.astifter.circatext.graphicshelpers;
 
-import android.graphics.Rect;
 import android.graphics.Typeface;
 
 public class DrawingHelpers {

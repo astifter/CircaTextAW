@@ -54,14 +54,14 @@ public interface Drawable {
 
     int getTouchedText(int x, int y);
 
+    enum Config {
+        PLAIN, PEEK, TIME
+    }
+
     interface Align {
         int LEFT = 0;
         int CENTER = 1;
         int RIGHT = 2;
-    }
-
-    enum Config {
-        PLAIN, PEEK, TIME
     }
 }
 

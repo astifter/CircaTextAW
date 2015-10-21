@@ -13,12 +13,12 @@ import android.view.WindowInsets;
 import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.CircaTextStringer;
 import com.astifter.circatext.datahelpers.CircaTextStringerV2;
+import com.astifter.circatext.graphicshelpers.Animatable;
 import com.astifter.circatext.graphicshelpers.AnimatableImpl;
 import com.astifter.circatext.graphicshelpers.Drawable;
 import com.astifter.circatext.graphicshelpers.DrawableIcon;
 import com.astifter.circatext.graphicshelpers.DrawableText;
 import com.astifter.circatext.graphicshelpers.StackHorizontal;
-import com.astifter.circatext.graphicshelpers.Animatable;
 
 import java.util.HashMap;
 
@@ -42,53 +42,57 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void setMetrics(Resources resources, WindowInsets insets) {
         super.setMetrics(resources, insets);
         if (this.roundemulation) {
-            int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
+            int offset = 12;
+            int height = (100 - (2 * offset)) / 3;
+            int io = 2;
 
-            createAnimatable(eTF.SHORTCAL,       new Rect(5, 8, 80, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
-                .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
-            createAnimatable(eTF.WEATHER_TEMP,   new Rect(20, 8, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
-                .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.LEFT)
-                .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
-            createAnimatable(eCT.FIRST,          new Rect(5, 17, 95, 43), Drawable.Align.CENTER)
-                .setConfig(Drawable.Config.TIME, new Rect(105, 17, 195, 43), Drawable.Align.CENTER)
-                .setConfig(Drawable.Config.PEEK, Drawable.Config.TIME);
-            createAnimatable(eCT.SECOND,         new Rect(5, 37, 95, 63), Drawable.Align.CENTER)
-                .setConfig(Drawable.Config.TIME, new Rect(105, 37, 195, 63), Drawable.Align.CENTER)
-                .setConfig(Drawable.Config.PEEK, Drawable.Config.TIME);
-            createAnimatable(eCT.THIRD,          new Rect(5, 57, 95, 83), Drawable.Align.CENTER)
-                .setConfig(Drawable.Config.TIME, new Rect(105, 57, 195, 83), Drawable.Align.CENTER)
-                .setConfig(Drawable.Config.PEEK, Drawable.Config.TIME);
-            createAnimatable(eTF.HOUR,           new Rect(-95, 22, -5, 75))
-                .setConfig(Drawable.Config.TIME, new Rect(5, 22, 95, 75), Drawable.Align.CENTER)
-                .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 98, 75), Drawable.Align.CENTER);
-            createAnimatable(eTF.SHORTDATE,      new Rect(5, 80, 95, 95), Drawable.Align.CENTER)
-                .setConfig(Drawable.Config.PEEK, new Rect(2, 70, 98, 98), Drawable.Align.CENTER)
-                .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
+            createAnimatable(eTF.SHORTCAL, new Rect(5, 8, 80, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
+                    .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
+            createAnimatable(eTF.WEATHER_TEMP, new Rect(20, 8, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
+                    .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.LEFT)
+                    .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
+            createAnimatable(eCT.FIRST, new Rect(5, 17, 95, 43), Drawable.Align.CENTER)
+                    .setConfig(Drawable.Config.TIME, new Rect(105, 17, 195, 43), Drawable.Align.CENTER)
+                    .setConfig(Drawable.Config.PEEK, Drawable.Config.TIME);
+            createAnimatable(eCT.SECOND, new Rect(5, 37, 95, 63), Drawable.Align.CENTER)
+                    .setConfig(Drawable.Config.TIME, new Rect(105, 37, 195, 63), Drawable.Align.CENTER)
+                    .setConfig(Drawable.Config.PEEK, Drawable.Config.TIME);
+            createAnimatable(eCT.THIRD, new Rect(5, 57, 95, 83), Drawable.Align.CENTER)
+                    .setConfig(Drawable.Config.TIME, new Rect(105, 57, 195, 83), Drawable.Align.CENTER)
+                    .setConfig(Drawable.Config.PEEK, Drawable.Config.TIME);
+            createAnimatable(eTF.HOUR, new Rect(-95, 22, -5, 75))
+                    .setConfig(Drawable.Config.TIME, new Rect(5, 22, 95, 75), Drawable.Align.CENTER)
+                    .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 98, 75), Drawable.Align.CENTER);
+            createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.CENTER)
+                    .setConfig(Drawable.Config.PEEK, new Rect(2, 70, 98, 98), Drawable.Align.CENTER)
+                    .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
         } else {
-            int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
+            int offset = 12;
+            int height = (100 - (2 * offset)) / 3;
+            int io = 2;
 
-            createAnimatable(eTF.SHORTCAL,       new Rect(5, 5, 95, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
-                .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -20), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
-            createAnimatable(eTF.WEATHER_TEMP,   new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
-                .setConfig(Drawable.Config.PEEK, new Rect(5, -20, 5, -20))
-                .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
-            createAnimatable(eCT.FIRST,          new Rect(5, 20, 95, 44), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.TIME, new Rect(105, 20, 195, 44), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.PEEK, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT);
-            createAnimatable(eCT.SECOND,         new Rect(5, 38, 95, 62), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.TIME, new Rect(105, 38, 195, 62), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.PEEK, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT);
-            createAnimatable(eCT.THIRD,          new Rect(5, 56, 95, 80), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.TIME, new Rect(105, 56, 195, 80), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
-            createAnimatable(eTF.HOUR,           new Rect(5, 80, 95, 95))
-                .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 95, 55))
-                .setConfig(Drawable.Config.TIME, new Rect(5, 25, 95, 75), Drawable.Align.CENTER);
-            createAnimatable(eTF.SHORTDATE,      new Rect(5, 80, 95, 95), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.PEEK, new Rect(2, 57, 47, 90))
-                .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
+            createAnimatable(eTF.SHORTCAL, new Rect(5, 5, 95, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
+                    .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -20), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
+            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
+                    .setConfig(Drawable.Config.PEEK, new Rect(5, -20, 5, -20))
+                    .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
+            createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 44), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.TIME, new Rect(105, 20, 195, 44), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.PEEK, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT);
+            createAnimatable(eCT.SECOND, new Rect(5, 38, 95, 62), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.TIME, new Rect(105, 38, 195, 62), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.PEEK, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT);
+            createAnimatable(eCT.THIRD, new Rect(5, 56, 95, 80), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.TIME, new Rect(105, 56, 195, 80), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
+            createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95))
+                    .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 95, 55))
+                    .setConfig(Drawable.Config.TIME, new Rect(5, 25, 95, 75), Drawable.Align.CENTER);
+            createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.PEEK, new Rect(2, 57, 47, 90))
+                    .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
         }
     }
 
@@ -122,6 +126,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private Animatable createAnimatable(int textid, Rect fp, int fpa) {
         return createAnimatable(textid, fp, fpa, null, -1);
     }
+
     private Animatable createAnimatable(int textid, Rect fp) {
         return createAnimatable(textid, fp, Drawable.Align.LEFT);
     }
@@ -192,7 +197,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
-        if (this.roundemulation){
+        if (this.roundemulation) {
             Paint c = new Paint();
             c.setColor(Color.BLACK);
             c.setAntiAlias(true);

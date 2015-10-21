@@ -55,8 +55,8 @@ public class DrawableIcon implements Drawable {
         }
         Rect scaledbounds = new Rect(currentBounds);
         if (scale != 100) {
-            int verticalinset   = currentBounds.height() * scale/200;
-            int horizontalinset = currentBounds.width() * scale/200;
+            int verticalinset = currentBounds.height() * scale / 200;
+            int horizontalinset = currentBounds.width() * scale / 200;
             scaledbounds.inset(horizontalinset, verticalinset);
         }
         icon.setBounds(scaledbounds);
