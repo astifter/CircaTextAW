@@ -1,5 +1,6 @@
 package com.astifter.circatext.watchfaces;
 
+import android.animation.Animator;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -192,7 +193,25 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void startTapHighlight() {
-        // TODO
+        for (Animatable a : topDrawable.values()) {
+            a.animateAlpha(255, 192, new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {}
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    for (Animatable a : topDrawable.values()) {
+                        a.animateAlpha(192, 255);
+                    }
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {}
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {}
+            });
+        }
     }
 
     @Override

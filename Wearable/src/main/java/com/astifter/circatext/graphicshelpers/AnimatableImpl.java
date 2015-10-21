@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.util.Log;
+import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 
 import java.util.HashMap;
@@ -124,6 +125,29 @@ public class AnimatableImpl implements Drawable, Animatable {
     @Override
     public void setBottom(int l) {
         this.currentPosition.setBottom(l);
+    }
+
+    @Override
+    public void animateAlpha(int from, int to) {
+        animateAlpha(from, to, null);
+    }
+
+    @Override
+    public void animateAlpha(int from, int to, Animator.AnimatorListener l) {
+        PropertyValuesHolder animateAlpha = PropertyValuesHolder.ofInt("Alpha", from, to);
+
+        ValueAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, animateAlpha);
+        anim.setDuration(100);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                parent.invalidate();
+            }
+        });
+        if (l != null)
+            anim.addListener(l);
+        anim.setInterpolator(new LinearInterpolator());
+        anim.start();
     }
 
     @Override

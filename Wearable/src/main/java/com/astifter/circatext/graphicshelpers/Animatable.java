@@ -1,5 +1,6 @@
 package com.astifter.circatext.graphicshelpers;
 
+import android.animation.Animator;
 import android.graphics.Rect;
 
 public interface Animatable {
@@ -20,4 +21,7 @@ public interface Animatable {
     void setRight(int l);
 
     void setBottom(int t);
+
+    void animateAlpha(int from, int to);
+    void animateAlpha(int from, int to, Animator.AnimatorListener l);
 }
