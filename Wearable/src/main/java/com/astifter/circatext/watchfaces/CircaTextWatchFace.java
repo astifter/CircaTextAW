@@ -44,10 +44,10 @@ public class CircaTextWatchFace extends BaseWatchFace {
         if (this.roundemulation) {
             int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
 
-            createAnimatable(eTF.SHORTCAL,       new Rect(5, 8, 75, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
+            createAnimatable(eTF.SHORTCAL,       new Rect(5, 8, 80, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
                 .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.RIGHT)
                 .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
-            createAnimatable(eTF.WEATHER_TEMP,   new Rect(25, 8, 47, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
+            createAnimatable(eTF.WEATHER_TEMP,   new Rect(20, 8, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
                 .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.LEFT)
                 .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
             createAnimatable(eCT.FIRST,          new Rect(5, 17, 95, 43), Drawable.Align.CENTER)
