@@ -76,7 +76,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 .setConfig(Drawable.Config.TIME, new Rect(105, 60, 105, 60), Drawable.Align.RIGHT);
             createAnimatable(eTF.HOUR,           new Rect(5, 80, 95, 95))
                 .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 95, 55))
-                .setConfig(Drawable.Config.TIME, new Rect(5, 26, 95, 74), Drawable.Align.CENTER);
+                .setConfig(Drawable.Config.TIME, new Rect(5, 25, 95, 75), Drawable.Align.CENTER);
             createAnimatable(eTF.SHORTDATE,      new Rect(5, 80, 95, 95), Drawable.Align.RIGHT)
                 .setConfig(Drawable.Config.PEEK, new Rect(2, 57, 47, 90))
                 .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
