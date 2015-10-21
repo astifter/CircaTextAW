@@ -439,7 +439,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                                 wtf = new RegularWatchFace(this);
                                 break;
                             case CIRCATEXTv1:
+                            case CIRCATEXTv1ROUND:
                                 wtf = new CircaTextWatchFace(this);
+                                if (wf == CircaTextConsts.WatchFaces.CIRCATEXTv1ROUND)
+                                    wtf.setRoundMode(true);
                                 break;
                         }
                         wtf.localeChanged();

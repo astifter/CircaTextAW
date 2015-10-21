@@ -228,6 +228,11 @@ public class RegularWatchFace extends BaseWatchFace {
     }
 
     @Override
+    public void setRoundMode(boolean b) {
+        // TODO
+    }
+
+    @Override
     public void onDraw(Canvas canvas, Rect bounds) {
         setTexts();
 

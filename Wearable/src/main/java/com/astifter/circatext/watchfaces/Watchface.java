@@ -35,4 +35,6 @@ public interface WatchFace {
     void updateVisibilty();
 
     int getTouchedText(int x, int y);
+
+    void setRoundMode(boolean b);
 }

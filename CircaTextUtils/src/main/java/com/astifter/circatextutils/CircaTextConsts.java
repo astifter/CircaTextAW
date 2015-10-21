@@ -41,6 +41,6 @@ public class CircaTextConsts {
     }
 
     public enum WatchFaces {
-        REGULAR, CIRCATEXTv1
+        REGULAR, CIRCATEXTv1, CIRCATEXTv1ROUND
     }
 }
