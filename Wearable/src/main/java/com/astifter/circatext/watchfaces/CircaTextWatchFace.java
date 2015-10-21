@@ -60,20 +60,20 @@ public class CircaTextWatchFace extends BaseWatchFace {
             int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
 
             createAnimatable(eTF.SHORTCAL,       new Rect(5, 5, 95, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
-                .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -5), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -20), Drawable.Align.RIGHT)
                 .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
             createAnimatable(eTF.WEATHER_TEMP,   new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
                 .setConfig(Drawable.Config.PEEK, new Rect(5, -20, 5, -20))
                 .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
             createAnimatable(eCT.FIRST,          new Rect(5, 20, 95, 40), Drawable.Align.RIGHT)
                 .setConfig(Drawable.Config.PEEK, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.TIME, new Rect(105, 20, 105, 20), Drawable.Align.RIGHT);
+                .setConfig(Drawable.Config.TIME, new Rect(105, 30, 105, 30), Drawable.Align.RIGHT);
             createAnimatable(eCT.SECOND,         new Rect(5, 40, 95, 60), Drawable.Align.RIGHT)
                 .setConfig(Drawable.Config.PEEK, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.TIME, new Rect(105, 40, 105, 40), Drawable.Align.RIGHT);
+                .setConfig(Drawable.Config.TIME, new Rect(105, 50, 105, 50), Drawable.Align.RIGHT);
             createAnimatable(eCT.THIRD,          new Rect(5, 60, 95, 80), Drawable.Align.RIGHT)
                 .setConfig(Drawable.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT)
-                .setConfig(Drawable.Config.TIME, new Rect(105, 60, 105, 60), Drawable.Align.RIGHT);
+                .setConfig(Drawable.Config.TIME, new Rect(105, 70, 105, 70), Drawable.Align.RIGHT);
             createAnimatable(eTF.HOUR,           new Rect(5, 80, 95, 95))
                 .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 95, 55))
                 .setConfig(Drawable.Config.TIME, new Rect(5, 25, 95, 75), Drawable.Align.CENTER);
