@@ -91,7 +91,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
         if (drawableid >= 0) {
             StackHorizontal tempstack = new StackHorizontal();
             DrawableIcon icon = new DrawableIcon(textid, res.getDrawable(drawableid, res.newTheme()), fpa, 35);
-            if (fpa == Drawable.Align.LEFT) {
+            if (fpa == Drawable.Align.LEFT || fpa == Drawable.Align.CENTER) {
                 tempstack.add(icon);
                 tempstack.add(dt);
             } else {

@@ -41,10 +41,11 @@ public class DrawableIcon implements Drawable {
         if (hidden)
             targetWidth = 0;
         switch (this.alignment) {
-            case Drawable.Align.LEFT:
+            case Align.LEFT:
+            case Align.CENTER:
                 currentBounds.right = currentBounds.left + targetWidth;
                 break;
-            case Drawable.Align.RIGHT:
+            case Align.RIGHT:
                 currentBounds.left = currentBounds.right - targetWidth;
                 break;
         }
