@@ -42,20 +42,29 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void setMetrics(Resources resources, WindowInsets insets) {
         super.setMetrics(resources, insets);
         if (this.roundemulation) {
-//            this.mBounds.bottom = 280;
-//            createAnimatable(eTF.BATTERY, new Rect(55, 5, 95, 20), new Rect(95, -20, 95, -5));
-//            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 45, 20), Drawable.Align.RIGHT,
-//                                               new Rect(5, -20, 5, -20), Drawable.Align.RIGHT,
-//                                               resources, R.drawable.thermometer);
-//
-//            int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
-//            createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 40), new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.CENTER);
-//            createAnimatable(eCT.SECOND, new Rect(5, 40, 95, 60), new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.CENTER);
-//            createAnimatable(eCT.THIRD, new Rect(5, 60, 95, 80), new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.CENTER);
-//
-//            createAnimatable(eTF.HOUR, new Rect(5, 80, 45, 95), new Rect(2, 10, 95, 55), Drawable.Align.RIGHT);
-//            createAnimatable(eTF.SHORTDATE, new Rect(55, 80, 95, 95), Drawable.Align.LEFT,
-//                                            new Rect(2, 57, 47, 90), Drawable.Align.LEFT);
+            int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
+
+            createAnimatable(eTF.SHORTCAL,       new Rect(5, 8, 75, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
+                .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.RIGHT)
+                .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
+            createAnimatable(eTF.WEATHER_TEMP,   new Rect(25, 8, 47, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
+                .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.LEFT)
+                .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
+            createAnimatable(eCT.FIRST,          new Rect(5, 17, 95, 43), Drawable.Align.CENTER)
+                .setConfig(Drawable.Config.TIME, new Rect(105, 17, 195, 43), Drawable.Align.CENTER)
+                .setConfig(Drawable.Config.PEEK, Drawable.Config.TIME);
+            createAnimatable(eCT.SECOND,         new Rect(5, 37, 95, 63), Drawable.Align.CENTER)
+                .setConfig(Drawable.Config.TIME, new Rect(105, 37, 195, 63), Drawable.Align.CENTER)
+                .setConfig(Drawable.Config.PEEK, Drawable.Config.TIME);
+            createAnimatable(eCT.THIRD,          new Rect(5, 57, 95, 83), Drawable.Align.CENTER)
+                .setConfig(Drawable.Config.TIME, new Rect(105, 57, 195, 83), Drawable.Align.CENTER)
+                .setConfig(Drawable.Config.PEEK, Drawable.Config.TIME);
+            createAnimatable(eTF.HOUR,           new Rect(-95, 22, -5, 75))
+                .setConfig(Drawable.Config.TIME, new Rect(5, 22, 95, 75), Drawable.Align.CENTER)
+                .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 98, 75), Drawable.Align.CENTER);
+            createAnimatable(eTF.SHORTDATE,      new Rect(5, 80, 95, 95), Drawable.Align.CENTER)
+                .setConfig(Drawable.Config.PEEK, new Rect(2, 70, 98, 98), Drawable.Align.CENTER)
+                .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
         } else {
             int offset = 12; int height = (100 - (2 * offset)) / 3; int io = 2;
 
