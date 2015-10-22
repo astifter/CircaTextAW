@@ -86,13 +86,13 @@ public class CircaTextWatchFace extends BaseWatchFace {
                     .setConfig(Drawable.Config.PEEK, new Rect(5, -20, 5, -20))
                     .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
             createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 44), Drawable.Align.RIGHT)
-                    .setConfig(Drawable.Config.TIME, new Rect(105, 20, 195, 44), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.TIME, new Rect(5, 80, 95, 87), Drawable.Align.LEFT)
                     .setConfig(Drawable.Config.PEEK, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT);
             createAnimatable(eCT.SECOND, new Rect(5, 38, 95, 62), Drawable.Align.RIGHT)
-                    .setConfig(Drawable.Config.TIME, new Rect(105, 38, 195, 62), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.TIME, new Rect(5, 84, 95, 91), Drawable.Align.LEFT)
                     .setConfig(Drawable.Config.PEEK, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT);
             createAnimatable(eCT.THIRD, new Rect(5, 56, 95, 80), Drawable.Align.RIGHT)
-                    .setConfig(Drawable.Config.TIME, new Rect(105, 56, 195, 80), Drawable.Align.RIGHT)
+                    .setConfig(Drawable.Config.TIME, new Rect(5, 88, 95, 95), Drawable.Align.LEFT)
                     .setConfig(Drawable.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
             createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95))
                     .setConfig(Drawable.Config.PEEK, new Rect(2, 10, 95, 55))
@@ -162,42 +162,43 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public int getTouchedText(int x, int y) {
+        int idx = -1;
         if (showScreen != null) {
             showScreen = null;
-            return -1;
-        }
-
-        int idx = -1;
-        for (Drawable a : topDrawable.values()) {
-            idx = a.getTouchedText(x, y);
-            if (idx >= 0)
-                break;
-        }
-        if (eCT.FIRST <= idx && idx <= eCT.THIRD || idx == eTF.HOUR) {
-            if (currentConfig == Drawable.Config.PEEK)
+        } else {
+            for (Drawable a : topDrawable.values()) {
+                idx = a.getTouchedText(x, y);
+                if (idx >= 0)
+                    break;
+            }
+            if (idx == -1)
                 return -1;
-            if (selectedConfig == Drawable.Config.PLAIN)
-                selectedConfig = Drawable.Config.TIME;
-            else if (selectedConfig == Drawable.Config.TIME)
-                selectedConfig = Drawable.Config.PLAIN;
-            currentConfig = selectedConfig;
-            for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
-                topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
+            if (eCT.FIRST <= idx && idx <= eCT.THIRD || idx == eTF.HOUR) {
+                if (currentConfig == Drawable.Config.PEEK)
+                    return -1;
+                if (selectedConfig == Drawable.Config.PLAIN)
+                    selectedConfig = Drawable.Config.TIME;
+                else if (selectedConfig == Drawable.Config.TIME)
+                    selectedConfig = Drawable.Config.PLAIN;
+                currentConfig = selectedConfig;
+                for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
+                    topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
+                }
+                topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
+            } else if (idx == eTF.SHORTCAL) {
+                showScreen = new Schedule(this.mMeetings);
+            } else if (idx == eTF.WEATHER_TEMP) {
+                showScreen = new WeatherScreen(this.mWeather);
+//            } else if (idx >= 0) {
+//                AnimatableImpl dt = topDrawable.get(idx);
+//                if (dt.getColor() == Color.GREEN) {
+//                    dt.setColor(Color.WHITE);
+//                } else {
+//                    dt.setColor(Color.GREEN);
+//                }
             }
-            topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
-        } else if (idx == eTF.SHORTCAL) {
-            showScreen = new Schedule(this.mMeetings);
-        } else if (idx == eTF.WEATHER_TEMP) {
-            showScreen = new WeatherScreen(this.mWeather);
-        } else if (idx >= 0) {
-            AnimatableImpl dt = topDrawable.get(idx);
-            if (dt.getColor() == Color.GREEN) {
-                dt.setColor(Color.WHITE);
-            } else {
-                dt.setColor(Color.GREEN);
-            }
-            parent.invalidate();
         }
+        parent.invalidate();
         return -1;
     }
 
@@ -208,28 +209,6 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void startTapHighlight() {
-        for (Animatable a : topDrawable.values()) {
-            a.animateAlpha(255, 192, new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    for (Animatable a : topDrawable.values()) {
-                        a.animateAlpha(192, 255);
-                    }
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-                }
-            });
-        }
     }
 
     @Override
