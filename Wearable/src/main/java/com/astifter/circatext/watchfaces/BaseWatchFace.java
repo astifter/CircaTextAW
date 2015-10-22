@@ -145,19 +145,24 @@ public abstract class BaseWatchFace implements WatchFace {
             mTexts.put(eTF.BATTERY, "");
         }
         if (mMeetings != null) {
-            int i = 0;
-            while (i < mMeetings.length && mMeetings[i].DtStart.getTime() < now) i++;
+            ArrayList<CalendarHelper.EventInfo> m = new ArrayList<>();
+            for (int i = 0; i < mMeetings.length; i++) {
+                CalendarHelper.EventInfo ei = mMeetings[i];
+                if (ei.DtStart.getTime() >= now && !ei.Hidden && !ei.Disabled)
+                    m.add(ei);
+            }
 
-            if (i >= mMeetings.length) {
+            if (m.size() == 0) {
                 mTexts.put(eTF.SHORTCAL, "-");
                 mTexts.put(eTF.CALENDAR_1, "no meetings");
                 mTexts.put(eTF.CALENDAR_2, "");
             } else {
+                CalendarHelper.EventInfo first = m.get(0); m.remove(0);
                 SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                mTexts.put(eTF.SHORTCAL, sdf.format(mMeetings[i].DtStart));
-                mTexts.put(eTF.CALENDAR_1, sdf.format(mMeetings[i].DtStart) + " " + mMeetings[i].Title);
+                mTexts.put(eTF.SHORTCAL, sdf.format(first.DtStart));
+                mTexts.put(eTF.CALENDAR_1, sdf.format(first.DtStart) + " " + first.Title);
 
-                int additionalEvents = mMeetings.length - 1 - i;
+                int additionalEvents = m.size();
                 if (additionalEvents == 1)
                     mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional event");
                 if (additionalEvents > 1)
