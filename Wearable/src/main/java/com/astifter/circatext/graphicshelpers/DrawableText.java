@@ -28,9 +28,18 @@ public class DrawableText implements Drawable {
     private boolean ensureMaxWidth;
     private boolean autoSize;
 
+    public DrawableText() {
+        this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
+        setAlignment(Align.LEFT);
+    }
+
     public DrawableText(int where, HashMap<Integer, String> source) {
         this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
         setAlignment(Align.LEFT);
+        setText(where, source);
+    }
+
+    protected void setText(int where, HashMap<Integer, String> source) {
         this.textSourceName = where;
         this.textSource = source;
         if (this.textSource.get(this.textSourceName) == null)
