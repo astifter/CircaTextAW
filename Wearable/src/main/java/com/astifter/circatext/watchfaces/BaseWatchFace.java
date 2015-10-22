@@ -17,6 +17,7 @@ import com.astifter.circatext.graphicshelpers.Drawable;
 import com.astifter.circatextutils.Weather;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
