@@ -39,8 +39,8 @@ public abstract class BaseWatchFace implements WatchFace {
     private SimpleDateFormat mDateFormat;
     private SimpleDateFormat mShortDateFormat;
     private BatteryHelper.BatteryInfo mBatteryInfo;
-    private CalendarHelper.EventInfo[] mMeetings;
-    private Weather mWeather = null;
+    protected CalendarHelper.EventInfo[] mMeetings;
+    protected Weather mWeather = null;
 
     BaseWatchFace(CanvasWatchFaceService.Engine parent) {
         this.parent = parent;

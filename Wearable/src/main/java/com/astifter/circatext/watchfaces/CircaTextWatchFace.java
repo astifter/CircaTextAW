@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.preference.PreferenceScreen;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
@@ -19,7 +20,11 @@ import com.astifter.circatext.graphicshelpers.AnimatableImpl;
 import com.astifter.circatext.graphicshelpers.Drawable;
 import com.astifter.circatext.graphicshelpers.DrawableIcon;
 import com.astifter.circatext.graphicshelpers.DrawableText;
+import com.astifter.circatext.graphicshelpers.Schedule;
+import com.astifter.circatext.graphicshelpers.Screen;
 import com.astifter.circatext.graphicshelpers.StackHorizontal;
+import com.astifter.circatext.graphicshelpers.WeatherScreen;
+import com.astifter.circatextutils.Weather;
 
 import java.util.HashMap;
 
@@ -29,6 +34,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private Drawable.Config currentConfig;
     private Drawable.Config selectedConfig;
     private boolean roundemulation = false;
+    private Screen showScreen;
 
     public CircaTextWatchFace(CanvasWatchFaceService.Engine parent) {
         super(parent);
@@ -156,6 +162,11 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public int getTouchedText(int x, int y) {
+        if (showScreen != null) {
+            showScreen = null;
+            return -1;
+        }
+
         int idx = -1;
         for (Drawable a : topDrawable.values()) {
             idx = a.getTouchedText(x, y);
@@ -174,6 +185,10 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
             }
             topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
+        } else if (idx == eTF.SHORTCAL) {
+            showScreen = new Schedule(this.mMeetings);
+        } else if (idx == eTF.WEATHER_TEMP) {
+            showScreen = new WeatherScreen(this.mWeather);
         } else if (idx >= 0) {
             AnimatableImpl dt = topDrawable.get(idx);
             if (dt.getColor() == Color.GREEN) {
@@ -196,7 +211,8 @@ public class CircaTextWatchFace extends BaseWatchFace {
         for (Animatable a : topDrawable.values()) {
             a.animateAlpha(255, 192, new Animator.AnimatorListener() {
                 @Override
-                public void onAnimationStart(Animator animation) {}
+                public void onAnimationStart(Animator animation) {
+                }
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
@@ -206,10 +222,12 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 }
 
                 @Override
-                public void onAnimationCancel(Animator animation) {}
+                public void onAnimationCancel(Animator animation) {
+                }
 
                 @Override
-                public void onAnimationRepeat(Animator animation) {}
+                public void onAnimationRepeat(Animator animation) {
+                }
             });
         }
     }
@@ -231,8 +249,13 @@ public class CircaTextWatchFace extends BaseWatchFace {
         canvas.drawRect(bounds, this.mBackgroundPaint);
         setTexts();
         fillCircaTexts();
-        for (AnimatableImpl a : topDrawable.values()) {
-            a.onDraw(canvas, this.mBounds);
+
+        if (showScreen != null) {
+            showScreen.onDraw(canvas, bounds);
+        } else {
+            for (AnimatableImpl a : topDrawable.values()) {
+                a.onDraw(canvas, this.mBounds);
+            }
         }
     }
 
