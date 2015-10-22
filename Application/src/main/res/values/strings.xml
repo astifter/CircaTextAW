@@ -17,14 +17,26 @@
     <string name="app_name">CircaText</string>
 
     <string name="digital_config_text">CircaText Configuration</string>
-    <string name="digital_config_calendars">Exclude Calendars</string>
+    <string name="digital_config_calendars">Kalender</string>
     <string name="digital_config_attribution">Attribution</string>
 
     <string name="title_no_device_connected">No wearable device is currently connected.</string>
     <string name="ok_no_device_connected">Connected.</string>
 
-    <string name="excluded_calendar_hint">Comma separated calendar names.</string>
+    <string name="excluded_calendar_hint">Mit Beistrichen getrennte Kalender-Namen</string>
+    <string name="excluded_calendar_explanation"><![CDATA[
+        CircaText zeigt eine kurze Zusammenfassung der nächsten Termine im Watchface an. Hier
+        angegebene Kalender werden in dieser Zusammenfassung nicht gezeigt. (Damit Kalendereinträge
+        auf der Uhr angezeigt werden, müssen die Kalender zuerst in der Android-Wear App aktiviert
+        werden.)<br/>
+        Einzelne Einträge können aus der Zusammenfassung entfernt werden in dem #nowatch in der
+        Beschreibung vorkommt.
+        ]]>
+    </string>
     <string name="digital_config_attribution_text">
-        Icons by Aaron K. Kim from the Noun Project.
+        <![CDATA[
+        Icons von <i>Aaron K. Kim</i> vom<br/>
+        <a href="https://thenounproject.com/">https://thenounproject.com/</a>
+        ]]>
     </string>
 </resources>
