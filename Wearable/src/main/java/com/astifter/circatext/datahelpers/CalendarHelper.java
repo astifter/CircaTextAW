@@ -12,6 +12,7 @@ import android.support.wearable.provider.WearableCalendarContract;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.text.format.DateUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -87,10 +88,15 @@ public class CalendarHelper {
     public class EventInfo implements Comparable<EventInfo> {
         public final String Title;
         public final Date DtStart;
+        public final boolean Hidden;
+        public final boolean Disabled;
+        public int Color;
 
-        EventInfo(String title, Date c) {
+        EventInfo(String title, Date c, boolean h, boolean d) {
             Title = title;
             DtStart = c;
+            Hidden = h;
+            Disabled = d;
         }
 
         @Override
@@ -104,6 +110,15 @@ public class CalendarHelper {
                 return -1;
             return 0;
         }
+
+        public void setColor(int color) {
+            this.Color = color;
+        }
+
+        public String formatTime() {
+            SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+            return sdf.format(this.DtStart);
+        }
     }
 
     private class LoadMeetingsTask extends AsyncTask<Void, Void, Set<EventInfo>> {
@@ -113,6 +128,7 @@ public class CalendarHelper {
                 CalendarContract.Instances.CALENDAR_ID,
                 CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
                 CalendarContract.Instances.DESCRIPTION,
+                CalendarContract.Calendars.CALENDAR_COLOR,
         };
         private PowerManager.WakeLock mWakeLock;
 
@@ -137,25 +153,25 @@ public class CalendarHelper {
                 while (cursor != null && cursor.moveToNext()) {
                     String cal_name = cursor.getString(3);
 
-                    boolean useThisCalendar = true;
+                    boolean disabled = false;
                     mExcludedCalendarsLock.readLock().lock();
                     try {
                         if (mExcludedCalendars.contains(cal_name))
-                            useThisCalendar = false;
+                            disabled = true;
                     } finally {
                         mExcludedCalendarsLock.readLock().unlock();
                     }
-                    if (!useThisCalendar)
-                        continue;
 
+                    boolean hidden = false;
                     String event_desc = cursor.getString(4);
                     if (event_desc.contains("#nowatch"))
-                        continue;
+                        hidden = true;
 
                     String title = cursor.getString(0);
                     Date d = new Date(cursor.getLong(1));
                     //String cal_id = cursor.getString(2);
-                    EventInfo ei = new EventInfo(title, d);
+                    EventInfo ei = new EventInfo(title, d, hidden, disabled);
+                    ei.setColor(cursor.getInt(5));
                     eis.add(ei);
                 }
             } catch (Throwable t) {
