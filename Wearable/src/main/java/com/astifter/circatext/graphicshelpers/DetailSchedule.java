@@ -14,7 +14,7 @@ public class DetailSchedule implements Screen {
     private final CalendarHelper.EventInfo meeting;
     private final ArrayList<StaticText> drawables;
 
-    DetailSchedule(CalendarHelper.EventInfo ei) {
+    DetailSchedule(CalendarHelper.EventInfo ei, int bgColor) {
         drawables = new ArrayList<>();
         meeting = ei;
 
@@ -29,6 +29,7 @@ public class DetailSchedule implements Screen {
 
         for (DrawableText dt : drawables) {
             dt.autoSize(true); dt.ensureMaximumWidth(true);
+            dt.setBackgroundColor(bgColor);
         }
     }
 

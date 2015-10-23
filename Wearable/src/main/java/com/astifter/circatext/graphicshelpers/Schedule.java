@@ -15,9 +15,11 @@ public class Schedule implements Screen {
 
     final static int disection = 25;
     final static int lineHeight = 10;
+    private final int bgColor;
     private DetailSchedule detailedScreen;
 
-    public Schedule(CalendarHelper.EventInfo[] mMeetings) {
+    public Schedule(CalendarHelper.EventInfo[] mMeetings, int bgColor) {
+        this.bgColor = bgColor;
         this.meetings = mMeetings;
         drawables = new ArrayList<>();
         rects = new ArrayList<>();
@@ -44,6 +46,7 @@ public class Schedule implements Screen {
         }
         for (DrawableText dt : drawables) {
             dt.autoSize(true); dt.ensureMaximumWidth(true);
+            dt.setBackgroundColor(bgColor);
         }
     }
 
@@ -80,12 +83,14 @@ public class Schedule implements Screen {
 
     @Override
     public int getTouchedText(int x, int y) {
-        if (detailedScreen != null)
-            return -1;
+        if (detailedScreen != null) {
+            detailedScreen = null;
+            return 0;
+        }
         for (DrawableText dt : drawables) {
             int idx = dt.getTouchedText(x, y);
             if (idx >= 0) {
-                detailedScreen = new DetailSchedule(meetings[idx]);
+                detailedScreen = new DetailSchedule(meetings[idx], bgColor);
                 return idx;
             }
         }

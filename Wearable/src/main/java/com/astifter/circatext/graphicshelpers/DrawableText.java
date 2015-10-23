@@ -2,6 +2,7 @@ package com.astifter.circatext.graphicshelpers;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -27,6 +28,7 @@ public class DrawableText implements Drawable {
     private boolean strokeInAmbientMode;
     private boolean ensureMaxWidth;
     private boolean autoSize;
+    private int backgroundColor;
 
     public DrawableText() {
         this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
@@ -188,21 +190,32 @@ public class DrawableText implements Drawable {
          *   the ellipsis.
          * - Adjust the actually used size (drawnSize) to the maxWidth.
          */
-        boolean hasSavedState = false;
+        Rect ellipsis = null;
         if (targetWidth > maxWidth && this.textAlignment == Align.LEFT && ensureMaxWidth) {
-            float ellipsisSize = textPaint.measureText("...");
-            canvas.drawText("...", x + maxWidth - ellipsisSize, y, textPaint);
-
             canvas.save();
-            hasSavedState = true;
-            canvas.clipRect(x, y + fm.ascent, x + maxWidth - ellipsisSize, y + fm.descent);
+            float ellipsisSize = textPaint.measureText("...");
+            ellipsis = new Rect((int)(x + maxWidth - ellipsisSize), (int)(y + fm.ascent ),
+                                (int)(x + maxWidth),                (int)(y + fm.descent) );
+
+            canvas.clipRect(new Rect((int) x,              (int) (y + fm.ascent),
+                                     (int) (x + maxWidth), (int) (y + fm.descent)));
 
             targetWidth = maxWidth;
             this.drawnBounds.right = this.drawnBounds.left + (int) targetWidth;
         }
         canvas.drawText(currentText, x, y, textPaint);
         /** In case the state was saved for clipping currentText, restore state. */
-        if (hasSavedState) {
+        if (ellipsis != null) {
+            int fadeColor = backgroundColor & 0x00FFFFFF;
+
+            LinearGradient gradient =
+                    new LinearGradient(ellipsis.left, ellipsis.top, ellipsis.right, ellipsis.top,
+                                       fadeColor, backgroundColor, android.graphics.Shader.TileMode.CLAMP);
+            Paint p = new Paint();
+            p.setDither(true);
+            p.setShader(gradient);
+            canvas.drawRect(ellipsis, p);
+
             canvas.restore();
         }
         if (CircaTextConsts.DEBUG) {
@@ -329,5 +342,9 @@ public class DrawableText implements Drawable {
 
     public void autoSize(boolean b) {
         this.autoSize = b;
+    }
+
+    public void setBackgroundColor(int backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 }

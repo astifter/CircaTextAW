@@ -189,7 +189,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 }
                 topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
             } else if (idx == eTF.SHORTCAL) {
-                showScreen = new Schedule(this.mMeetings);
+                showScreen = new Schedule(this.mMeetings, this.mBackgroundPaint.getColor());
             } else if (idx == eTF.WEATHER_TEMP) {
                 showScreen = new WeatherScreen(this.mWeather);
             }
