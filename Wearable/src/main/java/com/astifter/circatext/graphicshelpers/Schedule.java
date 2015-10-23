@@ -15,35 +15,44 @@ public class Schedule implements Screen {
 
     final static int disection = 25;
     final static int lineHeight = 10;
+    private DetailSchedule detailedScreen;
 
     public Schedule(CalendarHelper.EventInfo[] mMeetings) {
         this.meetings = mMeetings;
         drawables = new ArrayList<>();
         rects = new ArrayList<>();
         int i = 0;
-        StaticText head = new StaticText("Termine", new Rect(5,5,95,20), Drawable.Align.RIGHT);
+        StaticText head = new StaticText(i, "Termine", new Rect(5,5,95,20), Drawable.Align.RIGHT);
         head.autoSize(true);
         drawables.add(head);
         for (CalendarHelper.EventInfo ei : mMeetings) {
-            int top = 20 + (i*lineHeight);
+            int top = 20 + (i*(lineHeight*12/10));
             int bottom = top + lineHeight;
+            if (bottom > 95) {
+                break;
+            }
 
-            StaticText date = new StaticText(ei.formatTime(), new Rect(5,top,disection-2,bottom), Drawable.Align.RIGHT);
-            date.autoSize(true); date.ensureMaximumWidth(true);
+            StaticText date = new StaticText(i, ei.formatTime(), new Rect(5,top,disection-2,bottom), Drawable.Align.RIGHT);
             drawables.add(date);
 
-            StaticText title = new StaticText(ei.Title, new Rect(disection+2,top,95,bottom), Drawable.Align.LEFT);
-            title.autoSize(true); title.ensureMaximumWidth(true);
+            StaticText title = new StaticText(i, ei.Title, new Rect(disection+2,top,95,bottom), Drawable.Align.LEFT);
             drawables.add(title);
 
             ColorRect r = new ColorRect(new Rect(disection-1,top,disection+1,bottom), ei.Color);
             rects.add(r);
             i++;
         }
+        for (DrawableText dt : drawables) {
+            dt.autoSize(true); dt.ensureMaximumWidth(true);
+        }
     }
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
+        if (detailedScreen != null) {
+            detailedScreen.onDraw(canvas, bounds);
+            return;
+        }
         for (Drawable d : drawables) {
             d.onDraw(canvas, bounds);
         }
@@ -67,5 +76,19 @@ public class Schedule implements Screen {
             Position p = this.position.percentagePosition(bounds);
             canvas.drawRect(p.toRect(), this.p);
         }
+    }
+
+    @Override
+    public int getTouchedText(int x, int y) {
+        if (detailedScreen != null)
+            return -1;
+        for (DrawableText dt : drawables) {
+            int idx = dt.getTouchedText(x, y);
+            if (idx >= 0) {
+                detailedScreen = new DetailSchedule(meetings[idx]);
+                return idx;
+            }
+        }
+        return -1;
     }
 }

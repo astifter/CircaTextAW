@@ -12,10 +12,10 @@ public class StaticText extends DrawableText {
     private final HashMap<Integer, String> text;
     private Position position;
 
-    public StaticText(String s, Rect p, int a) {
+    public StaticText(int idx, String s, Rect p, int a) {
         text = new HashMap<>();
-        text.put(0, s);
-        setText(0, text);
+        text.put(idx, s);
+        setText(idx, text);
         position = new Position(p, a);
         setAlignment(a);
     }

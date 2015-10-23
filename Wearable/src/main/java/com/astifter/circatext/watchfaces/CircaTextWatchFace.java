@@ -164,7 +164,10 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public int getTouchedText(int x, int y) {
         int idx = -1;
         if (showScreen != null) {
-            showScreen = null;
+            idx = showScreen.getTouchedText(x, y);
+            if (idx == -1) {
+                showScreen = null;
+            }
         } else {
             for (Drawable a : topDrawable.values()) {
                 idx = a.getTouchedText(x, y);
@@ -189,13 +192,6 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 showScreen = new Schedule(this.mMeetings);
             } else if (idx == eTF.WEATHER_TEMP) {
                 showScreen = new WeatherScreen(this.mWeather);
-//            } else if (idx >= 0) {
-//                AnimatableImpl dt = topDrawable.get(idx);
-//                if (dt.getColor() == Color.GREEN) {
-//                    dt.setColor(Color.WHITE);
-//                } else {
-//                    dt.setColor(Color.GREEN);
-//                }
             }
         }
         parent.invalidate();

@@ -19,4 +19,9 @@ public class WeatherScreen implements Screen {
     public void onDraw(Canvas canvas, Rect bounds) {
 
     }
+
+    @Override
+    public int getTouchedText(int x, int y) {
+        return -1;
+    }
 }
