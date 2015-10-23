@@ -480,7 +480,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             switch (tapType) {
                 case WatchFaceService.TAP_TYPE_TAP:
                     wtf.startTapHighlight();
-                    int index = wtf.getTouchedText(x, y);
+                    wtf.getTouchedText(x, y);
                     break;
                 case WatchFaceService.TAP_TYPE_TOUCH:
                     break;

@@ -85,7 +85,7 @@ public class Schedule implements Screen {
     public int getTouchedText(int x, int y) {
         if (detailedScreen != null) {
             detailedScreen = null;
-            return 0;
+            return meetings.length + 1;
         }
         for (DrawableText dt : drawables) {
             int idx = dt.getTouchedText(x, y);

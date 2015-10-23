@@ -280,11 +280,9 @@ public class DrawableText implements Drawable {
 
     @Override
     public int getTouchedText(int x, int y) {
-        if (this.drawnBounds.contains(x, y)) {
+        if (this.drawnBounds.contains(x, y))
             return this.textSourceName;
-        } else {
-            return -1;
-        }
+        return -1;
     }
 
     public void setAlignment(int a) {
