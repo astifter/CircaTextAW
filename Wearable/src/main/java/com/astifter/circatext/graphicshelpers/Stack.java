@@ -70,12 +70,7 @@ abstract class Stack implements Drawable {
 
     @Override
     public int getTouchedText(int x, int y) {
-        for (Drawable t : this.stack) {
-            int idx = t.getTouchedText(x, y);
-            if (idx >= 0)
-                return idx;
-        }
-        return -1;
+        return DrawingHelpers.getTouchedText(x, y, this.stack);
     }
 
     @Override

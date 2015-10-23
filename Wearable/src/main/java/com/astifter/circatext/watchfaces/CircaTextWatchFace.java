@@ -20,6 +20,7 @@ import com.astifter.circatext.graphicshelpers.AnimatableImpl;
 import com.astifter.circatext.graphicshelpers.Drawable;
 import com.astifter.circatext.graphicshelpers.DrawableIcon;
 import com.astifter.circatext.graphicshelpers.DrawableText;
+import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.graphicshelpers.Schedule;
 import com.astifter.circatext.graphicshelpers.Screen;
 import com.astifter.circatext.graphicshelpers.StackHorizontal;
@@ -162,23 +163,21 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public int getTouchedText(int x, int y) {
-        int idx = -1;
         if (showScreen != null) {
-            idx = showScreen.getTouchedText(x, y);
-            if (idx == -1) {
+            int idx = showScreen.getTouchedText(x, y);
+            if (idx == Drawable.Touched.CLOSEME) {
                 showScreen = null;
             }
         } else {
+            int idx = Drawable.Touched.UNKNOWN;
             for (Drawable a : topDrawable.values()) {
                 idx = a.getTouchedText(x, y);
-                if (idx >= 0)
+                if (idx >= Drawable.Touched.FIRST)
                     break;
             }
-            if (idx == -1)
-                return -1;
             if (eCT.FIRST <= idx && idx <= eCT.THIRD || idx == eTF.HOUR) {
                 if (currentConfig == Drawable.Config.PEEK)
-                    return -1;
+                    return Drawable.Touched.FINISHED;
                 if (selectedConfig == Drawable.Config.PLAIN)
                     selectedConfig = Drawable.Config.TIME;
                 else if (selectedConfig == Drawable.Config.TIME)
@@ -192,10 +191,12 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 showScreen = new Schedule(this.mMeetings, this.mBackgroundPaint.getColor());
             } else if (idx == eTF.WEATHER_TEMP) {
                 showScreen = new WeatherScreen(this.mWeather);
+            } else {
+                return Drawable.Touched.FINISHED;
             }
         }
         parent.invalidate();
-        return -1;
+        return Drawable.Touched.FINISHED;
     }
 
     @Override

@@ -42,6 +42,6 @@ public class DetailSchedule implements Screen {
 
     @Override
     public int getTouchedText(int x, int y) {
-        return -1;
+        return Drawable.Touched.CLOSEME;
     }
 }

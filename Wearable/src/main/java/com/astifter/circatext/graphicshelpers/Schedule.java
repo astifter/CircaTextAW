@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class Schedule implements Screen {
     private final CalendarHelper.EventInfo[] meetings;
-    private final ArrayList<StaticText> drawables;
+    private final ArrayList<Drawable> drawables;
     private final ArrayList<ColorRect> rects;
 
     final static int disection = 25;
@@ -34,20 +34,21 @@ public class Schedule implements Screen {
                 break;
             }
 
-            StaticText date = new StaticText(i, ei.formatStart(), new Rect(5,top,disection-2,bottom), Drawable.Align.RIGHT);
-            drawables.add(date);
-
-            StaticText title = new StaticText(i, ei.Title, new Rect(disection+2,top,95,bottom), Drawable.Align.LEFT);
-            drawables.add(title);
+            createStaticTest(ei.formatStart(), i, new Rect(5,top,disection-2,bottom), Drawable.Align.RIGHT, bgColor);
+            createStaticTest(ei.Title, i, new Rect(disection + 2, top, 95, bottom), Drawable.Align.LEFT, bgColor);
 
             ColorRect r = new ColorRect(new Rect(disection-1,top,disection+1,bottom), ei.Color);
             rects.add(r);
             i++;
         }
-        for (DrawableText dt : drawables) {
-            dt.autoSize(true); dt.ensureMaximumWidth(true);
-            dt.setBackgroundColor(bgColor);
-        }
+    }
+
+    private void createStaticTest(String t, int i, Rect pos, int align, int bgColor) {
+        StaticText date = new StaticText(i, t, pos, align);
+        date.autoSize(true);
+        date.ensureMaximumWidth(true);
+        date.setBackgroundColor(bgColor);
+        drawables.add(date);
     }
 
     @Override
@@ -85,15 +86,14 @@ public class Schedule implements Screen {
     public int getTouchedText(int x, int y) {
         if (detailedScreen != null) {
             detailedScreen = null;
-            return meetings.length + 1;
-        }
-        for (DrawableText dt : drawables) {
-            int idx = dt.getTouchedText(x, y);
-            if (idx >= 0) {
+            return Drawable.Touched.FINISHED;
+        } else {
+            int idx = DrawingHelpers.getTouchedText(x, y, drawables);
+            if (idx >= Drawable.Touched.FIRST) {
                 detailedScreen = new DetailSchedule(meetings[idx], bgColor);
-                return idx;
+                return Drawable.Touched.FINISHED;
             }
+            return Drawable.Touched.CLOSEME;
         }
-        return -1;
     }
 }

@@ -63,5 +63,12 @@ public interface Drawable {
         int CENTER = 1;
         int RIGHT = 2;
     }
+
+    interface Touched {
+        int CLOSEME = -2;
+        int UNKNOWN = -1;
+        int FINISHED = -3;
+        int FIRST = 0;
+    }
 }
 

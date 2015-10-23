@@ -108,7 +108,7 @@ public class DrawableIcon implements Drawable {
     public int getTouchedText(int x, int y) {
         if (this.currentBounds.contains(x, y))
             return index;
-        return -1;
+        return Touched.UNKNOWN;
     }
 
     @Override

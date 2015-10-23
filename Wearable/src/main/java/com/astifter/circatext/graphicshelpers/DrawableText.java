@@ -282,7 +282,7 @@ public class DrawableText implements Drawable {
     public int getTouchedText(int x, int y) {
         if (this.drawnBounds.contains(x, y))
             return this.textSourceName;
-        return -1;
+        return Touched.UNKNOWN;
     }
 
     public void setAlignment(int a) {
