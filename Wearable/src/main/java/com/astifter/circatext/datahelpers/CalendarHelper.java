@@ -90,11 +90,17 @@ public class CalendarHelper {
         public final Date DtStart;
         public final boolean Hidden;
         public final boolean Disabled;
+        public final String Description;
+        private final Date DtEnd;
         public int Color;
 
-        EventInfo(String title, Date c, boolean h, boolean d) {
-            Title = title;
-            DtStart = c;
+        public EventInfo(Cursor cursor, boolean h, boolean d) {
+            Title = cursor.getString(0);
+            DtStart = new Date(cursor.getLong(1));
+            Description = cursor.getString(4);
+            Color = cursor.getInt(5);
+            DtEnd = new Date(cursor.getLong(6));
+
             Hidden = h;
             Disabled = d;
         }
@@ -111,13 +117,13 @@ public class CalendarHelper {
             return 0;
         }
 
-        public void setColor(int color) {
-            this.Color = color;
-        }
-
-        public String formatTime() {
+        public String formatStart() {
             SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
             return sdf.format(this.DtStart);
+        }
+        public String formatEnd() {
+            SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+            return sdf.format(this.DtEnd);
         }
     }
 
@@ -129,6 +135,7 @@ public class CalendarHelper {
                 CalendarContract.Instances.CALENDAR_DISPLAY_NAME,
                 CalendarContract.Instances.DESCRIPTION,
                 CalendarContract.Calendars.CALENDAR_COLOR,
+                CalendarContract.Instances.END,
         };
         private PowerManager.WakeLock mWakeLock;
 
@@ -167,11 +174,7 @@ public class CalendarHelper {
                     if (event_desc.contains("#nowatch"))
                         hidden = true;
 
-                    String title = cursor.getString(0);
-                    Date d = new Date(cursor.getLong(1));
-                    //String cal_id = cursor.getString(2);
-                    EventInfo ei = new EventInfo(title, d, hidden, disabled);
-                    ei.setColor(cursor.getInt(5));
+                    EventInfo ei = new EventInfo(cursor, hidden, disabled);
                     eis.add(ei);
                 }
             } catch (Throwable t) {
