@@ -22,7 +22,7 @@ public class Schedule implements Screen {
         drawables = new ArrayList<>();
         rects = new ArrayList<>();
         int i = 0;
-        StaticText head = new StaticText(i, "Termine", new Rect(5,5,95,20), Drawable.Align.RIGHT);
+        StaticText head = new StaticText(-1, "Termine", new Rect(5,5,95,20), Drawable.Align.RIGHT);
         head.autoSize(true);
         drawables.add(head);
         for (CalendarHelper.EventInfo ei : mMeetings) {
@@ -32,7 +32,7 @@ public class Schedule implements Screen {
                 break;
             }
 
-            StaticText date = new StaticText(i, ei.formatTime(), new Rect(5,top,disection-2,bottom), Drawable.Align.RIGHT);
+            StaticText date = new StaticText(i, ei.formatStart(), new Rect(5,top,disection-2,bottom), Drawable.Align.RIGHT);
             drawables.add(date);
 
             StaticText title = new StaticText(i, ei.Title, new Rect(disection+2,top,95,bottom), Drawable.Align.LEFT);
