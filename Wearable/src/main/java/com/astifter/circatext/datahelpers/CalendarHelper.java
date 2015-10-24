@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -115,6 +116,12 @@ public class CalendarHelper {
             if (thistime < othertime)
                 return -1;
             return 0;
+        }
+
+        public String formatDate() {
+            Locale de = Locale.GERMANY;
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", de);
+            return sdf.format(this.DtStart);
         }
 
         public String formatStart() {

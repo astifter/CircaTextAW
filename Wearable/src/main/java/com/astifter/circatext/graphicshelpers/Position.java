@@ -30,15 +30,22 @@ public class Position {
         this.alignment = a;
     }
 
+    public Position(int l, int t, int r, int b) {
+        this.left = l;
+        this.top = t;
+        this.right = r;
+        this.bottom = b;
+    }
+
     public Position percentagePosition(Rect b) {
         return Position.percentagePosition(this, b);
     }
     public static Position percentagePosition(Position p, Rect b) {
         Position newp = new Position();
-        newp.left = (int) (b.width() * p.left / 100f);
-        newp.top = (int) (b.height() * p.top / 100f);
-        newp.right = (int) (b.width() * p.right / 100f);
-        newp.bottom = (int) (b.height() * p.bottom / 100f);
+        newp.left = b.left + (int) (b.width() * p.left / 100f);
+        newp.top = b.top + (int) (b.height() * p.top / 100f);
+        newp.right = b.left + (int) (b.width() * p.right / 100f);
+        newp.bottom = b.top + (int) (b.height() * p.bottom / 100f);
         newp.alignment = p.alignment;
         return newp;
     }

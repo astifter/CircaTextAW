@@ -49,8 +49,8 @@ public class Schedule implements Screen {
             createStaticTest(ei.formatStart(), i, new Rect(5,top,disection-2,bottom), Drawable.Align.RIGHT, bgColor);
             createStaticTest(ei.Title, i, new Rect(disection + 2, top, 95, bottom), Drawable.Align.LEFT, bgColor);
 
-            ColorRect r = new ColorRect(new Rect(disection-1,top,disection+1,bottom), ei.Color);
-            rects.add(r);
+            ColorRect cr = new ColorRect(new Rect(disection-1,top,disection+1,bottom), ei.Color);
+            rects.add(cr);
             i++;
         }
     }
@@ -97,12 +97,14 @@ public class Schedule implements Screen {
     @Override
     public int getTouchedText(int x, int y) {
         if (detailedScreen != null) {
-            detailedScreen = null;
+            int idx = detailedScreen.getTouchedText(x, y);
+            if (idx == Drawable.Touched.CLOSEME)
+                detailedScreen = null;
             return Drawable.Touched.FINISHED;
         } else {
             int idx = DrawingHelpers.getTouchedText(x, y, drawables);
             if (idx >= Drawable.Touched.FIRST) {
-                detailedScreen = new DetailSchedule(meetings[idx], bgColor);
+                detailedScreen = new DetailSchedule(this.resources, meetings[idx], bgColor);
                 return Drawable.Touched.FINISHED;
             } else
             return idx;

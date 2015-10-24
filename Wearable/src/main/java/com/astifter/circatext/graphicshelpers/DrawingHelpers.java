@@ -13,7 +13,7 @@ public class DrawingHelpers {
     public static int getTouchedText(int x, int y, ArrayList<Drawable> drawables) {
         for (Drawable d : drawables) {
             int i = d.getTouchedText(x, y);
-            if (i >= Drawable.Touched.FIRST)
+            if (i != Drawable.Touched.UNKNOWN)
                 return i;
         }
         return Drawable.Touched.UNKNOWN;
