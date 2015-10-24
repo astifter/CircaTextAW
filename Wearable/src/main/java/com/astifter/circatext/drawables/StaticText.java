@@ -8,9 +8,6 @@ import com.astifter.circatext.graphicshelpers.Position;
 
 import java.util.HashMap;
 
-/**
- * Created by astifter on 22.10.15.
- */
 public class StaticText extends DrawableText {
     private final HashMap<Integer, String> text;
     private Position position;

@@ -7,9 +7,6 @@ import android.graphics.Rect;
 import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatextutils.Weather;
 
-/**
- * Created by astifter on 22.10.15.
- */
 public class WeatherScreen implements Screen {
     private final Weather weather;
 

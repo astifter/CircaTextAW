@@ -5,9 +5,6 @@ import android.graphics.Rect;
 
 import com.astifter.circatext.drawables.Drawable;
 
-/**
- * Created by astifter on 13.10.15.
- */
 public class DrawableIcon implements Drawable {
     private final int index;
     private final int scale;
