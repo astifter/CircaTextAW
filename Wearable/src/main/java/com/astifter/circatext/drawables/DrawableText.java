@@ -1,4 +1,4 @@
-package com.astifter.circatext.graphicshelpers;
+package com.astifter.circatext.drawables;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 
+import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatextutils.CircaTextConsts;
 
 import java.util.HashMap;

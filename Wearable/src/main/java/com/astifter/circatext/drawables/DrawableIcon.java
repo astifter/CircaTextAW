@@ -1,7 +1,9 @@
-package com.astifter.circatext.graphicshelpers;
+package com.astifter.circatext.drawables;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
+
+import com.astifter.circatext.drawables.Drawable;
 
 /**
  * Created by astifter on 13.10.15.

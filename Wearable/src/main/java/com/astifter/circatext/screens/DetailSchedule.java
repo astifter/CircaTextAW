@@ -4,9 +4,9 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 
 import com.astifter.circatext.datahelpers.CalendarHelper;
-import com.astifter.circatext.graphicshelpers.Drawable;
-import com.astifter.circatext.graphicshelpers.DrawableText;
-import com.astifter.circatext.graphicshelpers.StaticText;
+import com.astifter.circatext.drawables.Drawable;
+import com.astifter.circatext.drawables.DrawableText;
+import com.astifter.circatext.drawables.StaticText;
 
 import java.util.ArrayList;
 

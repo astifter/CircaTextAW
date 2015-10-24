@@ -1,7 +1,10 @@
-package com.astifter.circatext.graphicshelpers;
+package com.astifter.circatext.drawables;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
+
+import com.astifter.circatext.drawables.DrawableText;
+import com.astifter.circatext.graphicshelpers.Position;
 
 import java.util.HashMap;
 

@@ -1,4 +1,4 @@
-package com.astifter.circatext.graphicshelpers;
+package com.astifter.circatext.drawables;
 
 import android.animation.Animator;
 import android.graphics.Rect;

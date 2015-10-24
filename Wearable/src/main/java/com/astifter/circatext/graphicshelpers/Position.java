@@ -2,6 +2,8 @@ package com.astifter.circatext.graphicshelpers;
 
 import android.graphics.Rect;
 
+import com.astifter.circatext.drawables.Drawable;
+
 public class Position {
     private int right;
     private int top;

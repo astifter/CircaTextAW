@@ -10,11 +10,11 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
 import com.astifter.circatext.R;
-import com.astifter.circatext.graphicshelpers.Drawable;
-import com.astifter.circatext.graphicshelpers.DrawableText;
+import com.astifter.circatext.drawables.Drawable;
+import com.astifter.circatext.drawables.DrawableText;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
-import com.astifter.circatext.graphicshelpers.StackHorizontal;
-import com.astifter.circatext.graphicshelpers.StackVertical;
+import com.astifter.circatext.drawables.StackHorizontal;
+import com.astifter.circatext.drawables.StackVertical;
 
 import java.util.ArrayList;
 import java.util.HashMap;

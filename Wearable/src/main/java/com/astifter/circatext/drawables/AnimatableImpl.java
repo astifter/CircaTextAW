@@ -1,4 +1,4 @@
-package com.astifter.circatext.graphicshelpers;
+package com.astifter.circatext.drawables;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -8,8 +8,9 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.util.Log;
-import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+
+import com.astifter.circatext.graphicshelpers.Position;
 
 import java.util.HashMap;
 
