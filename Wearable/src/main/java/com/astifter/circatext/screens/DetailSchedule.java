@@ -1,9 +1,12 @@
-package com.astifter.circatext.graphicshelpers;
+package com.astifter.circatext.screens;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
 import com.astifter.circatext.datahelpers.CalendarHelper;
+import com.astifter.circatext.graphicshelpers.Drawable;
+import com.astifter.circatext.graphicshelpers.DrawableText;
+import com.astifter.circatext.graphicshelpers.StaticText;
 
 import java.util.ArrayList;
 

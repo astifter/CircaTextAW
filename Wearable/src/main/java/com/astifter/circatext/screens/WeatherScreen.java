@@ -1,8 +1,9 @@
-package com.astifter.circatext.graphicshelpers;
+package com.astifter.circatext.screens;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import com.astifter.circatext.graphicshelpers.Drawable;
 import com.astifter.circatextutils.Weather;
 
 /**
