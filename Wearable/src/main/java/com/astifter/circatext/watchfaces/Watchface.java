@@ -12,7 +12,7 @@ import com.astifter.circatextutils.Weather;
 public interface WatchFace {
     void localeChanged();
 
-    void setMetrics(Resources res, WindowInsets insets);
+    void setMetrics(Resources r, WindowInsets insets);
 
     void setAmbientMode(boolean inAmbientMode);
 

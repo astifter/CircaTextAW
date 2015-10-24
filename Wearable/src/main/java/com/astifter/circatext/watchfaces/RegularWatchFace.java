@@ -96,15 +96,15 @@ public class RegularWatchFace extends BaseWatchFace {
     }
 
     @Override
-    public void setMetrics(Resources resources, WindowInsets insets) {
-        super.setMetrics(resources, insets);
+    public void setMetrics(Resources r, WindowInsets insets) {
+        super.setMetrics(r, insets);
 
-        int left = (int) resources.getDimension(R.dimen.digital_x_offset);
+        int left = (int) r.getDimension(R.dimen.digital_x_offset);
         this.topDrawableBounds =
                 new Rect(left, left,
                          this.mBounds.width() - left, this.mBounds.height() - left);
 
-        int mYOffset = (int) resources.getDimension(R.dimen.digital_y_offset);
+        int mYOffset = (int) r.getDimension(R.dimen.digital_y_offset);
         topDrawable.setOffset(mYOffset);
 
         float textSize = DrawableText.getMaximumTextWidth(DrawingHelpers.NORMAL_TYPEFACE, this.topDrawableBounds, "00:00:00");
@@ -121,12 +121,12 @@ public class RegularWatchFace extends BaseWatchFace {
                 t.setTextSize(textSize * textScaleFactor);
             }
         }
-        mTF.get(eTF.DAY_OF_WEEK).setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
-        mTF.get(eTF.DATE).setTextSize(resources.getDimension(R.dimen.digital_date_text_size));
-        mTF.get(eTF.CALENDAR_1).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-        mTF.get(eTF.CALENDAR_2).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-        mTF.get(eTF.BATTERY).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
-        mTF.get(eTF.WEATHER_TEMP).setTextSize(resources.getDimension(R.dimen.digital_small_date_text_size));
+        mTF.get(eTF.DAY_OF_WEEK).setTextSize(r.getDimension(R.dimen.digital_date_text_size));
+        mTF.get(eTF.DATE).setTextSize(r.getDimension(R.dimen.digital_date_text_size));
+        mTF.get(eTF.CALENDAR_1).setTextSize(r.getDimension(R.dimen.digital_small_date_text_size));
+        mTF.get(eTF.CALENDAR_2).setTextSize(r.getDimension(R.dimen.digital_small_date_text_size));
+        mTF.get(eTF.BATTERY).setTextSize(r.getDimension(R.dimen.digital_small_date_text_size));
+        mTF.get(eTF.WEATHER_TEMP).setTextSize(r.getDimension(R.dimen.digital_small_date_text_size));
     }
 
     @Override

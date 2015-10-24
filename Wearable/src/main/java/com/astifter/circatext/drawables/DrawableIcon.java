@@ -17,12 +17,6 @@ public class DrawableIcon implements Drawable {
     private int alignment;
     private boolean hidden;
 
-    public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable) {
-        this.index = idx;
-        this.scale = 100;
-        create(drawable, Align.LEFT);
-    }
-
     public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable, int align, int scale) {
         this.index = idx;
         this.scale = scale;
@@ -56,7 +50,7 @@ public class DrawableIcon implements Drawable {
             return;
         }
         Rect scaledbounds = new Rect(currentBounds);
-        if (scale != 100) {
+        if (scale != 0) {
             int verticalinset = currentBounds.height() * scale / 200;
             int horizontalinset = currentBounds.width() * scale / 200;
             scaledbounds.inset(horizontalinset, verticalinset);

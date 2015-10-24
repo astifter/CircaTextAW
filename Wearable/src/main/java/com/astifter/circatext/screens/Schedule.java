@@ -1,11 +1,14 @@
 package com.astifter.circatext.screens;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.drawables.Drawable;
+import com.astifter.circatext.drawables.StaticIcon;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.graphicshelpers.Position;
 import com.astifter.circatext.drawables.StaticText;
@@ -20,17 +23,22 @@ public class Schedule implements Screen {
     final static int disection = 25;
     final static int lineHeight = 10;
     private final int bgColor;
+    private final Resources resources;
     private DetailSchedule detailedScreen;
 
-    public Schedule(CalendarHelper.EventInfo[] mMeetings, int bgColor) {
+    public Schedule(Resources r, CalendarHelper.EventInfo[] mMeetings, int bgColor) {
+        this.resources = r;
         this.bgColor = bgColor;
         this.meetings = mMeetings;
         drawables = new ArrayList<>();
         rects = new ArrayList<>();
-        int i = 0;
-        StaticText head = new StaticText(-1, "Termine", new Rect(5,5,95,20), Drawable.Align.RIGHT);
+
+        StaticText head = new StaticText(Drawable.Touched.UNKNOWN, "Termine", new Rect(5,5,95,20), Drawable.Align.RIGHT);
         head.autoSize(true);
         drawables.add(head);
+        drawables.add(new StaticIcon(Drawable.Touched.CLOSEME, r.getDrawable(R.drawable.ic_arrow_back_24dp, r.newTheme()), new Rect(5,5,20,20), 20));
+
+        int i = 0;
         for (CalendarHelper.EventInfo ei : mMeetings) {
             int top = 20 + (i*(lineHeight*12/10));
             int bottom = top + lineHeight;
@@ -96,8 +104,8 @@ public class Schedule implements Screen {
             if (idx >= Drawable.Touched.FIRST) {
                 detailedScreen = new DetailSchedule(meetings[idx], bgColor);
                 return Drawable.Touched.FINISHED;
-            }
-            return Drawable.Touched.CLOSEME;
+            } else
+            return idx;
         }
     }
 }

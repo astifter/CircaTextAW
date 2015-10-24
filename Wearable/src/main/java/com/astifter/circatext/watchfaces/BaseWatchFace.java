@@ -42,6 +42,7 @@ public abstract class BaseWatchFace implements WatchFace {
     private BatteryHelper.BatteryInfo mBatteryInfo;
     protected CalendarHelper.EventInfo[] mMeetings;
     protected Weather mWeather = null;
+    protected Resources resources;
 
     BaseWatchFace(CanvasWatchFaceService.Engine parent) {
         this.parent = parent;
@@ -68,12 +69,13 @@ public abstract class BaseWatchFace implements WatchFace {
     }
 
     @Override
-    public void setMetrics(Resources resources, WindowInsets insets) {
-        int width = resources.getDisplayMetrics().widthPixels;
-        int height = resources.getDisplayMetrics().heightPixels;
+    public void setMetrics(Resources r, WindowInsets insets) {
+        this.resources = r;
+        int width = r.getDisplayMetrics().widthPixels;
+        int height = r.getDisplayMetrics().heightPixels;
         mBounds = new Rect(0, 0, width, height);
 
-        mBackgroundPaintColor = resources.getColor(R.color.transparent);
+        mBackgroundPaintColor = r.getColor(R.color.transparent);
         mBackgroundPaint.setColor(mBackgroundPaintColor);
     }
 

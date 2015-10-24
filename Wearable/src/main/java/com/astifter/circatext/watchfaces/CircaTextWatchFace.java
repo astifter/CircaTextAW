@@ -43,17 +43,17 @@ public class CircaTextWatchFace extends BaseWatchFace {
     }
 
     @Override
-    public void setMetrics(Resources resources, WindowInsets insets) {
-        super.setMetrics(resources, insets);
+    public void setMetrics(Resources r, WindowInsets insets) {
+        super.setMetrics(r, insets);
         if (this.roundemulation) {
             int offset = 12;
             int height = (100 - (2 * offset)) / 3;
             int io = 2;
 
-            createAnimatable(eTF.SHORTCAL, new Rect(5, 8, 80, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
+            createAnimatable(eTF.SHORTCAL, new Rect(5, 8, 80, 20), Drawable.Align.RIGHT, r, R.drawable.calendar)
                     .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.RIGHT)
                     .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
-            createAnimatable(eTF.WEATHER_TEMP, new Rect(20, 8, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
+            createAnimatable(eTF.WEATHER_TEMP, new Rect(20, 8, 95, 20), Drawable.Align.LEFT, r, R.drawable.thermometer)
                     .setConfig(Drawable.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.LEFT)
                     .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
             createAnimatable(eCT.FIRST, new Rect(5, 17, 95, 43), Drawable.Align.CENTER)
@@ -76,10 +76,10 @@ public class CircaTextWatchFace extends BaseWatchFace {
             int height = (100 - (2 * offset)) / 3;
             int io = 2;
 
-            createAnimatable(eTF.SHORTCAL, new Rect(5, 5, 95, 20), Drawable.Align.RIGHT, resources, R.drawable.calendar)
+            createAnimatable(eTF.SHORTCAL, new Rect(5, 5, 95, 20), Drawable.Align.RIGHT, r, R.drawable.calendar)
                     .setConfig(Drawable.Config.PEEK, new Rect(95, -20, 95, -20), Drawable.Align.RIGHT)
                     .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
-            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT, resources, R.drawable.thermometer)
+            createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT, r, R.drawable.thermometer)
                     .setConfig(Drawable.Config.PEEK, new Rect(5, -20, 5, -20))
                     .setConfig(Drawable.Config.TIME, Drawable.Config.PLAIN);
             createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 44), Drawable.Align.RIGHT)
@@ -100,14 +100,14 @@ public class CircaTextWatchFace extends BaseWatchFace {
         }
     }
 
-    private Animatable createAnimatable(int textid, Rect fp, int fpa, Resources res, int drawableid) {
+    private Animatable createAnimatable(int textid, Rect fp, int fpa, Resources r, int drawableid) {
         DrawableText dt = new DrawableText(textid, mTexts);
         dt.autoSize(true);
 
         Drawable d;
         if (drawableid >= 0) {
             StackHorizontal tempstack = new StackHorizontal();
-            DrawableIcon icon = new DrawableIcon(textid, res.getDrawable(drawableid, res.newTheme()), fpa, 35);
+            DrawableIcon icon = new DrawableIcon(textid, r.getDrawable(drawableid, r.newTheme()), fpa, 35);
             if (fpa == Drawable.Align.LEFT || fpa == Drawable.Align.CENTER) {
                 tempstack.add(icon);
                 tempstack.add(dt);
@@ -184,9 +184,9 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 }
                 topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
             } else if (idx == eTF.SHORTCAL) {
-                showScreen = new Schedule(this.mMeetings, this.mBackgroundPaint.getColor());
+                showScreen = new Schedule(this.resources, this.mMeetings, this.mBackgroundPaint.getColor());
             } else if (idx == eTF.WEATHER_TEMP) {
-                showScreen = new WeatherScreen(this.mWeather);
+                showScreen = new WeatherScreen(this.resources, this.mWeather);
             } else {
                 return Drawable.Touched.FINISHED;
             }

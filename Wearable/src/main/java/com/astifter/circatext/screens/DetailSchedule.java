@@ -1,39 +1,42 @@
 package com.astifter.circatext.screens;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatext.drawables.DrawableText;
+import com.astifter.circatext.drawables.StaticIcon;
 import com.astifter.circatext.drawables.StaticText;
+import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 
 import java.util.ArrayList;
 
-/**
- * Created by astifter on 23.10.15.
- */
 public class DetailSchedule implements Screen {
     private final CalendarHelper.EventInfo meeting;
-    private final ArrayList<StaticText> drawables;
+    private final ArrayList<Drawable> drawables;
+    private final int bgColor;
 
-    DetailSchedule(CalendarHelper.EventInfo ei, int bgColor) {
+    DetailSchedule(Resources r, CalendarHelper.EventInfo ei, int bgColor) {
+        this.bgColor = bgColor;
         drawables = new ArrayList<>();
         meeting = ei;
+        drawables.add(new StaticIcon(Drawable.Touched.CLOSEME, r.getDrawable(R.drawable.ic_arrow_back_24dp, r.newTheme()), new Rect(5,5,20,20), 20));
 
-        StaticText start = new StaticText(0, meeting.formatStart(), new Rect(5,5,95,20), Drawable.Align.LEFT);
+        createStaticText(meeting.formatStart(), new Rect(5, 5, 95, 15), Drawable.Align.LEFT);
+        createStaticText(meeting.formatEnd(), new Rect(5, 5, 95, 15), Drawable.Align.RIGHT);
+        createStaticText(meeting.Title, new Rect(5, 17, 95, 27), Drawable.Align.LEFT);
+        createStaticText(meeting.Description, new Rect(5, 29, 95, 39), Drawable.Align.LEFT);
+    }
+
+    private void createStaticText(String s, Rect r, int a) {
+        StaticText start = new StaticText(0, s, r, a);
+        start.autoSize(true);
+        start.ensureMaximumWidth(true);
+        start.setBackgroundColor(this.bgColor);
         drawables.add(start);
-        StaticText end = new StaticText(0, meeting.formatEnd(), new Rect(5,5,95,20), Drawable.Align.RIGHT);
-        drawables.add(end);
-        StaticText title = new StaticText(0, meeting.Title, new Rect(5,22,95,37), Drawable.Align.LEFT);
-        drawables.add(title);
-        StaticText descr = new StaticText(0, meeting.Description, new Rect(5,39,95,54), Drawable.Align.LEFT);
-        drawables.add(descr);
-
-        for (DrawableText dt : drawables) {
-            dt.autoSize(true); dt.ensureMaximumWidth(true);
-            dt.setBackgroundColor(bgColor);
-        }
     }
 
     @Override

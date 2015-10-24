@@ -1,5 +1,6 @@
 package com.astifter.circatext.screens;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
@@ -12,7 +13,7 @@ import com.astifter.circatextutils.Weather;
 public class WeatherScreen implements Screen {
     private final Weather weather;
 
-    public WeatherScreen(Weather mWeather) {
+    public WeatherScreen(Resources r, Weather mWeather) {
         this.weather = mWeather;
     }
 
