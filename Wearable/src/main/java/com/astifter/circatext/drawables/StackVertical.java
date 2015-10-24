@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import com.astifter.circatextutils.CircaTextConsts;
+import com.astifter.circatextutils.CTCs;
 
 import java.util.ArrayList;
 
@@ -47,7 +47,7 @@ public class StackVertical extends Stack {
         this.bounds.bottom = Math.min(this.bounds.bottom, this.bounds.top + heigth);
         this.bounds.right = Math.min(this.bounds.right, this.bounds.left + width);
 
-        if (CircaTextConsts.DEBUG) {
+        if (CTCs.DEBUG) {
             Paint p = new Paint();
             p.setColor(Color.WHITE);
             p.setStyle(Paint.Style.STROKE);
@@ -89,7 +89,7 @@ public class StackVertical extends Stack {
         newBounds.bottom = Math.min(this.bounds.bottom, this.yCenter + heigthBelow);
         this.bounds = newBounds;
 
-        if (CircaTextConsts.DEBUG) {
+        if (CTCs.DEBUG) {
             Paint p = new Paint();
             p.setColor(Color.WHITE);
             p.setStyle(Paint.Style.STROKE);

@@ -41,8 +41,8 @@ import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.watchfaces.CircaTextWatchFace;
 import com.astifter.circatext.watchfaces.RegularWatchFace;
 import com.astifter.circatext.watchfaces.WatchFace;
-import com.astifter.circatextutils.CircaTextConsts;
-import com.astifter.circatextutils.CircaTextUtil;
+import com.astifter.circatextutils.CTCs;
+import com.astifter.circatextutils.CTU;
 import com.astifter.circatextutils.Serializer;
 import com.astifter.circatextutils.Weather;
 import com.google.android.gms.common.ConnectionResult;
@@ -85,7 +85,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                                  GoogleApiClient.OnConnectionFailedListener {
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
-        final GoogleApiClient mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(CircaTextService.this, this, this);
+        final GoogleApiClient mGoogleApiClient = CTU.buildGoogleApiClient(CircaTextService.this, this, this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
         WatchFace wtf;
@@ -303,7 +303,7 @@ public class CircaTextService extends CanvasWatchFaceService {
 
                 if (Log.isLoggable(TAG, Log.DEBUG))
                     Log.d(TAG, "onTimeTick() requesting weather update");
-                Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CircaTextConsts.REQUIRE_WEATHER_MESSAGE, null);
+                Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CTCs.REQUIRE_WEATHER_MESSAGE, null);
             }
 
             super.onTimeTick();
@@ -367,10 +367,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                 DataItem dataItem = dataEvent.getDataItem();
                 DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
                 DataMap config = dataMapItem.getDataMap();
-                if (dataItem.getUri().getPath().equals(CircaTextConsts.PATH_WITH_FEATURE)) {
+                if (dataItem.getUri().getPath().equals(CTCs.PATH_WITH_FEATURE)) {
                     updateUiForConfigDataMap(config);
                 }
-                if (dataItem.getUri().getPath().equals(CircaTextConsts.SEND_WEATHER_MESSAGE)) {
+                if (dataItem.getUri().getPath().equals(CTCs.SEND_WEATHER_MESSAGE)) {
                     if (config.containsKey("weather")) {
                         try {
                             mWeather = (Weather) Serializer.deserialize(config.getByteArray("weather"));
@@ -392,15 +392,15 @@ public class CircaTextService extends CanvasWatchFaceService {
 
             Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
 
-            CircaTextUtil.fetchConfigDataMap(mGoogleApiClient,
-                    new CircaTextUtil.FetchConfigDataMapCallback() {
+            CTU.fetchConfigDataMap(mGoogleApiClient,
+                    new CTU.FetchConfigDataMapCallback() {
                         @Override
                         public void onConfigDataMapFetched(DataMap startupConfig) {
                             if (Log.isLoggable(TAG, Log.DEBUG))
                                 Log.d(TAG, "onConnected().onConfigDataMapFetched()");
 
-                            CircaTextConsts.setDefaultValuesForMissingConfigKeys(startupConfig);
-                            CircaTextUtil.putConfigDataItem(mGoogleApiClient, CircaTextConsts.PATH_WITH_FEATURE, startupConfig);
+                            CTCs.setDefaultValuesForMissingConfigKeys(startupConfig);
+                            CTU.putConfigDataItem(mGoogleApiClient, CTCs.PATH_WITH_FEATURE, startupConfig);
 
                             updateUiForConfigDataMap(startupConfig);
                         }
@@ -408,7 +408,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             );
             {
                 DataMap blankWeather = new DataMap();
-                CircaTextUtil.putConfigDataItem(mGoogleApiClient, CircaTextConsts.SEND_WEATHER_MESSAGE, blankWeather);
+                CTU.putConfigDataItem(mGoogleApiClient, CTCs.SEND_WEATHER_MESSAGE, blankWeather);
             }
         }
 
@@ -421,16 +421,16 @@ public class CircaTextService extends CanvasWatchFaceService {
                     continue;
                 }
                 switch (configKey) {
-                    case CircaTextConsts.KEY_EXCLUDED_CALENDARS:
-                        mCalendarHelper.setExcludedCalendars(config.getString(CircaTextConsts.KEY_EXCLUDED_CALENDARS));
+                    case CTCs.KEY_EXCLUDED_CALENDARS:
+                        mCalendarHelper.setExcludedCalendars(config.getString(CTCs.KEY_EXCLUDED_CALENDARS));
                         uiUpdated = true;
                         break;
-                    case CircaTextConsts.KEY_WATCHFACE:
-                        CircaTextConsts.WatchFaces wf;
+                    case CTCs.KEY_WATCHFACE:
+                        CTCs.WatchFaces wf;
                         try {
-                            wf = CircaTextConsts.WatchFaces.valueOf(config.getString(configKey));
+                            wf = CTCs.WatchFaces.valueOf(config.getString(configKey));
                         } catch (Throwable t) {
-                            wf = CircaTextConsts.WatchFaces.CIRCATEXTv1;
+                            wf = CTCs.WatchFaces.CIRCATEXTv1;
 
                         }
                         updateEnabled = false;
@@ -441,7 +441,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                             case CIRCATEXTv1:
                             case CIRCATEXTv1ROUND:
                                 wtf = new CircaTextWatchFace(this);
-                                if (wf == CircaTextConsts.WatchFaces.CIRCATEXTv1ROUND)
+                                if (wf == CTCs.WatchFaces.CIRCATEXTv1ROUND)
                                     wtf.setRoundMode(true);
                                 break;
                         }

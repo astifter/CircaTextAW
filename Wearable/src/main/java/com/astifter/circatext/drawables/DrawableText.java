@@ -9,7 +9,7 @@ import android.graphics.Typeface;
 import android.text.TextPaint;
 
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
-import com.astifter.circatextutils.CircaTextConsts;
+import com.astifter.circatextutils.CTCs;
 
 import java.util.HashMap;
 
@@ -219,7 +219,7 @@ public class DrawableText implements Drawable {
 
             canvas.restore();
         }
-        if (CircaTextConsts.DEBUG) {
+        if (CTCs.DEBUG) {
             if (this.textAlignment == DrawableText.Align.RIGHT)
                 targetWidth = -targetWidth;
             canvas.drawLine(x, y, x + targetWidth, y, this.textPaint);

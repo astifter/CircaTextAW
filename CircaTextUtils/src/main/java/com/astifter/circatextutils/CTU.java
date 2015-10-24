@@ -30,11 +30,11 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
-public final class CircaTextUtil {
-    private static final String TAG = "CircaTextUtil";
+public final class CTU {
+    private static final String TAG = "CTU";
 
-    private CircaTextUtil() {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CircaTextUtil()");
+    private CTU() {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CTU()");
     }
 
     public static GoogleApiClient buildGoogleApiClient(
@@ -64,7 +64,7 @@ public final class CircaTextUtil {
                         String localNode = getLocalNodeResult.getNode().getId();
                         Uri uri = new Uri.Builder()
                                 .scheme("wear")
-                                .path(CircaTextConsts.PATH_WITH_FEATURE)
+                                .path(CTCs.PATH_WITH_FEATURE)
                                 .authority(localNode)
                                 .build();
 
@@ -80,7 +80,7 @@ public final class CircaTextUtil {
                                                     final DataMap configKeysToOverwrite) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteKeysInConfigDataMap()");
 
-        CircaTextUtil.fetchConfigDataMap(googleApiClient,
+        CTU.fetchConfigDataMap(googleApiClient,
                 new FetchConfigDataMapCallback() {
                     @Override
                     public void onConfigDataMapFetched(DataMap currentConfig) {
@@ -90,7 +90,7 @@ public final class CircaTextUtil {
                         DataMap overwrittenConfig = new DataMap();
                         overwrittenConfig.putAll(currentConfig);
                         overwrittenConfig.putAll(configKeysToOverwrite);
-                        CircaTextUtil.putConfigDataItem(googleApiClient, CircaTextConsts.PATH_WITH_FEATURE, overwrittenConfig);
+                        CTU.putConfigDataItem(googleApiClient, CTCs.PATH_WITH_FEATURE, overwrittenConfig);
                     }
                 }
         );

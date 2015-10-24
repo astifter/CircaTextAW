@@ -30,8 +30,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.astifter.circatextutils.CircaTextConsts;
-import com.astifter.circatextutils.CircaTextUtil;
+import com.astifter.circatextutils.CTCs;
+import com.astifter.circatextutils.CTU;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
@@ -58,11 +58,11 @@ public class CircaTextWearableConfigActivity extends Activity implements
         listView.setClickListener(this);
         listView.addOnScrollListener(this);
         
-        WatchFaceConfig ctf = new WatchFaceConfig(CircaTextConsts.WatchFaces.CIRCATEXTv1.toString(),
+        WatchFaceConfig ctf = new WatchFaceConfig(CTCs.WatchFaces.CIRCATEXTv1.toString(),
                                                   "CircaText", "Textual time representation.");
-        WatchFaceConfig rtf = new WatchFaceConfig(CircaTextConsts.WatchFaces.CIRCATEXTv1ROUND.toString(),
+        WatchFaceConfig rtf = new WatchFaceConfig(CTCs.WatchFaces.CIRCATEXTv1ROUND.toString(),
                                                   "CircaText Round", "Textual time representation.");
-        WatchFaceConfig rwf = new WatchFaceConfig(CircaTextConsts.WatchFaces.REGULAR.toString(),
+        WatchFaceConfig rwf = new WatchFaceConfig(CTCs.WatchFaces.REGULAR.toString(),
                                                   "Regular", "Conventional time.");
         WatchFaceConfig[] watchfaces = { ctf, rwf, rtf };
         watchFaceListAdapter = new WatchFaceListAdapter(watchfaces);
@@ -101,10 +101,10 @@ public class CircaTextWearableConfigActivity extends Activity implements
         super.onStart();
         mGoogleApiClient.connect();
 
-        CircaTextUtil.fetchConfigDataMap(mGoogleApiClient, new CircaTextUtil.FetchConfigDataMapCallback() {
+        CTU.fetchConfigDataMap(mGoogleApiClient, new CTU.FetchConfigDataMapCallback() {
             @Override
             public void onConfigDataMapFetched(DataMap config) {
-                String selectedWatchface = config.getString(CircaTextConsts.KEY_WATCHFACE);
+                String selectedWatchface = config.getString(CTCs.KEY_WATCHFACE);
                 WatchFaceConfig[] watchfaces = watchFaceListAdapter.getWatchFaces();
                 for (int i = 0; i < watchfaces.length; i++) {
                     if (watchfaces[i].equals(selectedWatchface)) {
@@ -155,8 +155,8 @@ public class CircaTextWearableConfigActivity extends Activity implements
 
     private void updateConfigDataItem(final String watchFace) {
         DataMap configKeysToOverwrite = new DataMap();
-        configKeysToOverwrite.putString(CircaTextConsts.KEY_WATCHFACE, watchFace);
-        CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
+        configKeysToOverwrite.putString(CTCs.KEY_WATCHFACE, watchFace);
+        CTU.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
     }
 
     private static class WatchFaceItem extends LinearLayout implements WearableListView.OnCenterProximityListener {

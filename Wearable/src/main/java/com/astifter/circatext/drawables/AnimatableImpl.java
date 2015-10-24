@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.animation.LinearInterpolator;
 
 import com.astifter.circatext.graphicshelpers.Position;
+import com.astifter.circatextutils.CTCs;
 
 import java.util.HashMap;
 
@@ -19,7 +20,7 @@ public class AnimatableImpl implements Drawable, Animatable {
 
     final CanvasWatchFaceService.Engine parent;
     private final Drawable drawable;
-    HashMap<Config, Position> configs;
+    HashMap<CTCs.Config, Position> configs;
 
     Position currentPosition;
     private boolean hidden;
@@ -31,34 +32,34 @@ public class AnimatableImpl implements Drawable, Animatable {
     }
 
     @Override
-    public void setPosition(Config c, Rect position, int alignment, Rect bounds) {
+    public void setPosition(CTCs.Config c, Rect position, int alignment, Rect bounds) {
         Position p = new Position(position, alignment);
         configs.put(c, p);
         this.currentPosition = Position.percentagePosition(p, bounds);
     }
 
-    public Animatable setConfig(Config c, Position p) {
+    public Animatable setConfig(CTCs.Config c, Position p) {
         configs.put(c, p);
         return this;
     }
 
     @Override
-    public Animatable setConfig(Config c, Rect position, int alignment) {
+    public Animatable setConfig(CTCs.Config c, Rect position, int alignment) {
         return setConfig(c, new Position(position, alignment));
     }
 
     @Override
-    public Animatable setConfig(Config c, Rect position) {
+    public Animatable setConfig(CTCs.Config c, Rect position) {
         return setConfig(c, position, Drawable.Align.LEFT);
     }
 
     @Override
-    public Animatable setConfig(Config c, Config o) {
+    public Animatable setConfig(CTCs.Config c, CTCs.Config o) {
         return setConfig(c, configs.get(o));
     }
 
     @Override
-    public void animateToConfig(Config c, Rect bounds) {
+    public void animateToConfig(CTCs.Config c, Rect bounds) {
         Position op = this.currentPosition;
         Position np = Position.percentagePosition(configs.get(c), bounds);
 

@@ -19,8 +19,8 @@ package com.astifter.circatext;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.astifter.circatextutils.CircaTextConsts;
-import com.astifter.circatextutils.CircaTextUtil;
+import com.astifter.circatextutils.CTCs;
+import com.astifter.circatextutils.CTU;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
@@ -45,7 +45,7 @@ public class CircaTextConfigListenerService extends WearableListenerService
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived()");
 
         if (mGoogleApiClient == null) {
-            mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this, this, this);
+            mGoogleApiClient = CTU.buildGoogleApiClient(this, this, this);
             if (Log.isLoggable(TAG, Log.DEBUG))
                 Log.d(TAG, "onMessageReceived(): built mGoogleApiClient");
         }
@@ -67,16 +67,16 @@ public class CircaTextConfigListenerService extends WearableListenerService
         // and skips the ones that we don't want to change.
         DataMap configKeys = DataMap.fromByteArray(rawData);
 
-        if (messageEvent.getPath().equals(CircaTextConsts.SEND_WEATHER_MESSAGE)) {
+        if (messageEvent.getPath().equals(CTCs.SEND_WEATHER_MESSAGE)) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): weather");
 
-            CircaTextUtil.putConfigDataItem(mGoogleApiClient, CircaTextConsts.SEND_WEATHER_MESSAGE, configKeys);
+            CTU.putConfigDataItem(mGoogleApiClient, CTCs.SEND_WEATHER_MESSAGE, configKeys);
         }
 
-        if (messageEvent.getPath().equals(CircaTextConsts.PATH_WITH_FEATURE)) {
+        if (messageEvent.getPath().equals(CTCs.PATH_WITH_FEATURE)) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived(): config");
 
-            CircaTextUtil.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeys);
+            CTU.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeys);
         }
     }
 

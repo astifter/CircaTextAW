@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.astifter.circatextutils.CircaTextConsts;
+import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.Serializer;
 import com.astifter.circatextutils.Weather;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -103,7 +103,7 @@ public class CircaTextWeatherService extends WearableListenerService {
 
         mPeerId = messageEvent.getSourceNodeId();
 
-        if (messageEvent.getPath().equals(CircaTextConsts.REQUIRE_WEATHER_MESSAGE)) {
+        if (messageEvent.getPath().equals(CTCs.REQUIRE_WEATHER_MESSAGE)) {
             getCity();
             JSONWeatherTask t = new JSONWeatherTask(this);
             t.execute();
@@ -164,7 +164,7 @@ public class CircaTextWeatherService extends WearableListenerService {
             if (!mGoogleApiClient.isConnected())
                 mGoogleApiClient.connect();
 
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CircaTextConsts.SEND_WEATHER_MESSAGE, weatherData.toByteArray())
+            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CTCs.SEND_WEATHER_MESSAGE, weatherData.toByteArray())
                     .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
                         @Override
                         public void onResult(MessageApi.SendMessageResult sendMessageResult) {

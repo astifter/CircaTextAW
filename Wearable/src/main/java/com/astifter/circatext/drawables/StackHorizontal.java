@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import com.astifter.circatextutils.CircaTextConsts;
+import com.astifter.circatextutils.CTCs;
 
 public class StackHorizontal extends Stack {
     @Override
@@ -44,7 +44,7 @@ public class StackHorizontal extends Stack {
         this.bounds.right = Math.min(this.bounds.right, this.bounds.left + width);
         this.bounds.bottom = Math.min(this.bounds.bottom, this.bounds.top + height);
 
-        if (CircaTextConsts.DEBUG) {
+        if (CTCs.DEBUG) {
             Paint p = new Paint();
             p.setColor(Color.GRAY);
             p.setStyle(Paint.Style.STROKE);

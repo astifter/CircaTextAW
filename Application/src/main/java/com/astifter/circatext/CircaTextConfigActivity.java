@@ -30,8 +30,8 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.astifter.circatextutils.CircaTextConsts;
-import com.astifter.circatextutils.CircaTextUtil;
+import com.astifter.circatextutils.CTCs;
+import com.astifter.circatextutils.CTU;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -63,7 +63,7 @@ public class CircaTextConfigActivity extends Activity
         mPeerId = getIntent().getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): mPeerId=" + mPeerId);
 
-        mGoogleApiClient = CircaTextUtil.buildGoogleApiClient(this, this, this);
+        mGoogleApiClient = CTU.buildGoogleApiClient(this, this, this);
 
         ComponentName name =
                 getIntent().getParcelableExtra(WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
@@ -105,7 +105,7 @@ public class CircaTextConfigActivity extends Activity
 
         if (mPeerId != null) {
             Uri.Builder builder = new Uri.Builder();
-            Uri uri = builder.scheme("wear").path(CircaTextConsts.PATH_WITH_FEATURE).authority(mPeerId).build();
+            Uri uri = builder.scheme("wear").path(CTCs.PATH_WITH_FEATURE).authority(mPeerId).build();
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected(): uri=" + uri.toString());
 
             Wearable.DataApi.getDataItem(mGoogleApiClient, uri).setResultCallback(this);
@@ -159,8 +159,8 @@ public class CircaTextConfigActivity extends Activity
     private void setUpAllPickers(DataMap config) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpAllPickers()");
 
-        setUpEditTextContent(R.id.exclude_calendars, CircaTextConsts.KEY_EXCLUDED_CALENDARS, config, "");
-        setUpEditTextListener(R.id.exclude_calendars, CircaTextConsts.KEY_EXCLUDED_CALENDARS);
+        setUpEditTextContent(R.id.exclude_calendars, CTCs.KEY_EXCLUDED_CALENDARS, config, "");
+        setUpEditTextListener(R.id.exclude_calendars, CTCs.KEY_EXCLUDED_CALENDARS);
     }
 
     private void setUpEditTextContent(int editTextId, final String configKey, DataMap config,
@@ -213,7 +213,7 @@ public class CircaTextConfigActivity extends Activity
         byte[] rawData = config.toByteArray();
 
         if (mPeerId != null) {
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CircaTextConsts.PATH_WITH_FEATURE, rawData);
+            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CTCs.PATH_WITH_FEATURE, rawData);
             if (Log.isLoggable(TAG, Log.DEBUG))
                 Log.d(TAG, "sendGenericConfigUpdateMessage(): Wearable.MessageApi.sendMessage()");
         }

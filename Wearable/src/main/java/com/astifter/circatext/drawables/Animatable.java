@@ -3,16 +3,18 @@ package com.astifter.circatext.drawables;
 import android.animation.Animator;
 import android.graphics.Rect;
 
+import com.astifter.circatextutils.CTCs;
+
 public interface Animatable {
-    void setPosition(Drawable.Config c, Rect position, int alignment, Rect bounds);
+    void setPosition(CTCs.Config c, Rect position, int alignment, Rect bounds);
 
-    Animatable setConfig(Drawable.Config c, Rect position, int alignment);
+    Animatable setConfig(CTCs.Config c, Rect position, int alignment);
 
-    Animatable setConfig(Drawable.Config c, Rect position);
+    Animatable setConfig(CTCs.Config c, Rect position);
 
-    Animatable setConfig(Drawable.Config c, Drawable.Config o);
+    Animatable setConfig(CTCs.Config c, CTCs.Config o);
 
-    void animateToConfig(Drawable.Config c, Rect bounds);
+    void animateToConfig(CTCs.Config c, Rect bounds);
 
     void setLeft(int l);
 

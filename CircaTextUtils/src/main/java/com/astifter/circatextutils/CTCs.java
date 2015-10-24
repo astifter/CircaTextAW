@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
 
-public class CircaTextConsts {
+public class CTCs {
     public static final boolean DEBUG = false;
     public static final String KEY_EXCLUDED_CALENDARS = "EXCLUDED_CALENDARS";
     public static final String KEY_WATCHFACE = "WATCHFACE";
@@ -15,7 +15,7 @@ public class CircaTextConsts {
     public static final String REQUIRE_WEATHER_MESSAGE = "/com.astifter.circatext/require_weather";
     public static final String SEND_WEATHER_MESSAGE = "/com.astifter.circatext/send_weather";
 
-    private static final String TAG = "CircaTextConsts";
+    private static final String TAG = "CTCs";
 
     private static int parseColor(String colorName) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "parseColor()");
@@ -42,5 +42,9 @@ public class CircaTextConsts {
 
     public enum WatchFaces {
         REGULAR, CIRCATEXTv1, CIRCATEXTv1ROUND
+    }
+
+    public enum Config {
+        PLAIN, PEEK, TIME
     }
 }
