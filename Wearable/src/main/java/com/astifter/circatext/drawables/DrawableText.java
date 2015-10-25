@@ -2,7 +2,6 @@ package com.astifter.circatext.drawables;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -42,13 +41,6 @@ public class DrawableText implements Drawable {
         this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
         setAlignment(Align.LEFT);
         setText(where, source);
-    }
-
-    protected void setText(int where, HashMap<Integer, String> source) {
-        this.textSourceName = where;
-        this.textSource = source;
-        if (this.textSource.get(this.textSourceName) == null)
-            throw new IllegalArgumentException();
     }
 
     private static float getMaximumTextHeight(Typeface f, Rect bounds, float lineHeight) {
@@ -124,6 +116,13 @@ public class DrawableText implements Drawable {
         return (-fm.ascent + fm.descent) * lineHeight;
     }
 
+    protected void setText(int where, HashMap<Integer, String> source) {
+        this.textSourceName = where;
+        this.textSource = source;
+        if (this.textSource.get(this.textSourceName) == null)
+            throw new IllegalArgumentException();
+    }
+
     @Override
     public float getFutureHeight() {
         if (this.hidden) return 0;
@@ -170,9 +169,15 @@ public class DrawableText implements Drawable {
         float lineWidth = 0;
         String lineString = "";
         switch (this.textAlignment) {
-            case Align.LEFT:   drawnBounds = new Rect(b.left, b.top, b.left, b.top); break;
-            case Align.RIGHT:  drawnBounds = new Rect(b.right, b.top, b.right, b.top); break;
-            case Align.CENTER: drawnBounds = new Rect(b.centerX(), b.top, b.centerX(), b.top); break;
+            case Align.LEFT:
+                drawnBounds = new Rect(b.left, b.top, b.left, b.top);
+                break;
+            case Align.RIGHT:
+                drawnBounds = new Rect(b.right, b.top, b.right, b.top);
+                break;
+            case Align.CENTER:
+                drawnBounds = new Rect(b.centerX(), b.top, b.centerX(), b.top);
+                break;
         }
 
         Paint.FontMetrics fm = this.textPaint.getFontMetrics();
@@ -182,7 +187,7 @@ public class DrawableText implements Drawable {
                 float wordWidth = this.getFutureWidth(" " + currentWord);
                 if ((wordWidth + lineWidth) < b.width() || lineString == "") {
                     lineWidth += wordWidth;
-                    if (lineString ==  "")
+                    if (lineString == "")
                         lineString = currentWord;
                     else
                         lineString += " " + currentWord;
@@ -200,22 +205,22 @@ public class DrawableText implements Drawable {
             if (textAlignment == DrawableText.Align.LEFT) {
                 x = drawnBounds.left;
                 if (lineWidth > drawnBounds.width())
-                    drawnBounds.right = (int)(x + lineWidth);
+                    drawnBounds.right = (int) (x + lineWidth);
             } else if (textAlignment == DrawableText.Align.RIGHT) {
                 x = drawnBounds.right;
                 if (lineWidth > drawnBounds.width())
-                    drawnBounds.left = (int)(x - lineWidth);
+                    drawnBounds.left = (int) (x - lineWidth);
             } else if (textAlignment == DrawableText.Align.CENTER) {
                 x = drawnBounds.centerX();
                 if (lineWidth > drawnBounds.width()) {
                     float inset = (b.width() - lineWidth) / 2;
-                    drawnBounds.left = (int)(b.left + inset);
-                    drawnBounds.right = (int)(b.right - inset);
+                    drawnBounds.left = (int) (b.left + inset);
+                    drawnBounds.right = (int) (b.right - inset);
                 }
             }
 
             float y = drawnBounds.bottom + (-fm.ascent * lineHeight);
-            drawnBounds.bottom += (int)getTextHeightForPaint(this.textPaint, this.lineHeight);
+            drawnBounds.bottom += (int) getTextHeightForPaint(this.textPaint, this.lineHeight);
 
             canvas.drawText(lineString, x, y, textPaint);
 

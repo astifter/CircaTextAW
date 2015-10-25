@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
 import com.astifter.circatext.CircaTextService;
@@ -28,6 +27,9 @@ import java.util.TimeZone;
 public abstract class BaseWatchFace implements WatchFace {
     final HashMap<Integer, String> mTexts = new HashMap<>();
     final CircaTextService.Engine parent;
+    protected CalendarHelper.EventInfo[] mMeetings;
+    protected Weather mWeather = null;
+    protected Resources resources;
     Paint mBackgroundPaint;
     int mBackgroundPaintColor;
     Rect mBounds;
@@ -41,9 +43,6 @@ public abstract class BaseWatchFace implements WatchFace {
     private SimpleDateFormat mDateFormat;
     private SimpleDateFormat mShortDateFormat;
     private BatteryHelper.BatteryInfo mBatteryInfo;
-    protected CalendarHelper.EventInfo[] mMeetings;
-    protected Weather mWeather = null;
-    protected Resources resources;
 
     BaseWatchFace(CircaTextService.Engine parent) {
         this.parent = parent;
@@ -161,7 +160,8 @@ public abstract class BaseWatchFace implements WatchFace {
                 mTexts.put(eTF.CALENDAR_1, "no meetings");
                 mTexts.put(eTF.CALENDAR_2, "");
             } else {
-                CalendarHelper.EventInfo first = m.get(0); m.remove(0);
+                CalendarHelper.EventInfo first = m.get(0);
+                m.remove(0);
                 SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
                 mTexts.put(eTF.SHORTCAL, sdf.format(first.DtStart));
                 mTexts.put(eTF.CALENDAR_1, sdf.format(first.DtStart) + " " + first.Title);

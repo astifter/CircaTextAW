@@ -37,9 +37,6 @@ public class Position {
         this.bottom = b;
     }
 
-    public Position percentagePosition(Rect b) {
-        return Position.percentagePosition(this, b);
-    }
     public static Position percentagePosition(Position p, Rect b) {
         Position newp = new Position();
         newp.left = b.left + (int) (b.width() * p.left / 100f);
@@ -48,6 +45,10 @@ public class Position {
         newp.bottom = b.top + (int) (b.height() * p.bottom / 100f);
         newp.alignment = p.alignment;
         return newp;
+    }
+
+    public Position percentagePosition(Rect b) {
+        return Position.percentagePosition(this, b);
     }
 
     public Rect toRect() {

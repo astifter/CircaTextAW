@@ -57,7 +57,7 @@ public class DetailSchedule implements Screen {
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
-        Rect r = Position.percentagePosition(new Position(5,39,95,49), bounds).toRect();
+        Rect r = Position.percentagePosition(new Position(5, 39, 95, 49), bounds).toRect();
         sh.onDraw(canvas, r);
         for (Drawable d : drawables) {
             d.onDraw(canvas, bounds);

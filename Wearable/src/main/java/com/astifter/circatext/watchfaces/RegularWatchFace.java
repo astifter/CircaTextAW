@@ -6,16 +6,15 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
 import com.astifter.circatext.CircaTextService;
 import com.astifter.circatext.R;
 import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatext.drawables.DrawableText;
-import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.drawables.StackHorizontal;
 import com.astifter.circatext.drawables.StackVertical;
+import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatextutils.CTCs;
 
 import java.util.ArrayList;

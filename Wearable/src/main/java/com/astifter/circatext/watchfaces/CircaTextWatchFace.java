@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Region;
-import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
 import com.astifter.circatext.CircaTextService;
@@ -19,9 +18,9 @@ import com.astifter.circatext.drawables.AnimatableImpl;
 import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatext.drawables.DrawableIcon;
 import com.astifter.circatext.drawables.DrawableText;
+import com.astifter.circatext.drawables.StackHorizontal;
 import com.astifter.circatext.screens.Schedule;
 import com.astifter.circatext.screens.Screen;
-import com.astifter.circatext.drawables.StackHorizontal;
 import com.astifter.circatext.screens.WeatherScreen;
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.CTU;

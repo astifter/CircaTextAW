@@ -2,7 +2,6 @@ package com.astifter.circatext.drawables;
 
 import android.graphics.Rect;
 
-import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 
 import java.util.ArrayList;

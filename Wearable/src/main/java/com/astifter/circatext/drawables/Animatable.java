@@ -25,5 +25,6 @@ public interface Animatable {
     void setBottom(int t);
 
     void animateAlpha(int from, int to);
+
     void animateAlpha(int from, int to, Animator.AnimatorListener l);
 }

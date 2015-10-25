@@ -3,8 +3,6 @@ package com.astifter.circatext.drawables;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
-import com.astifter.circatext.drawables.Drawable;
-
 public class DrawableIcon implements Drawable {
     private final int index;
     private final int scale;

@@ -69,9 +69,9 @@ public class CircaTextConfigActivity extends Activity
                 getIntent().getParcelableExtra(WatchFaceCompanion.EXTRA_WATCH_FACE_COMPONENT);
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): name=" + name);
 
-        TextView htmlText = (TextView)findViewById(R.id.attributions);
+        TextView htmlText = (TextView) findViewById(R.id.attributions);
         htmlText.setText(Html.fromHtml(getResources().getString(R.string.digital_config_attribution_text)));
-        htmlText = (TextView)findViewById(R.id.exclude_calendars_expanation);
+        htmlText = (TextView) findViewById(R.id.exclude_calendars_expanation);
         htmlText.setText(Html.fromHtml(getResources().getString(R.string.excluded_calendar_explanation)));
 
     }

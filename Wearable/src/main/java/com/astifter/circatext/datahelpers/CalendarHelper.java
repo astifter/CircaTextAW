@@ -128,6 +128,7 @@ public class CalendarHelper {
             SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
             return sdf.format(this.DtStart);
         }
+
         public String formatEnd() {
             SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
             return sdf.format(this.DtEnd);

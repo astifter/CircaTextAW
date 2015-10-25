@@ -23,17 +23,17 @@
         android:id="@+id/exclude_calendars_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/digital_config_calendars"
         android:padding="5dp"
+        android:text="@string/digital_config_calendars"
         android:textColor="@color/black"
         android:textSize="24dp" />
 
     <TextView
+        android:id="@+id/exclude_calendars_expanation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/excluded_calendar_explanation"
-        android:id="@+id/exclude_calendars_expanation"
-        android:padding="5dp" />
+        android:padding="5dp"
+        android:text="@string/excluded_calendar_explanation" />
 
     <EditText
         android:id="@+id/exclude_calendars"
@@ -54,8 +54,8 @@
         android:id="@+id/attributions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="@color/black"
         android:padding="5dp"
-        android:text="@string/digital_config_attribution_text" />
+        android:text="@string/digital_config_attribution_text"
+        android:textColor="@color/black" />
 
 </LinearLayout>

@@ -2,11 +2,8 @@ package com.astifter.circatext.drawables;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.drawable.*;
 
 import com.astifter.circatext.graphicshelpers.Position;
-
-import java.util.HashMap;
 
 public class StaticIcon extends DrawableIcon {
     private Position position;
