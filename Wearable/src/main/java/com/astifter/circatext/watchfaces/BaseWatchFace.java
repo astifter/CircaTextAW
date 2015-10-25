@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
+import com.astifter.circatext.CircaTextService;
 import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
@@ -26,7 +27,7 @@ import java.util.TimeZone;
 
 public abstract class BaseWatchFace implements WatchFace {
     final HashMap<Integer, String> mTexts = new HashMap<>();
-    final CanvasWatchFaceService.Engine parent;
+    final CircaTextService.Engine parent;
     Paint mBackgroundPaint;
     int mBackgroundPaintColor;
     Rect mBounds;
@@ -44,7 +45,7 @@ public abstract class BaseWatchFace implements WatchFace {
     protected Weather mWeather = null;
     protected Resources resources;
 
-    BaseWatchFace(CanvasWatchFaceService.Engine parent) {
+    BaseWatchFace(CircaTextService.Engine parent) {
         this.parent = parent;
 
         mBackgroundPaint = new Paint();

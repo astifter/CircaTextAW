@@ -96,6 +96,14 @@ public final class CTU {
         );
     }
 
+    public static void sendConfigUpdateMessage(GoogleApiClient googleApiClient, String configKey, String content) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage(String)");
+
+        DataMap config = new DataMap();
+        config.putString(configKey, content);
+        putConfigDataItem(googleApiClient, CTCs.PATH_WITH_FEATURE, config);
+    }
+
     public static void putConfigDataItem(GoogleApiClient googleApiClient, String path, DataMap newConfig) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "putConfigDataItem()");
 

@@ -9,12 +9,14 @@ import android.graphics.Rect;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
+import com.astifter.circatext.CircaTextService;
 import com.astifter.circatext.R;
 import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatext.drawables.DrawableText;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.drawables.StackHorizontal;
 import com.astifter.circatext.drawables.StackVertical;
+import com.astifter.circatextutils.CTCs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +30,7 @@ public class RegularWatchFace extends BaseWatchFace {
     private float textScaleFactor = 1.0f;
     private Rect topDrawableBounds;
 
-    public RegularWatchFace(CanvasWatchFaceService.Engine parent) {
+    public RegularWatchFace(CircaTextService.Engine parent) {
         super(parent);
 
         setTexts();
@@ -237,5 +239,10 @@ public class RegularWatchFace extends BaseWatchFace {
         // Draw the background.
         canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
         topDrawable.onDraw(canvas, topDrawableBounds);
+    }
+
+    @Override
+    public void setSelectedConfig(CTCs.Config cfg) {
+        // TODO
     }
 }

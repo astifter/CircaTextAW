@@ -9,6 +9,7 @@ public class CTCs {
     public static final boolean DEBUG = false;
     public static final String KEY_EXCLUDED_CALENDARS = "EXCLUDED_CALENDARS";
     public static final String KEY_WATCHFACE = "WATCHFACE";
+    public static final String KEY_WATCHFACE_CONFIG = "WATCHFACE_CONFIG";
 
     public static final String PATH_WITH_FEATURE = "/com.astifter.circatext/config";
 
@@ -26,6 +27,7 @@ public class CTCs {
     public static void setDefaultValuesForMissingConfigKeys(DataMap config) {
         addConfigKeyIfMissing(config, KEY_EXCLUDED_CALENDARS, "");
         addConfigKeyIfMissing(config, KEY_WATCHFACE, WatchFaces.CIRCATEXTv1.toString());
+        addConfigKeyIfMissing(config, KEY_WATCHFACE_CONFIG, Config.PLAIN.toString());
     }
 
     private static void addConfigKeyIfMissing(DataMap config, String key, int value) {

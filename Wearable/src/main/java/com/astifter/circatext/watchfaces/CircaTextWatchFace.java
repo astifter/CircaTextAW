@@ -10,6 +10,7 @@ import android.graphics.Region;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.view.WindowInsets;
 
+import com.astifter.circatext.CircaTextService;
 import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.CircaTextStringer;
 import com.astifter.circatext.datahelpers.CircaTextStringerV2;
@@ -23,6 +24,7 @@ import com.astifter.circatext.screens.Screen;
 import com.astifter.circatext.drawables.StackHorizontal;
 import com.astifter.circatext.screens.WeatherScreen;
 import com.astifter.circatextutils.CTCs;
+import com.astifter.circatextutils.CTU;
 
 import java.util.HashMap;
 
@@ -34,7 +36,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private boolean roundemulation = false;
     private Screen showScreen;
 
-    public CircaTextWatchFace(CanvasWatchFaceService.Engine parent) {
+    public CircaTextWatchFace(CircaTextService.Engine parent) {
         super(parent);
 
         fillCircaTexts();
@@ -179,6 +181,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                     selectedConfig = CTCs.Config.TIME;
                 else if (selectedConfig == CTCs.Config.TIME)
                     selectedConfig = CTCs.Config.PLAIN;
+                CTU.sendConfigUpdateMessage(parent.mGoogleApiClient, CTCs.KEY_WATCHFACE_CONFIG, selectedConfig.toString());
                 currentConfig = selectedConfig;
                 for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
                     topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
@@ -199,6 +202,18 @@ public class CircaTextWatchFace extends BaseWatchFace {
     @Override
     public void setRoundMode(boolean b) {
         this.roundemulation = b;
+    }
+
+    @Override
+    public void setSelectedConfig(CTCs.Config cfg) {
+        this.selectedConfig = cfg;
+        if (this.currentConfig != CTCs.Config.PEEK) {
+            currentConfig = selectedConfig;
+            for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
+                topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
+            }
+            topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
+        }
     }
 
     @Override

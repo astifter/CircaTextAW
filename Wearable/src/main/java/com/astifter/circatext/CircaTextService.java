@@ -79,13 +79,13 @@ public class CircaTextService extends CanvasWatchFaceService {
         return new Engine();
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine
+    public class Engine extends CanvasWatchFaceService.Engine
                       implements DataApi.DataListener,
                                  GoogleApiClient.ConnectionCallbacks,
                                  GoogleApiClient.OnConnectionFailedListener {
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
-        final GoogleApiClient mGoogleApiClient = CTU.buildGoogleApiClient(CircaTextService.this, this, this);
+        public final GoogleApiClient mGoogleApiClient = CTU.buildGoogleApiClient(CircaTextService.this, this, this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
         WatchFace wtf;
@@ -431,7 +431,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                             wf = CTCs.WatchFaces.valueOf(config.getString(configKey));
                         } catch (Throwable t) {
                             wf = CTCs.WatchFaces.CIRCATEXTv1;
-
                         }
                         updateEnabled = false;
                         switch (wf) {
@@ -453,6 +452,18 @@ public class CircaTextService extends CanvasWatchFaceService {
                         wtf.updateVisibilty();
                         wtf.setPeekCardPosition(getPeekCardPosition());
                         updateEnabled = true;
+                        uiUpdated = true;
+                        break;
+                    case CTCs.KEY_WATCHFACE_CONFIG:
+                        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + config.getString(configKey));
+                        CTCs.Config cfg;
+                        try {
+                            cfg = CTCs.Config.valueOf(config.getString(configKey));
+                        } catch (Throwable t) {
+                            cfg = CTCs.Config.PLAIN;
+                        }
+                        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + cfg.toString());
+                        wtf.setSelectedConfig(cfg);
                         uiUpdated = true;
                         break;
                 }

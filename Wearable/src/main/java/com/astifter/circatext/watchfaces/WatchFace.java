@@ -7,6 +7,7 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
+import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.Weather;
 
 public interface WatchFace {
@@ -37,4 +38,6 @@ public interface WatchFace {
     int getTouchedText(int x, int y);
 
     void setRoundMode(boolean b);
+
+    void setSelectedConfig(CTCs.Config cfg);
 }
