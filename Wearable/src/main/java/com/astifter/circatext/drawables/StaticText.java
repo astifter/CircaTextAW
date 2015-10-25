@@ -11,6 +11,10 @@ import java.util.HashMap;
 public class StaticText extends DrawableText {
     private Position position;
 
+    public StaticText(int idx, String s) {
+        create(idx, s, null, Align.LEFT);
+    }
+
     public StaticText(int idx, String s, Rect p, int a) {
         create(idx, s, p, a);
     }
@@ -20,17 +24,18 @@ public class StaticText extends DrawableText {
         text = new HashMap<>();
         text.put(idx, s);
         setText(idx, text);
-        position = new Position(p, a);
+        if (p != null)
+            position = new Position(p, a);
         setAlignment(a);
-    }
-
-    public StaticText(int idx, String s, Rect p) {
-        create(idx, s, p, Align.LEFT);
     }
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
-        Rect r = position.percentagePosition(bounds).toRect();
+        Rect r;
+        if (position != null)
+            r = position.percentagePosition(bounds).toRect();
+        else
+            r = bounds;
         super.onDraw(canvas, r);
     }
 }

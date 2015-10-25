@@ -11,6 +11,8 @@ import android.text.TextPaint;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatextutils.CTCs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class DrawableText implements Drawable {
@@ -27,9 +29,9 @@ public class DrawableText implements Drawable {
     private HashMap<Integer, String> textSource;
     private float defaultTextSize;
     private boolean strokeInAmbientMode;
-    private boolean ensureMaxWidth;
     private boolean autoSize;
     private int backgroundColor;
+    private int multiLine = 1;
 
     public DrawableText() {
         this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
@@ -130,8 +132,12 @@ public class DrawableText implements Drawable {
 
     @Override
     public float getFutureWidth() {
+        return getFutureWidth(getTextFromSource());
+    }
+
+    private float getFutureWidth(String text) {
         if (this.hidden) return 0;
-        return this.textPaint.measureText(getTextFromSource());
+        return this.textPaint.measureText(text);
     }
 
     private TextPaint createTextPaint(Typeface t) {
@@ -150,90 +156,106 @@ public class DrawableText implements Drawable {
             return;
         }
 
-        String currentText = getTextFromSource();
+        ArrayList<String> remainingText = new ArrayList<>();
+        remainingText.addAll(Arrays.asList(getTextFromSource().split(" ")));
         if (this.autoSize) {
             float ts = this.getMaximumTextHeight(b);
             this.textPaint.setTextSize(ts);
         }
 
-        this.drawnBounds = b;
-        float maxWidth = b.width();
-        float targetWidth = this.getFutureWidth();
+        canvas.save();
+        canvas.clipRect(new Rect(b.left, b.top, b.right, b.top + (b.height() * multiLine)));
 
-        float x = 0;
-        if (this.textAlignment == DrawableText.Align.LEFT) {
-            x = drawnBounds.left;
-            this.drawnBounds.right = this.drawnBounds.left + (int) targetWidth;
-        } else if (this.textAlignment == DrawableText.Align.RIGHT) {
-            x = drawnBounds.right;
-            this.drawnBounds.left = this.drawnBounds.right - (int) targetWidth;
-        } else if (this.textAlignment == DrawableText.Align.CENTER) {
-            x = (drawnBounds.left + drawnBounds.right) / 2;
-            if (targetWidth < this.drawnBounds.width()) {
-                float inset = (this.drawnBounds.width() - targetWidth) / 2;
-                this.drawnBounds.left += (int) inset;
-                this.drawnBounds.right -= (int) inset;
-            }
+        int currentLine = 1;
+        float lineWidth = 0;
+        String lineString = "";
+        switch (this.textAlignment) {
+            case Align.LEFT:   drawnBounds = new Rect(b.left, b.top, b.left, b.top); break;
+            case Align.RIGHT:  drawnBounds = new Rect(b.right, b.top, b.right, b.top); break;
+            case Align.CENTER: drawnBounds = new Rect(b.centerX(), b.top, b.centerX(), b.top); break;
         }
 
         Paint.FontMetrics fm = this.textPaint.getFontMetrics();
-        float y = drawnBounds.top + (-fm.ascent * lineHeight);
-        this.drawnBounds.bottom = this.drawnBounds.top + (int) getTextHeightForPaint(this.textPaint, this.lineHeight);
+        while (true) {
+            if (remainingText.size() > 0) {
+                String currentWord = remainingText.get(0);
+                float wordWidth = this.getFutureWidth(" " + currentWord);
+                if ((wordWidth + lineWidth) < b.width() || lineString == "") {
+                    lineWidth += wordWidth;
+                    if (lineString ==  "")
+                        lineString = currentWord;
+                    else
+                        lineString += " " + currentWord;
+                    remainingText.remove(0);
+                    continue;
+                }
+            }
 
-        /**
-         * Some comments are in order:
-         * We first measure the currentText to be drawn. In case the maximum width is set and the
-         * currentText will exceed it do:
-         * - Get the font metrics and measure the overflow currentText "..." (ellipsis).
-         * - Draw the ellpsis right at the end of the allowed area (defined by x, y and
-         *   maxWidth).
-         * - Save the canvas and set a clipping rectangle for the currentText minus the width of
-         *   the ellipsis.
-         * - Adjust the actually used size (drawnSize) to the maxWidth.
-         */
-        Rect ellipsis = null;
-        if (targetWidth > maxWidth && this.textAlignment == Align.LEFT && ensureMaxWidth) {
-            canvas.save();
-            float ellipsisSize = textPaint.measureText("...");
-            ellipsis = new Rect((int)(x + maxWidth - ellipsisSize), (int)(y + fm.ascent ),
-                                (int)(x + maxWidth),                (int)(y + fm.descent) );
+            if (currentLine == this.multiLine && remainingText.size() > 0) {
+                lineString += "...";
+                lineWidth += this.getFutureWidth("...");
+            }
 
-            canvas.clipRect(new Rect((int) x,              (int) (y + fm.ascent),
-                                     (int) (x + maxWidth), (int) (y + fm.descent)));
+            float x = 0;
+            if (textAlignment == DrawableText.Align.LEFT) {
+                x = drawnBounds.left;
+                if (lineWidth > drawnBounds.width())
+                    drawnBounds.right = (int)(x + lineWidth);
+            } else if (textAlignment == DrawableText.Align.RIGHT) {
+                x = drawnBounds.right;
+                if (lineWidth > drawnBounds.width())
+                    drawnBounds.left = (int)(x - lineWidth);
+            } else if (textAlignment == DrawableText.Align.CENTER) {
+                x = drawnBounds.centerX();
+                if (lineWidth > drawnBounds.width()) {
+                    float inset = (b.width() - lineWidth) / 2;
+                    drawnBounds.left = (int)(b.left + inset);
+                    drawnBounds.right = (int)(b.right - inset);
+                }
+            }
 
-            targetWidth = maxWidth;
-            this.drawnBounds.right = this.drawnBounds.left + (int) targetWidth;
+            float y = drawnBounds.bottom + (-fm.ascent * lineHeight);
+            drawnBounds.bottom += (int)getTextHeightForPaint(this.textPaint, this.lineHeight);
+
+            canvas.drawText(lineString, x, y, textPaint);
+
+            currentLine += 1;
+            lineWidth = 0;
+            lineString = "";
+            if (remainingText.size() <= 0 || currentLine > multiLine)
+                break;
+
+//            /** In case the state was saved for clipping currentText, restore state. */
+//            if (ellipsis != null) {
+//                int fadeColor = backgroundColor & 0x00FFFFFF;
+//
+//                LinearGradient gradient =
+//                        new LinearGradient(ellipsis.left, ellipsis.top, ellipsis.right, ellipsis.top,
+//                                fadeColor, backgroundColor, android.graphics.Shader.TileMode.CLAMP);
+//                Paint p = new Paint();
+//                p.setDither(true);
+//                p.setShader(gradient);
+//                canvas.drawRect(ellipsis, p);
+//
+//                canvas.restore();
+//            }
+            if (CTCs.DEBUG) {
+                if (this.textAlignment == DrawableText.Align.RIGHT)
+                    lineWidth = -lineWidth;
+                canvas.drawLine(x, y, x + lineWidth, y, this.textPaint);
+                float a = this.textPaint.ascent();
+                canvas.drawLine(x, y + a, x + lineWidth, y + a, this.textPaint);
+                float d = this.textPaint.descent();
+                canvas.drawLine(x, y + d, x + lineWidth, y + d, this.textPaint);
+                canvas.drawLine(x, y + a, x, y + d, this.textPaint);
+
+                Paint red = new Paint();
+                red.setColor(Color.RED);
+                canvas.drawLine(x - 10, y, x + 10, y, red);
+                canvas.drawLine(x, y - 10, x, y + 10, red);
+            }
         }
-        canvas.drawText(currentText, x, y, textPaint);
-        /** In case the state was saved for clipping currentText, restore state. */
-        if (ellipsis != null) {
-            int fadeColor = backgroundColor & 0x00FFFFFF;
-
-            LinearGradient gradient =
-                    new LinearGradient(ellipsis.left, ellipsis.top, ellipsis.right, ellipsis.top,
-                                       fadeColor, backgroundColor, android.graphics.Shader.TileMode.CLAMP);
-            Paint p = new Paint();
-            p.setDither(true);
-            p.setShader(gradient);
-            canvas.drawRect(ellipsis, p);
-
-            canvas.restore();
-        }
-        if (CTCs.DEBUG) {
-            if (this.textAlignment == DrawableText.Align.RIGHT)
-                targetWidth = -targetWidth;
-            canvas.drawLine(x, y, x + targetWidth, y, this.textPaint);
-            float a = this.textPaint.ascent();
-            canvas.drawLine(x, y + a, x + targetWidth, y + a, this.textPaint);
-            float d = this.textPaint.descent();
-            canvas.drawLine(x, y + d, x + targetWidth, y + d, this.textPaint);
-            canvas.drawLine(x, y + a, x, y + d, this.textPaint);
-
-            Paint red = new Paint();
-            red.setColor(Color.RED);
-            canvas.drawLine(x - 10, y, x + 10, y, red);
-            canvas.drawLine(x, y - 10, x, y + 10, red);
-        }
+        canvas.restore();
     }
 
     private String getTextFromSource() {
@@ -335,15 +357,15 @@ public class DrawableText implements Drawable {
         this.textPaint.setColor(color);
     }
 
-    public void ensureMaximumWidth(boolean m) {
-        this.ensureMaxWidth = m;
-    }
-
     public void autoSize(boolean b) {
         this.autoSize = b;
     }
 
     public void setBackgroundColor(int backgroundColor) {
         this.backgroundColor = backgroundColor;
+    }
+
+    public void setMultiLine(int multiLine) {
+        this.multiLine = multiLine;
     }
 }

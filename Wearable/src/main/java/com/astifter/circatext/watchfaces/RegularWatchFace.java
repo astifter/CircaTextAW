@@ -49,8 +49,6 @@ public class RegularWatchFace extends BaseWatchFace {
         topDrawable.addBelow(date);
         stackBottom(mTF, topDrawable, eTF.CALENDAR_1, mTexts);
         stackBottom(mTF, topDrawable, eTF.CALENDAR_2, mTexts);
-        mTF.get(eTF.CALENDAR_1).ensureMaximumWidth(true);
-        mTF.get(eTF.CALENDAR_2).ensureMaximumWidth(true);
 
         int fadeList[] = {eTF.CALENDAR_1, eTF.CALENDAR_2, eTF.SECOND,
                           eTF.BATTERY};

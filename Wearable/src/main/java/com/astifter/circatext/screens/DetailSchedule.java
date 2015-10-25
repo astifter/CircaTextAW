@@ -27,35 +27,37 @@ public class DetailSchedule implements Screen {
         drawables = new ArrayList<>();
         meeting = ei;
 
-        drawables.add(new StaticIcon(Drawable.Touched.CLOSEME, r.getDrawable(R.drawable.ic_arrow_back_24dp, r.newTheme()), new Rect(5, 5, 20, 20), 20));
-        createStaticText(meeting.Title, new Rect(22, 8, 95, 20), Drawable.Align.LEFT);
+        Drawable si = new StaticIcon(Drawable.Touched.CLOSEME, r.getDrawable(R.drawable.ic_arrow_back_24dp, r.newTheme()), new Rect(5, 5, 20, 20), 20);
+        drawables.add(si);
+        createStaticText(meeting.Title, new Rect(5, 22, 95, 37), Drawable.Align.LEFT);
 
         sh = new StackHorizontal();
         sh.add(getDrawableText(meeting.formatDate() + " "));
         sh.add(getDrawableText(meeting.formatStart() + "-"));
         sh.add(getDrawableText(meeting.formatEnd()));
 
-        createStaticText(meeting.Description, new Rect(5, 34, 95, 44), Drawable.Align.LEFT);
+        StaticText desc = createStaticText(meeting.Description, new Rect(5, 51, 95, 60), Drawable.Align.LEFT);
+        desc.setMultiLine(4);
     }
 
     private DrawableText getDrawableText(String text) {
-        DrawableText dt = new StaticText(Drawable.Touched.UNKNOWN, text, new Rect(0,0,100,100));
+        DrawableText dt = new StaticText(Drawable.Touched.UNKNOWN, text);
         dt.autoSize(true);
         dt.setBackgroundColor(this.bgColor);
         return dt;
     }
 
-    private void createStaticText(String s, Rect r, int a) {
-        StaticText start = new StaticText(0, s, r, a);
-        start.autoSize(true);
-        start.ensureMaximumWidth(true);
-        start.setBackgroundColor(this.bgColor);
-        drawables.add(start);
+    private StaticText createStaticText(String s, Rect r, int a) {
+        StaticText text = new StaticText(0, s, r, a);
+        text.autoSize(true);
+        text.setBackgroundColor(this.bgColor);
+        drawables.add(text);
+        return text;
     }
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
-        Rect r = Position.percentagePosition(new Position(5,22,95,32), bounds).toRect();
+        Rect r = Position.percentagePosition(new Position(5,39,95,49), bounds).toRect();
         sh.onDraw(canvas, r);
         for (Drawable d : drawables) {
             d.onDraw(canvas, bounds);

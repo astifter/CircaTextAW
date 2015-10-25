@@ -20,7 +20,7 @@ public class Schedule implements Screen {
     private final ArrayList<Drawable> drawables;
     private final ArrayList<ColorRect> rects;
 
-    final static int disection = 25;
+    final static int disection = 27;
     final static int lineHeight = 10;
     private final int bgColor;
     private final Resources resources;
@@ -58,7 +58,6 @@ public class Schedule implements Screen {
     private void createStaticTest(String t, int i, Rect pos, int align, int bgColor) {
         StaticText date = new StaticText(i, t, pos, align);
         date.autoSize(true);
-        date.ensureMaximumWidth(true);
         date.setBackgroundColor(bgColor);
         drawables.add(date);
     }
