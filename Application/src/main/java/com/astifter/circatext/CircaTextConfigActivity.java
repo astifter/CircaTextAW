@@ -192,14 +192,6 @@ public class CircaTextConfigActivity extends Activity
         });
     }
 
-    private void sendConfigUpdateMessage(String configKey, int value) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage(int)");
-
-        DataMap config = new DataMap();
-        config.putInt(configKey, value);
-        sendGenericConfigUpdateMessage(config);
-    }
-
     private void sendConfigUpdateMessage(String configKey, String content) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage(String)");
 
