@@ -63,11 +63,11 @@ abstract class Stack implements Drawable {
 
     @Override
     public float getFutureWidth() {
-        int height = 0;
+        int width = 0;
         for (Drawable t : stack) {
-            height += t.getFutureWidth();
+            width += t.getFutureWidth();
         }
-        return height;
+        return width;
     }
 
     @Override

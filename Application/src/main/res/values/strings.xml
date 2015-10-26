@@ -16,9 +16,7 @@
 <resources>
     <string name="app_name">CircaText</string>
 
-    <string name="digital_config_text">CircaText Configuration</string>
     <string name="digital_config_calendars">Kalender</string>
-    <string name="digital_config_attribution">Attribution</string>
 
     <string name="title_no_device_connected">No wearable device is currently connected.</string>
     <string name="ok_no_device_connected">Connected.</string>

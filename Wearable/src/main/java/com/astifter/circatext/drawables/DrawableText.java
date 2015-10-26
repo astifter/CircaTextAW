@@ -185,9 +185,9 @@ public class DrawableText implements Drawable {
             if (remainingText.size() > 0) {
                 String currentWord = remainingText.get(0);
                 float wordWidth = this.getFutureWidth(" " + currentWord);
-                if ((wordWidth + lineWidth) < b.width() || lineString == "") {
+                if ((wordWidth + lineWidth) < b.width() || lineString.equals("")) {
                     lineWidth += wordWidth;
-                    if (lineString == "")
+                    if (lineString.equals(""))
                         lineString = currentWord;
                     else
                         lineString += " " + currentWord;

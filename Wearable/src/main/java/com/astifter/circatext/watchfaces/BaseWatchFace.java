@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.WindowInsets;
 
 import com.astifter.circatext.CircaTextService;
@@ -75,7 +76,12 @@ public abstract class BaseWatchFace implements WatchFace {
         int height = r.getDisplayMetrics().heightPixels;
         mBounds = new Rect(0, 0, width, height);
 
-        mBackgroundPaintColor = r.getColor(R.color.transparent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mBackgroundPaintColor = r.getColor(R.color.transparent, r.newTheme());
+        } else {
+            //noinspection deprecation
+            mBackgroundPaintColor = r.getColor(R.color.transparent);
+        }
         mBackgroundPaint.setColor(mBackgroundPaintColor);
     }
 
@@ -149,8 +155,7 @@ public abstract class BaseWatchFace implements WatchFace {
         }
         if (mMeetings != null) {
             ArrayList<CalendarHelper.EventInfo> m = new ArrayList<>();
-            for (int i = 0; i < mMeetings.length; i++) {
-                CalendarHelper.EventInfo ei = mMeetings[i];
+            for (CalendarHelper.EventInfo ei : mMeetings) {
                 if (ei.DtStart.getTime() >= now && !ei.Hidden && !ei.Disabled)
                     m.add(ei);
             }
@@ -162,9 +167,8 @@ public abstract class BaseWatchFace implements WatchFace {
             } else {
                 CalendarHelper.EventInfo first = m.get(0);
                 m.remove(0);
-                SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
-                mTexts.put(eTF.SHORTCAL, sdf.format(first.DtStart));
-                mTexts.put(eTF.CALENDAR_1, sdf.format(first.DtStart) + " " + first.Title);
+                mTexts.put(eTF.SHORTCAL, first.formatStart());
+                mTexts.put(eTF.CALENDAR_1, first.formatEnd() + " " + first.Title);
 
                 int additionalEvents = m.size();
                 if (additionalEvents == 1)

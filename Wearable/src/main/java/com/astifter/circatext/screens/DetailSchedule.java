@@ -17,7 +17,6 @@ import com.astifter.circatext.graphicshelpers.Position;
 import java.util.ArrayList;
 
 public class DetailSchedule implements Screen {
-    private final CalendarHelper.EventInfo meeting;
     private final ArrayList<Drawable> drawables;
     private final int bgColor;
     private final StackHorizontal sh;
@@ -25,18 +24,17 @@ public class DetailSchedule implements Screen {
     DetailSchedule(Resources r, CalendarHelper.EventInfo ei, int bgColor) {
         this.bgColor = bgColor;
         drawables = new ArrayList<>();
-        meeting = ei;
 
         Drawable si = new StaticIcon(Drawable.Touched.CLOSEME, r.getDrawable(R.drawable.ic_arrow_back_24dp, r.newTheme()), new Rect(5, 5, 20, 20), 20);
         drawables.add(si);
-        createStaticText(meeting.Title, new Rect(5, 22, 95, 37), Drawable.Align.LEFT);
+        createStaticText(ei.Title, new Rect(5, 22, 95, 37), Drawable.Align.LEFT);
 
         sh = new StackHorizontal();
-        sh.add(getDrawableText(meeting.formatDate() + " "));
-        sh.add(getDrawableText(meeting.formatStart() + "-"));
-        sh.add(getDrawableText(meeting.formatEnd()));
+        sh.add(getDrawableText(ei.formatDate() + " "));
+        sh.add(getDrawableText(ei.formatStart() + "-"));
+        sh.add(getDrawableText(ei.formatEnd()));
 
-        StaticText desc = createStaticText(meeting.Description, new Rect(5, 51, 95, 60), Drawable.Align.LEFT);
+        StaticText desc = createStaticText(ei.Description, new Rect(5, 51, 95, 60), Drawable.Align.LEFT);
         desc.setMultiLine(4);
     }
 

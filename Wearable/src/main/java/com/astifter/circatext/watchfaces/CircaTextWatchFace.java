@@ -48,10 +48,6 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void setMetrics(Resources r, WindowInsets insets) {
         super.setMetrics(r, insets);
         if (this.roundemulation) {
-            int offset = 12;
-            int height = (100 - (2 * offset)) / 3;
-            int io = 2;
-
             createAnimatable(eTF.SHORTCAL, new Rect(5, 8, 80, 20), Drawable.Align.RIGHT, r, R.drawable.calendar)
                     .setConfig(CTCs.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);

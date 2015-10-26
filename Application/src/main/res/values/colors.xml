@@ -1,7 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="transparent">#424242</color>
-    <color name="config_activity_header_text_color">#ffffff</color>
-    <color name="color_item_circle_border_color">#000000</color>
-    <color name="color_item_label_color">#ffffff</color>
-</resources>
+<resources></resources>

@@ -84,14 +84,14 @@ public class AnimatableImpl implements Drawable, Animatable {
             @Override
             public void onAnimationStart(Animator animation) {
                 if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    Log.d(TAG, String.format("AnimatableImpl: -- started"));
+                    Log.d(TAG, "AnimatableImpl: -- started");
                 }
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (Log.isLoggable(TAG, Log.DEBUG)) {
-                    Log.d(TAG, String.format("AnimatableImpl: -- ended"));
+                    Log.d(TAG, "AnimatableImpl: -- ended");
                 }
             }
 

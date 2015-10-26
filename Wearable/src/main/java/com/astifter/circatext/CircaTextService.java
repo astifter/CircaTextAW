@@ -16,6 +16,7 @@
 
 package com.astifter.circatext;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -98,6 +99,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         Weather mWeather;
         private Date mWeatherRequested = null;
         private boolean updateEnabled = true;
+        @SuppressLint("HandlerLeak")
         final Handler mUpdateHandler = new Handler() {
             @Override
             public void handleMessage(Message message) {
@@ -455,14 +457,16 @@ public class CircaTextService extends CanvasWatchFaceService {
                         uiUpdated = true;
                         break;
                     case CTCs.KEY_WATCHFACE_CONFIG:
-                        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + config.getString(configKey));
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + config.getString(configKey));
                         CTCs.Config cfg;
                         try {
                             cfg = CTCs.Config.valueOf(config.getString(configKey));
                         } catch (Throwable t) {
                             cfg = CTCs.Config.PLAIN;
                         }
-                        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + cfg.toString());
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + cfg.toString());
                         wtf.setSelectedConfig(cfg);
                         uiUpdated = true;
                         break;

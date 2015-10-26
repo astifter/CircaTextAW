@@ -10,6 +10,8 @@
  */
 package com.astifter.circatext;
 
+import android.annotation.SuppressLint;
+
 import com.astifter.circatextutils.Weather;
 
 import org.json.JSONException;
@@ -18,6 +20,7 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /*
@@ -65,7 +68,7 @@ public class YahooJSONParser implements JSONWeatherParser {
 
         JSONObject queryObj = getObject("query", jObj);
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             weather.time = sdf.parse(getString("created", queryObj));
         } catch (Throwable t) {
@@ -82,7 +85,8 @@ public class YahooJSONParser implements JSONWeatherParser {
         weather.temperature.setTemp(temperatureC);
         try {
             // Tue, 04 Aug 2015 10:59 pm CEST
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm a zzz");
+            Locale l = Locale.ENGLISH;
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm a zzz", l);
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             weather.lastupdate = sdf.parse(getString("date", condition));
         } catch (Throwable t) {

@@ -93,6 +93,7 @@ public class CalendarHelper {
         public final boolean Disabled;
         public final String Description;
         private final Date DtEnd;
+        private final Locale locale;
         public int Color;
 
         public EventInfo(Cursor cursor, boolean h, boolean d) {
@@ -104,6 +105,7 @@ public class CalendarHelper {
 
             Hidden = h;
             Disabled = d;
+            locale = Locale.GERMAN;
         }
 
         @Override
@@ -119,18 +121,17 @@ public class CalendarHelper {
         }
 
         public String formatDate() {
-            Locale de = Locale.GERMANY;
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", de);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", locale);
             return sdf.format(this.DtStart);
         }
 
         public String formatStart() {
-            SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat("H:mm", locale);
             return sdf.format(this.DtStart);
         }
 
         public String formatEnd() {
-            SimpleDateFormat sdf = new SimpleDateFormat("H:mm");
+            SimpleDateFormat sdf = new SimpleDateFormat("H:mm", locale);
             return sdf.format(this.DtEnd);
         }
     }
