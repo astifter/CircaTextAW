@@ -54,7 +54,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
             if (this.roundemulation) {
                 this.mBounds.bottom = 290;
             } else {
-                this.mBounds.bottom = insets.getStableInsetBottom();
+                this.mBounds.bottom -= insets.getStableInsetBottom();
             }
         }
 
@@ -196,7 +196,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
             } else if (idx == eTF.SHORTCAL) {
                 showScreen = new Schedule(this.resources, this.isRound, this.mMeetings, this.mBackgroundPaint.getColor());
             } else if (idx == eTF.WEATHER_TEMP) {
-                showScreen = new WeatherScreen(this.resources, this.mWeather);
+                //showScreen = new WeatherScreen(this.resources, this.mWeather);
             } else {
                 return Drawable.Touched.FINISHED;
             }
