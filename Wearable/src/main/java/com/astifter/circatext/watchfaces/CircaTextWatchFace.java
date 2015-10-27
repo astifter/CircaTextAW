@@ -33,6 +33,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private CTCs.Config currentConfig;
     private CTCs.Config selectedConfig;
     private boolean roundemulation = false;
+    private boolean isRound = false;
     private Screen showScreen;
 
     public CircaTextWatchFace(CircaTextService.Engine parent) {
@@ -47,24 +48,34 @@ public class CircaTextWatchFace extends BaseWatchFace {
     @Override
     public void setMetrics(Resources r, WindowInsets insets) {
         super.setMetrics(r, insets);
-        if (this.roundemulation) {
+
+        this.isRound = this.roundemulation || insets.isRound();
+        if (isRound) {
+            if (this.roundemulation) {
+                this.mBounds.bottom = 280;
+            } else {
+                this.mBounds.bottom = insets.getStableInsetBottom();
+            }
+        }
+
+        if (this.isRound) {
             createAnimatable(eTF.SHORTCAL, new Rect(5, 8, 80, 20), Drawable.Align.RIGHT, r, R.drawable.calendar)
                     .setConfig(CTCs.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);
             createAnimatable(eTF.WEATHER_TEMP, new Rect(20, 8, 95, 20), Drawable.Align.LEFT, r, R.drawable.thermometer)
                     .setConfig(CTCs.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.LEFT)
                     .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);
-            createAnimatable(eCT.FIRST, new Rect(5, 17, 95, 43), Drawable.Align.CENTER)
+            createAnimatable(eCT.FIRST, new Rect(0, 17, 100, 43), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.TIME, new Rect(105, 17, 195, 43), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.PEEK, CTCs.Config.TIME);
-            createAnimatable(eCT.SECOND, new Rect(5, 37, 95, 63), Drawable.Align.CENTER)
+            createAnimatable(eCT.SECOND, new Rect(0, 37, 100, 63), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.TIME, new Rect(105, 37, 195, 63), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.PEEK, CTCs.Config.TIME);
-            createAnimatable(eCT.THIRD, new Rect(5, 57, 95, 83), Drawable.Align.CENTER)
+            createAnimatable(eCT.THIRD, new Rect(0, 57, 100, 83), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.TIME, new Rect(105, 57, 195, 83), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.PEEK, CTCs.Config.TIME);
             createAnimatable(eTF.HOUR, new Rect(-95, 22, -5, 75))
-                    .setConfig(CTCs.Config.TIME, new Rect(5, 22, 95, 75), Drawable.Align.CENTER)
+                    .setConfig(CTCs.Config.TIME, new Rect(0, 22, 100, 75), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.PEEK, new Rect(2, 10, 98, 75), Drawable.Align.CENTER);
             createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.PEEK, new Rect(2, 70, 98, 98), Drawable.Align.CENTER)
@@ -90,10 +101,10 @@ public class CircaTextWatchFace extends BaseWatchFace {
                     .setConfig(CTCs.Config.TIME, new Rect(5, 88, 95, 95), Drawable.Align.LEFT)
                     .setConfig(CTCs.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
             createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95))
-                    .setConfig(CTCs.Config.PEEK, new Rect(2, 10, 95, 55))
+                    .setConfig(CTCs.Config.PEEK, new Rect(2, 10, 98, 55))
                     .setConfig(CTCs.Config.TIME, new Rect(5, 25, 95, 75), Drawable.Align.CENTER);
             createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.RIGHT)
-                    .setConfig(CTCs.Config.PEEK, new Rect(2, 57, 47, 90))
+                    .setConfig(CTCs.Config.PEEK, new Rect(2, 57, 98, 90))
                     .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);
         }
     }
@@ -105,7 +116,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
         Drawable d;
         if (drawableid >= 0) {
             StackHorizontal tempstack = new StackHorizontal();
-            DrawableIcon icon = new DrawableIcon(textid, r.getDrawable(drawableid, r.newTheme()), fpa, 35);
+            DrawableIcon icon = new DrawableIcon(textid, r.getDrawable(drawableid, r.newTheme()), fpa, 20);
             if (fpa == Drawable.Align.LEFT || fpa == Drawable.Align.CENTER) {
                 tempstack.add(icon);
                 tempstack.add(dt);
@@ -183,7 +194,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 }
                 topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
             } else if (idx == eTF.SHORTCAL) {
-                showScreen = new Schedule(this.resources, this.mMeetings, this.mBackgroundPaint.getColor());
+                showScreen = new Schedule(this.resources, this.isRound, this.mMeetings, this.mBackgroundPaint.getColor());
             } else if (idx == eTF.WEATHER_TEMP) {
                 showScreen = new WeatherScreen(this.resources, this.mWeather);
             } else {
