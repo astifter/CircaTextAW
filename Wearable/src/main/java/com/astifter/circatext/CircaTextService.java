@@ -38,6 +38,7 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
+import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.watchfaces.CircaTextWatchFace;
 import com.astifter.circatext.watchfaces.RegularWatchFace;
@@ -441,9 +442,12 @@ public class CircaTextService extends CanvasWatchFaceService {
                                 break;
                             case CIRCATEXTv1:
                             case CIRCATEXTv1ROUND:
+                            case CIRCATEXTv1CHIN:
                                 wtf = new CircaTextWatchFace(this);
                                 if (wf == CTCs.WatchFaces.CIRCATEXTv1ROUND)
-                                    wtf.setRoundMode(true);
+                                    wtf.setRoundMode(Drawable.RoundEmulation.CIRCULAR);
+                                else if (wf == CTCs.WatchFaces.CIRCATEXTv1CHIN)
+                                    wtf.setRoundMode(Drawable.RoundEmulation.CHIN);
                                 break;
                         }
                         wtf.localeChanged();

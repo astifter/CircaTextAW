@@ -62,9 +62,11 @@ public class CircaTextWearableConfigActivity extends Activity implements
                                                   "CircaText", "Textual time representation.");
         WatchFaceConfig rtf = new WatchFaceConfig(CTCs.WatchFaces.CIRCATEXTv1ROUND.toString(),
                                                   "CircaText Round", "Textual time representation.");
+        WatchFaceConfig cwf = new WatchFaceConfig(CTCs.WatchFaces.CIRCATEXTv1CHIN.toString(),
+                                                  "CircaText Chin", "Textual time representation.");
         WatchFaceConfig rwf = new WatchFaceConfig(CTCs.WatchFaces.REGULAR.toString(),
                                                   "Regular", "Conventional time.");
-        WatchFaceConfig[] watchfaces = { ctf, rwf, rtf };
+        WatchFaceConfig[] watchfaces = { ctf, rtf, cwf, rwf };
         watchFaceListAdapter = new WatchFaceListAdapter(watchfaces);
         listView.setAdapter(watchFaceListAdapter);
 

@@ -21,7 +21,6 @@ import com.astifter.circatext.drawables.DrawableText;
 import com.astifter.circatext.drawables.StackHorizontal;
 import com.astifter.circatext.screens.Schedule;
 import com.astifter.circatext.screens.Screen;
-import com.astifter.circatext.screens.WeatherScreen;
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.CTU;
 
@@ -32,7 +31,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private final HashMap<Integer, AnimatableImpl> topDrawable;
     private CTCs.Config currentConfig;
     private CTCs.Config selectedConfig;
-    private boolean roundemulation = false;
+    private Drawable.RoundEmulation roundemulation = Drawable.RoundEmulation.NONE;
     private boolean isRound = false;
     private Screen showScreen;
 
@@ -49,10 +48,11 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void setMetrics(Resources r, WindowInsets insets) {
         super.setMetrics(r, insets);
 
-        this.isRound = this.roundemulation || insets.isRound();
+        this.isRound = (this.roundemulation != Drawable.RoundEmulation.NONE) || insets.isRound();
         if (isRound) {
-            if (this.roundemulation) {
-                this.mBounds.bottom = 290;
+            if (this.roundemulation != Drawable.RoundEmulation.NONE) {
+                if (this.roundemulation == Drawable.RoundEmulation.CHIN)
+                    this.mBounds.bottom = 290;
             } else {
                 this.mBounds.bottom -= insets.getStableInsetBottom();
             }
@@ -206,7 +206,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     }
 
     @Override
-    public void setRoundMode(boolean b) {
+    public void setRoundMode(Drawable.RoundEmulation b) {
         this.roundemulation = b;
     }
 
@@ -228,7 +228,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
-        if (this.roundemulation) {
+        if (this.roundemulation != Drawable.RoundEmulation.NONE) {
             Paint c = new Paint();
             c.setColor(Color.BLACK);
             c.setAntiAlias(true);
@@ -237,7 +237,9 @@ public class CircaTextWatchFace extends BaseWatchFace {
             Path clippingpath = new Path();
             clippingpath.addCircle(160, 160, 160, Path.Direction.CW);
             canvas.clipPath(clippingpath);
-            canvas.clipRect(this.mBounds, Region.Op.INTERSECT);
+            if (this.roundemulation == Drawable.RoundEmulation.CHIN) {
+                canvas.clipRect(this.mBounds, Region.Op.INTERSECT);
+            }
         }
 
         canvas.drawRect(bounds, this.mBackgroundPaint);

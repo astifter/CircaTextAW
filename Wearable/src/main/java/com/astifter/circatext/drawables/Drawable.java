@@ -66,5 +66,10 @@ public interface Drawable {
         int FINISHED = -3;
         int FIRST = 0;
     }
-}
 
+    enum RoundEmulation {
+        NONE,
+        CIRCULAR,
+        CHIN
+    }
+}

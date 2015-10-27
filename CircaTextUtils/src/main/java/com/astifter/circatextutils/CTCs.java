@@ -43,7 +43,7 @@ public class CTCs {
     }
 
     public enum WatchFaces {
-        REGULAR, CIRCATEXTv1, CIRCATEXTv1ROUND
+        REGULAR, CIRCATEXTv1, CIRCATEXTv1ROUND, CIRCATEXTv1CHIN,
     }
 
     public enum Config {

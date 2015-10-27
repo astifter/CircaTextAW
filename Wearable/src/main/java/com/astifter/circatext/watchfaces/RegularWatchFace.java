@@ -227,7 +227,7 @@ public class RegularWatchFace extends BaseWatchFace {
     }
 
     @Override
-    public void setRoundMode(boolean b) {
+    public void setRoundMode(Drawable.RoundEmulation b) {
         // TODO
     }
 
