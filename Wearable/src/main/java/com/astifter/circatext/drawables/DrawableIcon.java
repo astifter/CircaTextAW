@@ -28,16 +28,20 @@ public class DrawableIcon implements Drawable {
     public void onDraw(Canvas canvas, Rect bounds) {
         currentBounds = new Rect(bounds);
 
-        int targetWidth = currentBounds.height() * dimensions.width() / dimensions.height();
+        float targetWidth = currentBounds.height() * dimensions.width() / dimensions.height();
         if (hidden)
             targetWidth = 0;
         switch (this.alignment) {
             case Align.LEFT:
+                currentBounds.right = currentBounds.left + (int) Math.ceil(targetWidth);
+                break;
             case Align.CENTER:
-                currentBounds.right = currentBounds.left + targetWidth;
+                int inset = (int) Math.floor((currentBounds.width() - targetWidth) / 2);
+                currentBounds.right -= inset;
+                currentBounds.left += inset;
                 break;
             case Align.RIGHT:
-                currentBounds.left = currentBounds.right - targetWidth;
+                currentBounds.left = currentBounds.right - (int) Math.ceil(targetWidth);
                 break;
         }
         if (hidden) {

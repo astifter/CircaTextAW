@@ -13,6 +13,12 @@ public class StaticIcon extends DrawableIcon {
         position = new Position(p);
     }
 
+    public StaticIcon(int idx, android.graphics.drawable.Drawable drawable, Rect p, int scale, int align) {
+        super(idx, drawable, align, scale);
+        position = new Position(p, align);
+        this.setAlignment(align);
+    }
+
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
         Rect r = position.percentagePosition(bounds).toRect();
