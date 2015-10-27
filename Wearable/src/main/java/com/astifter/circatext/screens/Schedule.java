@@ -5,10 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.drawables.Drawable;
-import com.astifter.circatext.drawables.StaticIcon;
 import com.astifter.circatext.drawables.StaticText;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.graphicshelpers.Position;
@@ -23,19 +21,18 @@ public class Schedule implements Screen {
     private final ArrayList<ColorRect> rects;
     private final int bgColor;
     private final Resources resources;
+    private final boolean isRound;
     private DetailSchedule detailedScreen;
 
-    public Schedule(Resources r, CalendarHelper.EventInfo[] mMeetings, int bgColor) {
+    public Schedule(Resources r, boolean isRound, CalendarHelper.EventInfo[] mMeetings, int bgColor) {
         this.resources = r;
         this.bgColor = bgColor;
         this.meetings = mMeetings;
         drawables = new ArrayList<>();
         rects = new ArrayList<>();
 
-        StaticText head = new StaticText(Drawable.Touched.UNKNOWN, "Termine", new Rect(5, 5, 95, 20), Drawable.Align.RIGHT);
-        head.autoSize(true);
-        drawables.add(head);
-        drawables.add(new StaticIcon(Drawable.Touched.CLOSEME, r.getDrawable(R.drawable.ic_arrow_back_24dp, r.newTheme()), new Rect(5, 5, 20, 20), 20));
+        this.isRound = isRound;
+        DrawingHelpers.createHeadline(drawables, r, isRound, "Termine");
 
         int i = 0;
         for (CalendarHelper.EventInfo ei : mMeetings) {
@@ -85,7 +82,7 @@ public class Schedule implements Screen {
         } else {
             int idx = DrawingHelpers.getTouchedText(x, y, drawables);
             if (idx >= Drawable.Touched.FIRST) {
-                detailedScreen = new DetailSchedule(this.resources, meetings[idx], bgColor);
+                detailedScreen = new DetailSchedule(this.resources, this.isRound, meetings[idx], bgColor);
                 return Drawable.Touched.FINISHED;
             } else
                 return idx;

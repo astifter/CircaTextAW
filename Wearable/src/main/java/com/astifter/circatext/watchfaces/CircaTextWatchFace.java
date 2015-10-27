@@ -52,7 +52,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
         this.isRound = this.roundemulation || insets.isRound();
         if (isRound) {
             if (this.roundemulation) {
-                this.mBounds.bottom = 280;
+                this.mBounds.bottom = 290;
             } else {
                 this.mBounds.bottom = insets.getStableInsetBottom();
             }
