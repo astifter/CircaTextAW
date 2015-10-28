@@ -25,8 +25,8 @@ android {
     compileSdkVersion 23
     buildToolsVersion "22.0.1"
     defaultConfig {
-        versionCode 1
-        versionName "1.0"
+        versionCode project.circaTextVersionId.toInteger()
+        versionName project.circaTextVersion.toString()
         minSdkVersion 21
         targetSdkVersion 23
     }
