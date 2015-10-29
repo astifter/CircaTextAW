@@ -12,6 +12,7 @@ import android.view.WindowInsets;
 import com.astifter.circatext.CircaTextService;
 import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.CircaTextStringer;
+import com.astifter.circatext.datahelpers.CircaTextStringerV1;
 import com.astifter.circatext.datahelpers.CircaTextStringerV2;
 import com.astifter.circatext.drawables.Animatable;
 import com.astifter.circatext.drawables.AnimatableImpl;
@@ -27,7 +28,7 @@ import com.astifter.circatextutils.CTU;
 import java.util.HashMap;
 
 public class CircaTextWatchFace extends BaseWatchFace {
-    private final CircaTextStringer cts = new CircaTextStringerV2();
+    private volatile CircaTextStringer cts;
     private final HashMap<Integer, AnimatableImpl> topDrawable;
     private CTCs.Config currentConfig;
     private CTCs.Config selectedConfig;
@@ -38,8 +39,10 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public CircaTextWatchFace(CircaTextService.Engine parent) {
         super(parent);
 
+        this.cts = new CircaTextStringerV1();
         fillCircaTexts();
         setTexts();
+
         topDrawable = new HashMap<>();
         selectedConfig = CTCs.Config.PLAIN;
     }
@@ -187,7 +190,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                     selectedConfig = CTCs.Config.TIME;
                 else if (selectedConfig == CTCs.Config.TIME)
                     selectedConfig = CTCs.Config.PLAIN;
-                CTU.sendConfigUpdateMessage(parent.mGoogleApiClient, CTCs.KEY_WATCHFACE_CONFIG, selectedConfig.toString());
+                CTU.overwriteKeysInConfigDataMap(parent.mGoogleApiClient, CTCs.KEY_WATCHFACE_CONFIG, selectedConfig.toString());
                 currentConfig = selectedConfig;
                 for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
                     topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
@@ -219,6 +222,19 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
             }
             topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
+        }
+    }
+
+    @Override
+    public void setStringer(CTCs.Stringer cfg) {
+        this.cts = null;
+        switch(cfg) {
+            case CIRCA:
+                this.cts = new CircaTextStringerV1(); break;
+            case RELAXED:
+                this.cts = new CircaTextStringerV2(); break;
+            case PRECISE:
+                this.cts = new CircaTextStringerV1(true); break;
         }
     }
 
@@ -256,7 +272,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     }
 
     private void fillCircaTexts() {
-        String[] circaTexts = cts.getString();
+        String[] circaTexts = this.cts.getString();
         for (int i = eCT.FIRST; i < eCT.SIZE; i++) {
             mTexts.put(i, "");
         }

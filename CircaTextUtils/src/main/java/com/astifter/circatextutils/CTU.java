@@ -76,6 +76,14 @@ public final class CTU {
         );
     }
 
+    public static void overwriteKeysInConfigDataMap(GoogleApiClient googleApiClient, String configKey, String content) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage(String)");
+
+        DataMap config = new DataMap();
+        config.putString(configKey, content);
+        overwriteKeysInConfigDataMap(googleApiClient, config);
+    }
+
     public static void overwriteKeysInConfigDataMap(final GoogleApiClient googleApiClient,
                                                     final DataMap configKeysToOverwrite) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteKeysInConfigDataMap()");

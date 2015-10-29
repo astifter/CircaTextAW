@@ -41,4 +41,6 @@ public interface WatchFace {
     void setRoundMode(Drawable.RoundEmulation b);
 
     void setSelectedConfig(CTCs.Config cfg);
+
+    void setStringer(CTCs.Stringer cfg);
 }

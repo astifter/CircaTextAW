@@ -244,4 +244,9 @@ public class RegularWatchFace extends BaseWatchFace {
     public void setSelectedConfig(CTCs.Config cfg) {
         // TODO
     }
+
+    @Override
+    public void setStringer(CTCs.Stringer cfg) {
+        // TODO
+    }
 }

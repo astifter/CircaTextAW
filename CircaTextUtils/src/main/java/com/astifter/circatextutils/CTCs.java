@@ -10,6 +10,7 @@ public class CTCs {
     public static final String KEY_EXCLUDED_CALENDARS = "EXCLUDED_CALENDARS";
     public static final String KEY_WATCHFACE = "WATCHFACE";
     public static final String KEY_WATCHFACE_CONFIG = "WATCHFACE_CONFIG";
+    public static final String KEY_WATCHFACE_STRINGER = "WATCHFACE_STRINGER";
 
     public static final String PATH_WITH_FEATURE = "/com.astifter.circatext/config";
 
@@ -24,6 +25,7 @@ public class CTCs {
         addConfigKeyIfMissing(config, KEY_EXCLUDED_CALENDARS, "");
         addConfigKeyIfMissing(config, KEY_WATCHFACE, WatchFaces.CIRCATEXTv1.toString());
         addConfigKeyIfMissing(config, KEY_WATCHFACE_CONFIG, Config.PLAIN.toString());
+        addConfigKeyIfMissing(config, KEY_WATCHFACE_STRINGER, Stringer.CIRCA.toString());
     }
 
     private static void addConfigKeyIfMissing(DataMap config, String key, int value) {
@@ -46,5 +48,9 @@ public class CTCs {
 
     public enum Config {
         PLAIN, PEEK, TIME
+    }
+
+    public enum Stringer {
+        CIRCA, RELAXED, PRECISE
     }
 }
