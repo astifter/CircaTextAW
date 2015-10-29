@@ -61,7 +61,7 @@ public class CircaTextConfigActivity extends Activity
         setContentView(R.layout.activity_circa_text_config);
 
         mPeerId = getIntent().getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): mPeerId=" + mPeerId);
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onCreate(): mPeerId=" + mPeerId.toString());
 
         mGoogleApiClient = CTU.buildGoogleApiClient(this, this, this);
 
@@ -83,7 +83,7 @@ public class CircaTextConfigActivity extends Activity
         super.onStart();
 
         mGoogleApiClient.connect();
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate(): mGoogleApiClient.connect()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onStart(): mGoogleApiClient.connect()");
     }
 
     @Override // Activity
@@ -91,6 +91,7 @@ public class CircaTextConfigActivity extends Activity
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onStop()");
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onStart(): mGoogleApiClient.disconnect()");
             mGoogleApiClient.disconnect();
             if (Log.isLoggable(TAG, Log.DEBUG))
                 Log.d(TAG, "onStop(): mGoogleApiClient.disconnect()");
@@ -101,12 +102,12 @@ public class CircaTextConfigActivity extends Activity
 
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnected(Bundle connectionHint) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onConnected()");
 
         if (mPeerId != null) {
             Uri.Builder builder = new Uri.Builder();
             Uri uri = builder.scheme("wear").path(CTCs.PATH_WITH_FEATURE).authority(mPeerId).build();
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected(): uri=" + uri.toString());
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onConnected(): uri=" + uri.toString());
 
             Wearable.DataApi.getDataItem(mGoogleApiClient, uri).setResultCallback(this);
         } else {
@@ -132,19 +133,19 @@ public class CircaTextConfigActivity extends Activity
 
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnectionSuspended(int cause) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionSuspended()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onConnectionSuspended()");
     }
 
     @Override // GoogleApiClient.ConnectionCallbacks
     public void onConnectionFailed(ConnectionResult result) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onConnectionFailed()");
         if (result.getErrorCode() == ConnectionResult.API_UNAVAILABLE)
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed(): API_UNAVAILABLE");
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onConnectionFailed(): API_UNAVAILABLE");
     }
 
     @Override // ResultCallback<DataApi.DataItemResult>
     public void onResult(DataApi.DataItemResult dataItemResult) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onResult()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onResult()");
 
         if (dataItemResult.getStatus().isSuccess() && dataItemResult.getDataItem() != null) {
             DataItem configDataItem = dataItemResult.getDataItem();
@@ -157,7 +158,7 @@ public class CircaTextConfigActivity extends Activity
     }
 
     private void setUpAllPickers(DataMap config) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpAllPickers()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "setUpAllPickers(): config=" + config.toString());
 
         setUpEditTextContent(R.id.exclude_calendars, CTCs.KEY_EXCLUDED_CALENDARS, config, "");
         setUpEditTextListener(R.id.exclude_calendars, CTCs.KEY_EXCLUDED_CALENDARS);
@@ -165,7 +166,8 @@ public class CircaTextConfigActivity extends Activity
 
     private void setUpEditTextContent(int editTextId, final String configKey, DataMap config,
                                       String defaultContent) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpEditTextContent()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+            Log.d(CTCs.TAGCON, "setUpAllPickers(): configKey=" + configKey + ", defaultContent=" + defaultContent);
 
         String content;
         if (config != null) {
@@ -173,27 +175,29 @@ public class CircaTextConfigActivity extends Activity
         } else {
             content = defaultContent;
         }
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "setUpAllPickers(): content=" + content);
 
         EditText editText = (EditText) findViewById(editTextId);
         editText.setText(content);
     }
 
     private void setUpEditTextListener(final int editTextId, final String configKey) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "setUpEditTextListener()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "setUpEditTextListener()");
 
         final EditText editText = (EditText) findViewById(editTextId);
         editText.addTextChangedListener(new DelayedTextWatcher() {
             @Override
             void onResult() {
-                if (Log.isLoggable(TAG, Log.DEBUG))
-                    Log.d(TAG, "setUpEditTextListener().onResult()");
-                sendConfigUpdateMessage(configKey, editText.getText().toString());
+                String text = editText.getText().toString();
+                if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+                    Log.d(CTCs.TAGCON, "setUpEditTextListener(): onResult(): configKey=" + configKey + ", editText=" + text);
+                sendConfigUpdateMessage(configKey, text);
             }
         });
     }
 
     private void sendConfigUpdateMessage(String configKey, String content) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage(String)");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "sendConfigUpdateMessage()");
 
         DataMap config = new DataMap();
         config.putString(configKey, content);
@@ -201,13 +205,12 @@ public class CircaTextConfigActivity extends Activity
     }
 
     private void sendGenericConfigUpdateMessage(DataMap config) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendGenericConfigUpdateMessage()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "sendGenericConfigUpdateMessage()");
         byte[] rawData = config.toByteArray();
 
         if (mPeerId != null) {
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "sendGenericConfigUpdateMessage(): sendMessage()");
             Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CTCs.PATH_WITH_FEATURE, rawData);
-            if (Log.isLoggable(TAG, Log.DEBUG))
-                Log.d(TAG, "sendGenericConfigUpdateMessage(): Wearable.MessageApi.sendMessage()");
         }
     }
 

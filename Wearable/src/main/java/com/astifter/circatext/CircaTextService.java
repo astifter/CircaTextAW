@@ -372,8 +372,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 DataMap config = dataMapItem.getDataMap();
                 if (dataItem.getUri().getPath().equals(CTCs.PATH_WITH_FEATURE)) {
                     updateUiForConfigDataMap(config);
-                }
-                if (dataItem.getUri().getPath().equals(CTCs.SEND_WEATHER_MESSAGE)) {
+                } else if (dataItem.getUri().getPath().equals(CTCs.SEND_WEATHER_MESSAGE)) {
                     if (config.containsKey("weather")) {
                         try {
                             mWeather = (Weather) Serializer.deserialize(config.getByteArray("weather"));

@@ -98,12 +98,14 @@ public class CircaTextWeatherService extends WearableListenerService {
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onMessageReceived()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onMessageReceived()");
         super.onMessageReceived(messageEvent);
 
         mPeerId = messageEvent.getSourceNodeId();
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onMessageReceived(): mPeerId=" + mPeerId.toString());
 
         if (messageEvent.getPath().equals(CTCs.REQUIRE_WEATHER_MESSAGE)) {
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onMessageReceived(): REQUIRE_WEATHER_MESSAGE");
             getCity();
             JSONWeatherTask t = new JSONWeatherTask(this);
             t.execute();
@@ -159,17 +161,23 @@ public class CircaTextWeatherService extends WearableListenerService {
                     Log.d(TAG, "onPostExecute(): " + e.toString());
             }
 
-            if (mGoogleApiClient == null)
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onPostExecute()");
+            if (mGoogleApiClient == null) {
+                if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onPostExecute(): mGoogleApiClient == null");
                 mGoogleApiClient = new GoogleApiClient.Builder(this.context).addApi(Wearable.API).build();
-            if (!mGoogleApiClient.isConnected())
+            }
+            if (!mGoogleApiClient.isConnected()) {
+                if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onPostExecute(): mGoogleApiClient not connected");
                 mGoogleApiClient.connect();
+            }
 
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onPostExecute(): sendMessage()");
             Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CTCs.SEND_WEATHER_MESSAGE, weatherData.toByteArray())
                     .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
                         @Override
                         public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                            if (Log.isLoggable(TAG, Log.DEBUG))
-                                Log.d(TAG, "onPostExecute(): " + sendMessageResult.toString());
+                            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+                                Log.d(CTCs.TAGCON, "onPostExecute(): onResult=" + sendMessageResult.toString());
                         }
                     });
         }
