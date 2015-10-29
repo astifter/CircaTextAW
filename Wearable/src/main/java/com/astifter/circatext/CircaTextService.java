@@ -418,62 +418,69 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "updateUiForConfigDataMap()");
 
             boolean uiUpdated = false;
-            for (String configKey : config.keySet()) {
-                if (!config.containsKey(configKey)) {
-                    continue;
+            if (config.containsKey(CTCs.KEY_EXCLUDED_CALENDARS)) {
+                mCalendarHelper.setExcludedCalendars(config.getString(CTCs.KEY_EXCLUDED_CALENDARS));
+                uiUpdated = true;
+            }
+            if (config.containsKey(CTCs.KEY_WATCHFACE)) {
+                CTCs.WatchFaces wf;
+                try {
+                    wf = CTCs.WatchFaces.valueOf(config.getString(CTCs.KEY_WATCHFACE));
+                } catch (Throwable t) {
+                    wf = CTCs.WatchFaces.CIRCATEXTv1;
                 }
-                switch (configKey) {
-                    case CTCs.KEY_EXCLUDED_CALENDARS:
-                        mCalendarHelper.setExcludedCalendars(config.getString(CTCs.KEY_EXCLUDED_CALENDARS));
-                        uiUpdated = true;
+                updateEnabled = false;
+                switch (wf) {
+                    case REGULAR:
+                        wtf = new RegularWatchFace(this);
                         break;
-                    case CTCs.KEY_WATCHFACE:
-                        CTCs.WatchFaces wf;
-                        try {
-                            wf = CTCs.WatchFaces.valueOf(config.getString(configKey));
-                        } catch (Throwable t) {
-                            wf = CTCs.WatchFaces.CIRCATEXTv1;
-                        }
-                        updateEnabled = false;
-                        switch (wf) {
-                            case REGULAR:
-                                wtf = new RegularWatchFace(this);
-                                break;
-                            case CIRCATEXTv1:
-                            case CIRCATEXTv1ROUND:
-                            case CIRCATEXTv1CHIN:
-                                wtf = new CircaTextWatchFace(this);
-                                if (wf == CTCs.WatchFaces.CIRCATEXTv1ROUND)
-                                    wtf.setRoundMode(Drawable.RoundEmulation.CIRCULAR);
-                                else if (wf == CTCs.WatchFaces.CIRCATEXTv1CHIN)
-                                    wtf.setRoundMode(Drawable.RoundEmulation.CHIN);
-                                break;
-                        }
-                        wtf.localeChanged();
-                        wtf.setMetrics(getResources(), currentWindowInsets);
-                        wtf.setLowBitAmbientMode(lowBitAmbientMode);
-                        wtf.setMuteMode(inMuteMode);
-                        wtf.setWeatherInfo(mWeather);
-                        wtf.updateVisibilty();
-                        wtf.setPeekCardPosition(getPeekCardPosition());
-                        updateEnabled = true;
-                        uiUpdated = true;
-                        break;
-                    case CTCs.KEY_WATCHFACE_CONFIG:
-                        if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + config.getString(configKey));
-                        CTCs.Config cfg;
-                        try {
-                            cfg = CTCs.Config.valueOf(config.getString(configKey));
-                        } catch (Throwable t) {
-                            cfg = CTCs.Config.PLAIN;
-                        }
-                        if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + cfg.toString());
-                        wtf.setSelectedConfig(cfg);
-                        uiUpdated = true;
+                    case CIRCATEXTv1:
+                    case CIRCATEXTv1ROUND:
+                    case CIRCATEXTv1CHIN:
+                        wtf = new CircaTextWatchFace(this);
+                        if (wf == CTCs.WatchFaces.CIRCATEXTv1ROUND)
+                            wtf.setRoundMode(Drawable.RoundEmulation.CIRCULAR);
+                        else if (wf == CTCs.WatchFaces.CIRCATEXTv1CHIN)
+                            wtf.setRoundMode(Drawable.RoundEmulation.CHIN);
                         break;
                 }
+                wtf.localeChanged();
+                wtf.setMetrics(getResources(), currentWindowInsets);
+                wtf.setLowBitAmbientMode(lowBitAmbientMode);
+                wtf.setMuteMode(inMuteMode);
+                wtf.setWeatherInfo(mWeather);
+                wtf.updateVisibilty();
+                wtf.setPeekCardPosition(getPeekCardPosition());
+                updateEnabled = true;
+                uiUpdated = true;
+            }
+            if (config.containsKey(CTCs.KEY_WATCHFACE_CONFIG))  {
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + config.getString(CTCs.KEY_WATCHFACE_CONFIG));
+                CTCs.Config cfg;
+                try {
+                    cfg = CTCs.Config.valueOf(config.getString(CTCs.KEY_WATCHFACE_CONFIG));
+                } catch (Throwable t) {
+                    cfg = CTCs.Config.PLAIN;
+                }
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + cfg.toString());
+                wtf.setSelectedConfig(cfg);
+                uiUpdated = true;
+            }
+            if (config.containsKey(CTCs.KEY_WATCHFACE_STRINGER)) {
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_STRINGER: " + config.getString(CTCs.KEY_WATCHFACE_STRINGER));
+                CTCs.Stringer cfg;
+                try {
+                    cfg = CTCs.Stringer.valueOf(config.getString(CTCs.KEY_WATCHFACE_STRINGER));
+                } catch (Throwable t) {
+                    cfg = CTCs.Stringer.CIRCA;
+                }
+                if (Log.isLoggable(TAG, Log.DEBUG))
+                    Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_STRINGER: " + cfg.toString());
+                wtf.setStringer(cfg);
+                uiUpdated = true;
             }
             if (uiUpdated) {
                 invalidate();
