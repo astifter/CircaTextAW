@@ -15,19 +15,19 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="icon.svg"
+   sodipodi:docname="icon_banner.svg"
    inkscape:export-filename="/Users/astifter/AndroidStudio/CircaTextAW/Resources/icon.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <sodipodi:namedview
      id="base"
-     pagecolor="#848484"
+     pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageopacity="0.5372549"
+     inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.63378905"
-     inkscape:cx="262.31125"
+     inkscape:cx="12.22804"
      inkscape:cy="256.00001"
      inkscape:document-units="px"
      inkscape:current-layer="layer3"
@@ -94,13 +94,13 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
      sodipodi:insensitive="true"
-     style="display:none"
+     style="display:inline"
      transform="translate(0,-540.36216)"
      id="layer1"
      inkscape:groupmode="layer"
@@ -117,7 +117,9 @@
   <g
      inkscape:label="Header Backdrop"
      id="layer3"
-     inkscape:groupmode="layer">
+     inkscape:groupmode="layer"
+     sodipodi:insensitive="true"
+     style="display:none">
     <rect
        ry="0"
        y="6"
