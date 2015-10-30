@@ -1,0 +1,12 @@
+#!/bin/bash
+set -x
+name=screenshot
+number=$(ls -1 ${name}*.png | sed -e "s/${name}\(.*\).png/\1/g" | sort -n | tail -n 1)
+if [[ -z $number ]]; then
+    number=0
+fi
+while true; do
+    number=$(( $number + 1 ))
+    read -n 1 -p "next"
+    ~/bin/adb-screenshot ${name}${number}.png
+done
