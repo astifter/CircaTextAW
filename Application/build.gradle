@@ -36,6 +36,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion "22.0.1"
     defaultConfig {
+        applicationId project.circaTextId.toString()
         minSdkVersion 18
         targetSdkVersion 23
         versionCode project.circaTextVersionId.toInteger()
@@ -44,7 +45,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
     }
     compileOptions {
