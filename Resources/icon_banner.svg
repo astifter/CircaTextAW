@@ -27,7 +27,7 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.63378905"
-     inkscape:cx="12.22804"
+     inkscape:cx="694.12939"
      inkscape:cy="256.00001"
      inkscape:document-units="px"
      inkscape:current-layer="layer3"
@@ -76,13 +76,17 @@
        inkscape:label=""
        id="guide4175"
        orientation="1,0"
-       position="949,6.0000001" />
+       position="1455,74.999979" />
     <sodipodi:guide
        position="512.00001,75.000001"
        orientation="1,0"
        id="guide4236"
        inkscape:label=""
        inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="0,6.0000001"
+       orientation="0,1"
+       id="guide3357" />
   </sodipodi:namedview>
   <defs
      id="defs4" />
@@ -94,13 +98,13 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
      sodipodi:insensitive="true"
-     style="display:inline"
+     style="display:none"
      transform="translate(0,-540.36216)"
      id="layer1"
      inkscape:groupmode="layer"
@@ -118,21 +122,21 @@
      inkscape:label="Header Backdrop"
      id="layer3"
      inkscape:groupmode="layer"
-     sodipodi:insensitive="true"
-     style="display:none">
+     style="display:inline"
+     sodipodi:insensitive="true">
     <rect
        ry="0"
-       y="6"
+       y="-204.4492"
        x="0"
-       height="500"
-       width="1024"
+       height="710.44922"
+       width="1455"
        id="rect4166"
        style="fill:#424242;fill-opacity:1;stroke:none;stroke-width:16.97999954;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
+       inkscape:export-xdpi="63.34"
+       inkscape:export-ydpi="63.34" />
     <g
        id="g4230"
-       transform="matrix(1.3812415,0,0,1.3812415,-408.6951,9.6727237)">
+       transform="matrix(2.7624827,0,0,2.7624827,-1329.39,-417.65447)">
       <text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:81.51345062px;font-family:'Roboto Condensed';-inkscape-font-specification:'Roboto Condensed, ';fill:#424242;fill-opacity:1;stroke:none;stroke-width:16.97999954;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none"
@@ -158,11 +162,11 @@
     </g>
   </g>
   <g
-     sodipodi:insensitive="true"
      style="display:inline"
      inkscape:label="CircaText Logo"
      id="layer2"
-     inkscape:groupmode="layer">
+     inkscape:groupmode="layer"
+     sodipodi:insensitive="true">
     <g
        transform="translate(-2.2649765e-6,-534.79079)"
        id="g4188">
