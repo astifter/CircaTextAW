@@ -3,35 +3,9 @@ package com.astifter.circatext.datahelpers;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class CircaTextStringerV2 implements CircaTextStringer {
-    private static String german_numbers[] = {
-            "null",
-            "eins",
-            "zwei",
-            "drei",
-            "vier",
-            "fünf",
-            "sechs",
-            "sieben",
-            "acht",
-            "neun",
-            "zehn",
-            "elf",
-            "zwölf"
-    };
-    private Calendar calendar;
-
+public class CircaTextStringerV2 extends CircaTextStringerBase {
     public CircaTextStringerV2() {
         calendar = Calendar.getInstance();
-    }
-
-    public String[] getString() {
-        long now = System.currentTimeMillis();
-        calendar.setTimeInMillis(now);
-
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-        return getStringFromTime(hour, minute);
     }
 
     public String[] getStringFromTime(int hour, int minute) {

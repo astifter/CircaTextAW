@@ -3,28 +3,7 @@ package com.astifter.circatext.datahelpers;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class CircaTextStringerV1 implements CircaTextStringer {
-    private static String german_numbers[] = {
-            "null",
-            "eins",
-            "zwei",
-            "drei",
-            "vier",
-            "fünf",
-            "sechs",
-            "sieben",
-            "acht",
-            "neun",
-            "zehn",
-            "elf",
-            "zwölf",
-            "dreizehn",
-            "vierzehn",
-            "fünfzehn"
-    };
-    private boolean precise;
-    private Calendar calendar;
-
+public class CircaTextStringerV1 extends CircaTextStringerBase {
     public CircaTextStringerV1() {
         calendar = Calendar.getInstance();
         precise = false;
@@ -35,19 +14,10 @@ public class CircaTextStringerV1 implements CircaTextStringer {
         precise = p;
     }
 
-    public String[] getString() {
-        long now = System.currentTimeMillis();
-        calendar.setTimeInMillis(now);
-
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
+    public String[] getStringFromTime(int hour, int minute) {
         if (precise)
             return getPreciseStringFromTime(hour, minute);
-        else
-            return getStringFromTime(hour, minute);
-    }
 
-    public String[] getStringFromTime(int hour, int minute) {
         ArrayList<String> returnvalue = new ArrayList<>();
 
         // To make things easier the first eight minutes of the new hour are

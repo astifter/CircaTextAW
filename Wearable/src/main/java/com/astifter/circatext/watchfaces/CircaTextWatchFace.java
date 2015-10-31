@@ -273,7 +273,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     }
 
     private void fillCircaTexts() {
-        String[] circaTexts = this.cts.getString();
+        String[] circaTexts = this.cts.getString(this.mCalendar);
         for (int i = eCT.FIRST; i < eCT.SIZE; i++) {
             mTexts.put(i, "");
         }

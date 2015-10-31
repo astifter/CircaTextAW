@@ -38,14 +38,14 @@ public abstract class BaseWatchFace implements WatchFace {
     boolean ambientMode;
     boolean mLowBitAmbient;
     boolean mMute;
-    private Calendar mCalendar;
+    protected Calendar mCalendar;
     private Date mDate;
     private SimpleDateFormat mDayFormat;
     private SimpleDateFormat mDateFormat;
     private SimpleDateFormat mShortDateFormat;
     private BatteryHelper.BatteryInfo mBatteryInfo;
     // DEBUG OPTIONS
-    private boolean fixedDateTime = true;
+    private boolean fixedDateTime = false;
 
     BaseWatchFace(CircaTextService.Engine parent) {
         this.parent = parent;
