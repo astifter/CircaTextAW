@@ -44,6 +44,8 @@ public abstract class BaseWatchFace implements WatchFace {
     private SimpleDateFormat mDateFormat;
     private SimpleDateFormat mShortDateFormat;
     private BatteryHelper.BatteryInfo mBatteryInfo;
+    // DEBUG OPTIONS
+    private boolean fixedDateTime = true;
 
     BaseWatchFace(CircaTextService.Engine parent) {
         this.parent = parent;
@@ -135,6 +137,11 @@ public abstract class BaseWatchFace implements WatchFace {
         long now = System.currentTimeMillis();
         mCalendar.setTimeInMillis(now);
         mDate.setTime(now);
+        if (fixedDateTime) {
+            mDate.setYear(2015); mDate.setMonth(10); mDate.setDate(30);
+            mDate.setHours(17); mDate.setMinutes(9); mDate.setSeconds(30);
+            mCalendar.set(2015, 10, 30, 17, 9, 30);
+        }
 
         {
             String sb = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY)) + ":" +

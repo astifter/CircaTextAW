@@ -32,9 +32,10 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private final HashMap<Integer, AnimatableImpl> topDrawable;
     private CTCs.Config currentConfig;
     private CTCs.Config selectedConfig;
-    private Drawable.RoundEmulation roundemulation = Drawable.RoundEmulation.NONE;
     private boolean isRound = false;
     private Screen showScreen;
+    // DEBUG OPTIONS
+    private Drawable.RoundEmulation roundemulation = Drawable.RoundEmulation.NONE;
 
     public CircaTextWatchFace(CircaTextService.Engine parent) {
         super(parent);
