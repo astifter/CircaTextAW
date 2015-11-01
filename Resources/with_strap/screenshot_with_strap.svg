@@ -16,8 +16,8 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="screenshot_with_strap.svg"
-   inkscape:export-filename="/Users/astifter/AndroidStudio/CircaTextAW/Resources/round_peek_strap.png"
+   sodipodi:docname="screenshot_with_strap.svg.2015_11_01_20_42_53.0.svg"
+   inkscape:export-filename="/Users/astifter/AndroidStudio/CircaTextAW/Resources/rect_circa_strap.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -27,13 +27,13 @@
      pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageopacity="0.0"
+     inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98333333"
-     inkscape:cx="138.30568"
-     inkscape:cy="259.32219"
+     inkscape:zoom="1.0301587"
+     inkscape:cx="195"
+     inkscape:cy="250"
      inkscape:document-units="px"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer4"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
@@ -62,7 +62,8 @@
      inkscape:snap-to-guides="true"
      inkscape:snap-text-baseline="true"
      inkscape:snap-page="true"
-     inkscape:showpageshadow="false">
+     inkscape:showpageshadow="false"
+     showborder="true">
     <sodipodi:guide
        position="35.000581,409.99804"
        orientation="1,0"
@@ -98,7 +99,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -107,16 +108,16 @@
      id="layer5"
      inkscape:label="rect_circa"
      transform="translate(-15.00002,-24.998163)"
-     style="display:none">
+     style="display:inline">
     <image
        sodipodi:absref="/Users/astifter/AndroidStudio/CircaTextAW/Resources/time_circa.png"
        xlink:href="time_circa.png"
-       width="320"
-       height="320"
-       preserveAspectRatio="none"
-       id="image4645"
+       y="114.99998"
        x="50.000603"
-       y="114.99998" />
+       id="image4645"
+       preserveAspectRatio="none"
+       height="320"
+       width="320" />
   </g>
   <g
      style="display:none"
@@ -127,12 +128,12 @@
     <image
        sodipodi:absref="/Users/astifter/AndroidStudio/CircaTextAW/Resources/time_precise.png"
        xlink:href="time_precise.png"
-       width="320"
-       height="320"
-       preserveAspectRatio="none"
-       id="image4720"
+       y="114.99998"
        x="50.000603"
-       y="114.99998" />
+       id="image4720"
+       preserveAspectRatio="none"
+       height="320"
+       width="320" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -143,13 +144,13 @@
     <image
        sodipodi:absref="/Users/astifter/AndroidStudio/CircaTextAW/Resources/time_digital.png"
        xlink:href="time_digital.png"
-       transform="translate(-1.0166566e-6,-2.5231157e-7)"
-       width="320"
-       height="320"
-       preserveAspectRatio="none"
-       id="image4795"
+       y="114.99998"
        x="50.000603"
-       y="114.99998" />
+       id="image4795"
+       preserveAspectRatio="none"
+       height="320"
+       width="320"
+       transform="translate(-1.0166566e-6,-2.5231157e-7)" />
   </g>
   <g
      style="display:none"
@@ -160,20 +161,19 @@
     <image
        sodipodi:absref="/Users/astifter/AndroidStudio/CircaTextAW/Resources/time_with_peek.png"
        xlink:href="time_with_peek.png"
-       width="320"
-       height="320"
-       preserveAspectRatio="none"
-       id="image4870"
+       y="114.99998"
        x="50.000603"
-       y="114.99998" />
+       id="image4870"
+       preserveAspectRatio="none"
+       height="320"
+       width="320" />
   </g>
   <g
      inkscape:label="strap_recangular"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:none"
-     transform="translate(-164.99941,-212.36033)"
-     sodipodi:insensitive="true">
+     style="display:inline"
+     transform="translate(-164.99941,-212.36033)">
     <rect
        style="fill:none;fill-opacity:1;stroke:#666666;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
        id="rect3430"
@@ -230,82 +230,88 @@
     <image
        sodipodi:absref="/Users/astifter/AndroidStudio/CircaTextAW/Resources/round_time_relaxed.png"
        xlink:href="round_time_relaxed.png"
-       width="320.00003"
-       height="320.00003"
-       preserveAspectRatio="none"
-       id="image3497"
+       y="89.999992"
        x="34.999989"
-       y="89.999992" />
+       id="image3497"
+       preserveAspectRatio="none"
+       height="320.00003"
+       width="320.00003" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer3"
-     inkscape:label="round_peek">
+     inkscape:label="round_peek"
+     style="display:none">
     <image
        sodipodi:absref="/Users/astifter/AndroidStudio/CircaTextAW/Resources/round_with_peek.png"
        xlink:href="round_with_peek.png"
-       width="320.00003"
-       height="320.00003"
-       preserveAspectRatio="none"
-       id="image3560"
+       y="90.001991"
        x="35.000568"
-       y="90.001991" />
+       id="image3560"
+       preserveAspectRatio="none"
+       height="320.00003"
+       width="320.00003" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="strap_round"
-     style="display:inline"
-     transform="translate(-14.99942,-79.99817)"
-     sodipodi:insensitive="true">
+     style="display:none"
+     transform="translate(-14.99942,-79.99817)">
     <path
-       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-       d="m 38.999404,155.74818 0,344 341.999996,0 0,-344 z M 210,170 c 88.36556,0 160,71.63444 160,160 0,88.36556 -71.63444,160 -160,160 C 121.63444,490 50,418.36556 50,330 50,241.63444 121.63444,170 210,170 Z"
-       id="rect4385"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccsssss" />
+       style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 7.5,62.5 0,375 375,0 0,-375 -375,0 z m 187.5,26 c 89.471,0 161.5,72.029 161.5,161.5 0,89.47099 -72.029,161.5 -161.5,161.5 C 105.529,411.5 33.5,339.47099 33.5,250 33.5,160.529 105.529,88.5 195,88.5 Z"
+       transform="translate(14.999405,79.99817)"
+       id="rect3430-1"
+       inkscape:connector-curvature="0" />
     <rect
-       ry="161.5052"
-       y="168.493"
-       x="48.494209"
-       height="323.01041"
-       width="323.01044"
-       id="rect4396"
-       style="display:inline;fill:none;fill-opacity:1;stroke:#666666;stroke-width:4.98958158;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-       rx="161.50522" />
+       rx="187.50002"
+       ry="187.50003"
+       y="142.49818"
+       x="22.499527"
+       height="375.00006"
+       width="375.00003"
+       id="rect3429"
+       style="display:inline;fill:none;fill-opacity:1;stroke:#666666;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+    <rect
+       rx="161.50002"
+       ry="161.50002"
+       y="168.49823"
+       x="48.499283"
+       height="323.00003"
+       width="323.00003"
+       id="rect3431"
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#666666;stroke-width:5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
     <g
-       transform="translate(-149.99998,-232.36219)"
-       style="display:inline"
-       id="g4971-9">
+       id="g3448">
       <path
-         sodipodi:nodetypes="czzc"
+         sodipodi:nodetypes="cc"
          inkscape:connector-curvature="0"
-         id="path3441-5"
-         d="m 172.49935,602.36034 0,20.00021 c 0,40.00043 57.5001,60.00065 57.5001,99.64391 l 0,155.35591"
+         id="path4979-7"
+         d="m 339.99946,194.99818 0,-180.00003"
          style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#666666;stroke-width:4.99990416;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
       <path
-         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#666666;stroke-width:4.99990416;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-         d="m 547.49969,602.36034 0,20.00021 c 0,40.00043 -57.5001,60.00065 -57.5001,99.64391 l 0,155.35591"
-         id="path4969-1"
+         sodipodi:nodetypes="cc"
          inkscape:connector-curvature="0"
-         sodipodi:nodetypes="czzc" />
+         id="path3437"
+         d="m 79.99932,194.99818 0,-180.00003"
+         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#666666;stroke-width:4.99990416;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
     </g>
     <g
-       style="display:inline"
-       id="g4975-8"
-       transform="matrix(1,0,0,-1,-149.99998,892.35853)">
+       id="g3444"
+       transform="translate(0,449.99998)">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path3439"
+         d="m 339.99946,194.99818 0,-180.00003"
+         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#666666;stroke-width:4.99990416;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
       <path
          style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#666666;stroke-width:4.99990416;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-         d="m 172.49935,522.36038 0,100.00017 c 0,40.00043 57.5001,60.00065 57.5001,99.64391 l 0,155.35593"
-         id="path4977-2"
+         d="m 79.99932,194.99818 0,-180.00003"
+         id="path3442"
          inkscape:connector-curvature="0"
-         sodipodi:nodetypes="czzc" />
-      <path
-         sodipodi:nodetypes="czzc"
-         inkscape:connector-curvature="0"
-         id="path4979-3"
-         d="m 547.49969,522.36038 0,100.00017 c 0,40.00043 -57.5001,60.00065 -57.5001,99.64391 l 0,155.35593"
-         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#666666;stroke-width:4.99990416;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+         sodipodi:nodetypes="cc" />
     </g>
   </g>
 </svg>
