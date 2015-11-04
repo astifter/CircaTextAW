@@ -20,14 +20,11 @@ public class DrawableText implements Drawable {
     private final Paint textPaint;
     private Rect drawnBounds = new Rect(0, 0, 0, 0);
     private int textAlignment = Drawable.Align.LEFT;
-    private float lineHeight = 1.0f;
 
     private boolean hidden = false;
 
     private Integer textSourceName;
     private HashMap<Integer, String> textSource;
-    private float defaultTextSize;
-    private boolean strokeInAmbientMode;
     private boolean autoSize;
     private int backgroundColor;
     private int multiLine = 1;
@@ -43,7 +40,7 @@ public class DrawableText implements Drawable {
         setText(where, source);
     }
 
-    private static float getMaximumTextHeight(Typeface f, Rect bounds, float lineHeight) {
+    private static float getMaximumTextHeight(Typeface f, Rect bounds) {
         Paint p = new Paint();
         p.setTypeface(f);
         p.setAntiAlias(true);
@@ -54,7 +51,7 @@ public class DrawableText implements Drawable {
 
         // First double the text size until its too big.
         p.setTextSize(1);
-        while (getTextHeightForPaint(p, lineHeight) < height)
+        while (getTextHeightForPaint(p) < height)
             p.setTextSize(p.getTextSize() * 2);
 
         // Now determine the high and low borders and define a cutoff threshold.
@@ -69,7 +66,7 @@ public class DrawableText implements Drawable {
         while (hi - lo > threshold) {
             float size = (hi + lo) / 2;
             p.setTextSize(size);
-            if (getTextHeightForPaint(p, lineHeight) >= height)
+            if (getTextHeightForPaint(p) >= height)
                 hi = size;
             else
                 lo = size;
@@ -111,9 +108,9 @@ public class DrawableText implements Drawable {
         return p.getTextSize();
     }
 
-    private static float getTextHeightForPaint(Paint p, float lineHeight) {
+    private static float getTextHeightForPaint(Paint p) {
         Paint.FontMetrics fm = p.getFontMetrics();
-        return (-fm.ascent + fm.descent) * lineHeight;
+        return (-fm.ascent + fm.descent);
     }
 
     protected void setText(int where, HashMap<Integer, String> source) {
@@ -126,7 +123,7 @@ public class DrawableText implements Drawable {
     @Override
     public float getFutureHeight() {
         if (this.hidden) return 0;
-        return getTextHeightForPaint(this.textPaint, this.lineHeight);
+        return getTextHeightForPaint(this.textPaint);
     }
 
     @Override
@@ -219,8 +216,8 @@ public class DrawableText implements Drawable {
                 }
             }
 
-            float y = drawnBounds.bottom + (-fm.ascent * lineHeight);
-            drawnBounds.bottom += (int) getTextHeightForPaint(this.textPaint, this.lineHeight);
+            float y = drawnBounds.bottom + -fm.ascent;
+            drawnBounds.bottom += (int) getTextHeightForPaint(this.textPaint);
 
             canvas.drawText(lineString, x, y, textPaint);
 
@@ -284,8 +281,8 @@ public class DrawableText implements Drawable {
     @Override
     public void setAmbientMode(boolean inAmbientMode) {
         this.textPaint.setAntiAlias(!inAmbientMode);
-        if (inAmbientMode && this.strokeInAmbientMode) {
-            this.textPaint.setStyle(Paint.Style.STROKE);
+        if (inAmbientMode) {
+            // this.textPaint.setStyle(Paint.Style.STROKE);
         } else {
             this.textPaint.setStyle(Paint.Style.FILL);
         }
@@ -328,28 +325,8 @@ public class DrawableText implements Drawable {
         }
     }
 
-    public void setLineHeight(float lineHeight) {
-        this.lineHeight = lineHeight;
-    }
-
     public float getMaximumTextHeight(Rect pos) {
-        return getMaximumTextHeight(this.textPaint.getTypeface(), pos, this.lineHeight);
-    }
-
-    public float getDefaultTextSize() {
-        return defaultTextSize;
-    }
-
-    public void setDefaultTextSize(float defaultTextSize) {
-        this.defaultTextSize = defaultTextSize;
-    }
-
-    public void strokeInAmbientMode(boolean s) {
-        this.strokeInAmbientMode = s;
-    }
-
-    public void setTextFont(Typeface textFont) {
-        this.textPaint.setTypeface(textFont);
+        return getMaximumTextHeight(this.textPaint.getTypeface(), pos);
     }
 
     @Override
