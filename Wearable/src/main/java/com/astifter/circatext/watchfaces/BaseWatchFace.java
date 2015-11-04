@@ -39,7 +39,6 @@ public abstract class BaseWatchFace implements WatchFace {
     boolean mLowBitAmbient;
     boolean mMute;
     protected Calendar mCalendar;
-    private Date mDate;
     private SimpleDateFormat mDayFormat;
     private SimpleDateFormat mDateFormat;
     private SimpleDateFormat mShortDateFormat;
@@ -55,7 +54,6 @@ public abstract class BaseWatchFace implements WatchFace {
         mBackgroundPaint = new Paint();
 
         mCalendar = Calendar.getInstance();
-        mDate = new Date();
         localeChanged();
 
         setTexts();
@@ -152,11 +150,8 @@ public abstract class BaseWatchFace implements WatchFace {
     void setTexts() {
         long now = System.currentTimeMillis();
         mCalendar.setTimeInMillis(now);
-        mDate.setTime(now);
         if (fixedDateTime) {
-            mDate.setYear(2015); mDate.setMonth(10); mDate.setDate(30);
-            mDate.setHours(17); mDate.setMinutes(9); mDate.setSeconds(30);
-            mCalendar.set(2015, 10, 30, 17, 9, 30);
+            mCalendar.set(2015, 10, 30, 17, 6, 30);
         }
 
         {
@@ -168,9 +163,10 @@ public abstract class BaseWatchFace implements WatchFace {
             String sb = ":" + formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
             mTexts.put(eTF.SECOND, sb);
         }
-        mTexts.put(eTF.DAY_OF_WEEK, mDayFormat.format(mDate));
-        mTexts.put(eTF.DATE, mDateFormat.format(mDate));
-        mTexts.put(eTF.SHORTDATE, mShortDateFormat.format(mDate));
+        Date d = mCalendar.getTime();
+        mTexts.put(eTF.DAY_OF_WEEK, mDayFormat.format(d));
+        mTexts.put(eTF.DATE, mDateFormat.format(d));
+        mTexts.put(eTF.SHORTDATE, mShortDateFormat.format(d));
         if (mBatteryInfo != null) {
             mTexts.put(eTF.BATTERY, String.format("%3.0f%%", mBatteryInfo.getPercent() * 100));
         } else {
