@@ -8,7 +8,6 @@ import com.google.android.gms.wearable.DataMap;
 public class CTCs {
     public static final boolean DEBUG = false;
     public static final String KEY_EXCLUDED_CALENDARS = "EXCLUDED_CALENDARS";
-    public static final String KEY_WATCHFACE = "WATCHFACE";
     public static final String KEY_WATCHFACE_CONFIG = "WATCHFACE_CONFIG";
     public static final String KEY_WATCHFACE_STRINGER = "WATCHFACE_STRINGER";
 
@@ -23,7 +22,6 @@ public class CTCs {
         if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "setDefaultValuesForMissingConfigKeys()");
 
         addConfigKeyIfMissing(config, KEY_EXCLUDED_CALENDARS, "");
-        addConfigKeyIfMissing(config, KEY_WATCHFACE, WatchFaces.CIRCATEXTv1.toString());
         addConfigKeyIfMissing(config, KEY_WATCHFACE_CONFIG, Config.PLAIN.toString());
         addConfigKeyIfMissing(config, KEY_WATCHFACE_STRINGER, Stringer.CIRCA.toString());
     }
@@ -40,10 +38,6 @@ public class CTCs {
         if (!config.containsKey(key)) {
             config.putString(key, value);
         }
-    }
-
-    public enum WatchFaces {
-        REGULAR, CIRCATEXTv1, CIRCATEXTv1ROUND, CIRCATEXTv1CHIN,
     }
 
     public enum Config {

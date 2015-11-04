@@ -38,10 +38,8 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
-import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.watchfaces.CircaTextWatchFace;
-import com.astifter.circatext.watchfaces.RegularWatchFace;
 import com.astifter.circatext.watchfaces.WatchFace;
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.CTU;
@@ -148,7 +146,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                     Typeface.createFromAsset(getResources().getAssets(),
                                              "fonts/RobotoCondensed-Bold.ttf");
 
-            wtf = new RegularWatchFace(this);
+            wtf = new CircaTextWatchFace(this);
             wtf.localeChanged();
         }
 
@@ -420,38 +418,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             boolean uiUpdated = false;
             if (config.containsKey(CTCs.KEY_EXCLUDED_CALENDARS)) {
                 mCalendarHelper.setExcludedCalendars(config.getString(CTCs.KEY_EXCLUDED_CALENDARS));
-                uiUpdated = true;
-            }
-            if (config.containsKey(CTCs.KEY_WATCHFACE)) {
-                CTCs.WatchFaces wf;
-                try {
-                    wf = CTCs.WatchFaces.valueOf(config.getString(CTCs.KEY_WATCHFACE));
-                } catch (Throwable t) {
-                    wf = CTCs.WatchFaces.CIRCATEXTv1;
-                }
-                updateEnabled = false;
-                switch (wf) {
-                    case REGULAR:
-                        wtf = new RegularWatchFace(this);
-                        break;
-                    case CIRCATEXTv1:
-                    case CIRCATEXTv1ROUND:
-                    case CIRCATEXTv1CHIN:
-                        wtf = new CircaTextWatchFace(this);
-                        if (wf == CTCs.WatchFaces.CIRCATEXTv1ROUND)
-                            wtf.setRoundMode(Drawable.RoundEmulation.CIRCULAR);
-                        else if (wf == CTCs.WatchFaces.CIRCATEXTv1CHIN)
-                            wtf.setRoundMode(Drawable.RoundEmulation.CHIN);
-                        break;
-                }
-                wtf.localeChanged();
-                wtf.setMetrics(getResources(), currentWindowInsets);
-                wtf.setLowBitAmbientMode(lowBitAmbientMode);
-                wtf.setMuteMode(inMuteMode);
-                wtf.setWeatherInfo(mWeather);
-                wtf.updateVisibilty();
-                wtf.setPeekCardPosition(getPeekCardPosition());
-                updateEnabled = true;
                 uiUpdated = true;
             }
             if (config.containsKey(CTCs.KEY_WATCHFACE_CONFIG))  {
