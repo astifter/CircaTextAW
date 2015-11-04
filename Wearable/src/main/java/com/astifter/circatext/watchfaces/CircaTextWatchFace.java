@@ -172,6 +172,17 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public int getTouchedText(int x, int y) {
+        if (peekCardDebug > 0) {
+            if (this.peekCardPosition.contains(x, y)) {
+                if (peekCardDebug >= 70) {
+                    peekCardDebug = 10;
+                } else {
+                    peekCardDebug += 10;
+                }
+            }
+            this.setPeekCardPosition(this.peekCardPosition);
+            return Drawable.Touched.FINISHED;
+        }
         if (showScreen != null) {
             int idx = showScreen.getTouchedText(x, y);
             if (idx == Drawable.Touched.CLOSEME) {
@@ -260,6 +271,14 @@ public class CircaTextWatchFace extends BaseWatchFace {
         }
 
         canvas.drawRect(bounds, this.mBackgroundPaint);
+        if (this.peekCardDebug > 0) {
+            Paint c = new Paint();
+            c.setColor(Color.WHITE);
+            c.setAntiAlias(true);
+            canvas.drawRect(this.peekCardPosition, c);
+
+        }
+
         setTexts();
         fillCircaTexts();
 

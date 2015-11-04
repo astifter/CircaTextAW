@@ -46,6 +46,7 @@ public abstract class BaseWatchFace implements WatchFace {
     private BatteryHelper.BatteryInfo mBatteryInfo;
     // DEBUG OPTIONS
     private boolean fixedDateTime = false;
+    protected int peekCardDebug = -1;
 
     BaseWatchFace(CircaTextService.Engine parent) {
         this.parent = parent;
@@ -85,6 +86,15 @@ public abstract class BaseWatchFace implements WatchFace {
             mBackgroundPaintColor = r.getColor(R.color.transparent);
         }
         mBackgroundPaint.setColor(mBackgroundPaintColor);
+
+        setDebugPeekCardRect();
+    }
+
+    private void setDebugPeekCardRect() {
+        if (peekCardDebug > 0) {
+            this.peekCardPosition = new Rect(mBounds);
+            this.peekCardPosition.top = ((100-peekCardDebug) * mBounds.height()) / 100;
+        }
     }
 
     @Override
@@ -120,6 +130,7 @@ public abstract class BaseWatchFace implements WatchFace {
     @Override
     public void setPeekCardPosition(Rect rect) {
         this.peekCardPosition = rect;
+        setDebugPeekCardRect();
         updateVisibilty();
         parent.invalidate();
     }
