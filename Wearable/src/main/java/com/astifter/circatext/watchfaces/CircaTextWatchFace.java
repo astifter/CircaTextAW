@@ -34,8 +34,6 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private CTCs.Config selectedConfig;
     private boolean isRound = false;
     private Screen showScreen;
-    // DEBUG OPTIONS
-    private Drawable.RoundEmulation roundemulation = Drawable.RoundEmulation.NONE;
     private Rect currentPeekCardPosition;
 
     public CircaTextWatchFace(CircaTextService.Engine parent) {
@@ -182,7 +180,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                     peekCardDebug += 10;
                 }
             }
-            this.setPeekCardPosition(this.peekCardPosition);
+            this.setPeekCardPosition(null);
             return Drawable.Touched.FINISHED;
         }
         if (showScreen != null) {
@@ -277,8 +275,10 @@ public class CircaTextWatchFace extends BaseWatchFace {
             Paint c = new Paint();
             c.setColor(Color.WHITE);
             c.setAntiAlias(true);
+            c.setTextAlign(Paint.Align.CENTER);
             canvas.drawRect(this.peekCardPosition, c);
-
+            c.setColor(Color.BLACK);
+            canvas.drawText(String.valueOf(this.peekCardDebug) + "%", this.peekCardPosition.centerX(), this.peekCardPosition.centerY(), c);
         }
 
         setTexts();
