@@ -36,6 +36,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     private Screen showScreen;
     // DEBUG OPTIONS
     private Drawable.RoundEmulation roundemulation = Drawable.RoundEmulation.NONE;
+    private Rect currentPeekCardPosition;
 
     public CircaTextWatchFace(CircaTextService.Engine parent) {
         super(parent);
@@ -162,8 +163,9 @@ public class CircaTextWatchFace extends BaseWatchFace {
             newConfig = CTCs.Config.PEEK;
             r.bottom = this.peekCardPosition.top;
         }
-        if (newConfig != currentConfig) {
+        if (newConfig != currentConfig || r.bottom != currentPeekCardPosition.bottom) {
             currentConfig = newConfig;
+            currentPeekCardPosition = r;
             for (AnimatableImpl a : topDrawable.values()) {
                 a.animateToConfig(currentConfig, r);
             }
