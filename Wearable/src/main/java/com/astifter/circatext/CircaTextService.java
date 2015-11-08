@@ -280,6 +280,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             currentWindowInsets = insets;
 
             wtf.setMetrics(getResources(), insets);
+            wtf.setPeekCardPosition(getPeekCardPosition());
         }
 
         @Override // WatchFaceService.Engine

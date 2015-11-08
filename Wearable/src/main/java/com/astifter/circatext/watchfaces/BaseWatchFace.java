@@ -44,7 +44,7 @@ public abstract class BaseWatchFace implements WatchFace {
     private SimpleDateFormat mShortDateFormat;
     private BatteryHelper.BatteryInfo mBatteryInfo;
     // DEBUG OPTIONS
-    private boolean fixedDateTime = true;
+    private boolean fixedDateTime = false;
     protected int peekCardDebug = -1;
     protected Drawable.RoundEmulation roundemulation = Drawable.RoundEmulation.NONE;
 
