@@ -94,13 +94,13 @@ public class CircaTextWatchFace extends BaseWatchFace {
             createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT, r, R.drawable.thermometer)
                     .setConfig(CTCs.Config.PEEK, new Rect(5, -20, 5, -20))
                     .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);
-            createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 43), Drawable.Align.RIGHT)
+            createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 42), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, new Rect(5, 80, 95, 87), Drawable.Align.LEFT)
                     .setConfig(CTCs.Config.PEEK, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT);
-            createAnimatable(eCT.SECOND, new Rect(5, 38, 95, 61), Drawable.Align.RIGHT)
+            createAnimatable(eCT.SECOND, new Rect(5, 39, 95, 61), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, new Rect(5, 84, 95, 91), Drawable.Align.LEFT)
                     .setConfig(CTCs.Config.PEEK, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT);
-            createAnimatable(eCT.THIRD, new Rect(5, 57, 95, 80), Drawable.Align.RIGHT)
+            createAnimatable(eCT.THIRD, new Rect(5, 58, 95, 80), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, new Rect(5, 88, 95, 95), Drawable.Align.LEFT)
                     .setConfig(CTCs.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
             createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95))

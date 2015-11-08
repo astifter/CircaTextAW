@@ -151,7 +151,7 @@ public abstract class BaseWatchFace implements WatchFace {
         long now = System.currentTimeMillis();
         mCalendar.setTimeInMillis(now);
         if (fixedDateTime) {
-            mCalendar.set(2015, 10, 30, 17, 6, 30);
+            mCalendar.set(2015, 10, 30, 17, 7, 30);
         }
 
         {
