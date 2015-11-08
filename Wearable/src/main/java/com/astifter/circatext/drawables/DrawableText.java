@@ -281,11 +281,6 @@ public class DrawableText implements Drawable {
     @Override
     public void setAmbientMode(boolean inAmbientMode) {
         this.textPaint.setAntiAlias(!inAmbientMode);
-        if (inAmbientMode) {
-            // this.textPaint.setStyle(Paint.Style.STROKE);
-        } else {
-            this.textPaint.setStyle(Paint.Style.FILL);
-        }
     }
 
     @Override
