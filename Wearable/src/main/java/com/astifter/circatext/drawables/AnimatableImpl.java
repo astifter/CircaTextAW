@@ -130,11 +130,6 @@ public class AnimatableImpl implements Drawable, Animatable {
     }
 
     @Override
-    public void animateAlpha(int from, int to) {
-        animateAlpha(from, to, null);
-    }
-
-    @Override
     public void animateAlpha(int from, int to, Animator.AnimatorListener l) {
         PropertyValuesHolder animateAlpha = PropertyValuesHolder.ofInt("Alpha", from, to);
 
