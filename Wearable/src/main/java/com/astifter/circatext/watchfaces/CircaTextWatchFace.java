@@ -25,6 +25,7 @@ import com.astifter.circatext.screens.Screen;
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.CTU;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CircaTextWatchFace extends BaseWatchFace {
@@ -51,10 +52,10 @@ public class CircaTextWatchFace extends BaseWatchFace {
     public void setMetrics(Resources r, WindowInsets insets) {
         super.setMetrics(r, insets);
 
-        this.isRound = (this.roundemulation != Drawable.RoundEmulation.NONE) || insets.isRound();
+        this.isRound = (this.debugUseRoundEmulation != Drawable.RoundEmulation.NONE) || insets.isRound();
         if (isRound) {
-            if (this.roundemulation != Drawable.RoundEmulation.NONE) {
-                if (this.roundemulation == Drawable.RoundEmulation.CHIN)
+            if (this.debugUseRoundEmulation != Drawable.RoundEmulation.NONE) {
+                if (this.debugUseRoundEmulation == Drawable.RoundEmulation.CHIN)
                     this.mBounds.bottom = 290;
             } else {
                 this.mBounds.bottom -= insets.getStableInsetBottom();
@@ -172,12 +173,12 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public int getTouchedText(int x, int y) {
-        if (peekCardDebug > 0) {
+        if (debugPeekCardPercentage > 0) {
             if (this.peekCardPosition.contains(x, y)) {
-                if (peekCardDebug >= 70) {
-                    peekCardDebug = 10;
+                if (debugPeekCardPercentage >= 70) {
+                    debugPeekCardPercentage = 10;
                 } else {
-                    peekCardDebug += 10;
+                    debugPeekCardPercentage += 10;
                 }
             }
             this.setPeekCardPosition(null);
@@ -222,7 +223,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void setRoundMode(Drawable.RoundEmulation b) {
-        this.roundemulation = b;
+        this.debugUseRoundEmulation = b;
     }
 
     @Override
@@ -256,7 +257,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
-        if (this.roundemulation != Drawable.RoundEmulation.NONE) {
+        if (this.debugUseRoundEmulation != Drawable.RoundEmulation.NONE) {
             Paint c = new Paint();
             c.setColor(Color.BLACK);
             c.setAntiAlias(true);
@@ -265,20 +266,20 @@ public class CircaTextWatchFace extends BaseWatchFace {
             Path clippingpath = new Path();
             clippingpath.addCircle(160, 160, 160, Path.Direction.CW);
             canvas.clipPath(clippingpath);
-            if (this.roundemulation == Drawable.RoundEmulation.CHIN) {
+            if (this.debugUseRoundEmulation == Drawable.RoundEmulation.CHIN) {
                 canvas.clipRect(this.mBounds, Region.Op.INTERSECT);
             }
         }
 
         canvas.drawRect(bounds, this.mBackgroundPaint);
-        if (this.peekCardDebug > 0) {
+        if (this.debugPeekCardPercentage > 0) {
             Paint c = new Paint();
             c.setColor(Color.WHITE);
             c.setAntiAlias(true);
             c.setTextAlign(Paint.Align.CENTER);
             canvas.drawRect(this.peekCardPosition, c);
             c.setColor(Color.BLACK);
-            canvas.drawText(String.valueOf(this.peekCardDebug) + "%", this.peekCardPosition.centerX(), this.peekCardPosition.centerY(), c);
+            canvas.drawText(String.valueOf(this.debugPeekCardPercentage) + "%", this.peekCardPosition.centerX(), this.peekCardPosition.centerY(), c);
         }
 
         setTexts();
@@ -289,6 +290,25 @@ public class CircaTextWatchFace extends BaseWatchFace {
         } else {
             for (AnimatableImpl a : topDrawable.values()) {
                 a.onDraw(canvas, this.mBounds);
+            }
+        }
+
+        if (debugOverdraws) {
+            Paint p = new Paint();
+            p.setColor(Color.RED);
+            p.setStyle(Paint.Style.STROKE);
+            ArrayList<Rect> rl = new ArrayList<>();
+            for (AnimatableImpl a : topDrawable.values()) {
+                rl.addAll(a.getDrawnRects());
+            }
+            while (rl.size() > 0) {
+                Rect drawn = rl.remove(0);
+                for (Rect r : rl) {
+                    Rect where = new Rect(r);
+                    if (where.intersect(drawn)) {
+                        canvas.drawRect(where, p);
+                    }
+                }
             }
         }
     }

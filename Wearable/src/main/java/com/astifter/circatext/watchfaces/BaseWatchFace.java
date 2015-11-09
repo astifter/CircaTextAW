@@ -44,9 +44,10 @@ public abstract class BaseWatchFace implements WatchFace {
     private SimpleDateFormat mShortDateFormat;
     private BatteryHelper.BatteryInfo mBatteryInfo;
     // DEBUG OPTIONS
-    private boolean fixedDateTime = false;
-    protected int peekCardDebug = -1;
-    protected Drawable.RoundEmulation roundemulation = Drawable.RoundEmulation.NONE;
+    private boolean debugUseFixedDate = false;
+    protected int debugPeekCardPercentage = -1;
+    protected Drawable.RoundEmulation debugUseRoundEmulation = Drawable.RoundEmulation.NONE;
+    protected boolean debugOverdraws = false;
 
     BaseWatchFace(CircaTextService.Engine parent) {
         this.parent = parent;
@@ -90,8 +91,8 @@ public abstract class BaseWatchFace implements WatchFace {
     }
 
     private void setDebugPeekCardRect(Rect rect) {
-        if (peekCardDebug > 0) {
-            int top = ((100-peekCardDebug) * mBounds.height()) / 100;
+        if (debugPeekCardPercentage > 0) {
+            int top = ((100- debugPeekCardPercentage) * mBounds.height()) / 100;
             if (rect != null && !rect.isEmpty())
                 top = Math.min(top, rect.top);
 
@@ -150,7 +151,7 @@ public abstract class BaseWatchFace implements WatchFace {
     void setTexts() {
         long now = System.currentTimeMillis();
         mCalendar.setTimeInMillis(now);
-        if (fixedDateTime) {
+        if (debugUseFixedDate) {
             mCalendar.set(2015, 10, 30, 17, 7, 30);
         }
 

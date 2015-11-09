@@ -305,6 +305,13 @@ public class DrawableText implements Drawable {
         return Touched.UNKNOWN;
     }
 
+    @Override
+    public ArrayList<Rect> getDrawnRects() {
+        ArrayList<Rect> retval = new ArrayList<>();
+        retval.add(this.drawnBounds);
+        return retval;
+    }
+
     public void setAlignment(int a) {
         this.textAlignment = a;
         switch (a) {

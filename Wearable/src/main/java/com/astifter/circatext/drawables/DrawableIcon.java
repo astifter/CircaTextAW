@@ -3,6 +3,9 @@ package com.astifter.circatext.drawables;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class DrawableIcon implements Drawable {
     private final int index;
     private final int scale;
@@ -104,6 +107,13 @@ public class DrawableIcon implements Drawable {
         if (this.currentBounds.contains(x, y))
             return index;
         return Touched.UNKNOWN;
+    }
+
+    @Override
+    public ArrayList<Rect> getDrawnRects() {
+        ArrayList<Rect> retval = new ArrayList<>();
+        retval.add(icon.getBounds());
+        return retval;
     }
 
     @Override

@@ -13,6 +13,7 @@ import android.view.animation.LinearInterpolator;
 import com.astifter.circatext.graphicshelpers.Position;
 import com.astifter.circatextutils.CTCs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AnimatableImpl implements Drawable, Animatable {
@@ -207,6 +208,11 @@ public class AnimatableImpl implements Drawable, Animatable {
     @Override
     public int getTouchedText(int x, int y) {
         return drawable.getTouchedText(x, y);
+    }
+
+    @Override
+    public ArrayList<Rect> getDrawnRects() {
+        return drawable.getDrawnRects();
     }
 
     @Override

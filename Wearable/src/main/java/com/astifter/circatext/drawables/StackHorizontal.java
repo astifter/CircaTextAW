@@ -7,6 +7,8 @@ import android.graphics.Rect;
 
 import com.astifter.circatextutils.CTCs;
 
+import java.util.ArrayList;
+
 public class StackHorizontal extends Stack {
     @Override
     public void onDraw(Canvas canvas, Rect b) {
@@ -50,6 +52,15 @@ public class StackHorizontal extends Stack {
             p.setStyle(Paint.Style.STROKE);
             canvas.drawRect(this.bounds, p);
         }
+    }
+
+    @Override
+    public ArrayList<Rect> getDrawnRects() {
+        ArrayList<Rect> retval = new ArrayList<>();
+        for (Drawable d : stack) {
+            retval.addAll(d.getDrawnRects());
+        }
+        return retval;
     }
 
     public void add(Drawable d) {

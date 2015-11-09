@@ -3,6 +3,8 @@ package com.astifter.circatext.drawables;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
+import java.util.ArrayList;
+
 public interface Drawable {
     /**
      * Draws the {@link Drawable} on the canvas inside the bounds.
@@ -53,6 +55,8 @@ public interface Drawable {
     boolean isHidden();
 
     int getTouchedText(int x, int y);
+
+    ArrayList<Rect> getDrawnRects();
 
     interface Align {
         int LEFT = 0;

@@ -107,6 +107,15 @@ public class StackVertical extends Stack {
         this.aboveStack.add(d);
     }
 
+    @Override
+    public ArrayList<Rect> getDrawnRects() {
+        ArrayList<Rect> retval = new ArrayList<>();
+        for (Drawable d : stack) {
+            retval.addAll(d.getDrawnRects());
+        }
+        return retval;
+    }
+
     public void setOffset(int mYOffset) {
         yCenter = mYOffset;
     }
