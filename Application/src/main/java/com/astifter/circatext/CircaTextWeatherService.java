@@ -102,10 +102,12 @@ public class CircaTextWeatherService extends WearableListenerService {
         super.onMessageReceived(messageEvent);
 
         mPeerId = messageEvent.getSourceNodeId();
-        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onMessageReceived(): mPeerId=" + mPeerId.toString());
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+            Log.d(CTCs.TAGCON, "onMessageReceived(): mPeerId=" + mPeerId);
 
         if (messageEvent.getPath().equals(CTCs.REQUIRE_WEATHER_MESSAGE)) {
-            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onMessageReceived(): REQUIRE_WEATHER_MESSAGE");
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+                Log.d(CTCs.TAGCON, "onMessageReceived(): REQUIRE_WEATHER_MESSAGE");
             getCity();
             JSONWeatherTask t = new JSONWeatherTask(this);
             t.execute();
@@ -163,15 +165,18 @@ public class CircaTextWeatherService extends WearableListenerService {
 
             if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onPostExecute()");
             if (mGoogleApiClient == null) {
-                if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onPostExecute(): mGoogleApiClient == null");
+                if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+                    Log.d(CTCs.TAGCON, "onPostExecute(): mGoogleApiClient == null");
                 mGoogleApiClient = new GoogleApiClient.Builder(this.context).addApi(Wearable.API).build();
             }
             if (!mGoogleApiClient.isConnected()) {
-                if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onPostExecute(): mGoogleApiClient not connected");
+                if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+                    Log.d(CTCs.TAGCON, "onPostExecute(): mGoogleApiClient not connected");
                 mGoogleApiClient.connect();
             }
 
-            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onPostExecute(): sendMessage()");
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+                Log.d(CTCs.TAGCON, "onPostExecute(): sendMessage()");
             Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CTCs.SEND_WEATHER_MESSAGE, weatherData.toByteArray())
                     .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
                         @Override

@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CircaTextWatchFace extends BaseWatchFace {
-    private volatile CircaTextStringer cts;
     private final HashMap<Integer, AnimatableImpl> topDrawable;
+    private volatile CircaTextStringer cts;
     private CTCs.Config currentConfig;
     private CTCs.Config selectedConfig;
     private boolean isRound = false;
@@ -241,13 +241,16 @@ public class CircaTextWatchFace extends BaseWatchFace {
     @Override
     public void setStringer(CTCs.Stringer cfg) {
         this.cts = null;
-        switch(cfg) {
+        switch (cfg) {
             case CIRCA:
-                this.cts = new CircaTextStringerV1(); break;
+                this.cts = new CircaTextStringerV1();
+                break;
             case RELAXED:
-                this.cts = new CircaTextStringerV2(); break;
+                this.cts = new CircaTextStringerV2();
+                break;
             case PRECISE:
-                this.cts = new CircaTextStringerV1(true); break;
+                this.cts = new CircaTextStringerV1(true);
+                break;
         }
     }
 

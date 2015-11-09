@@ -31,6 +31,7 @@ public abstract class BaseWatchFace implements WatchFace {
     protected CalendarHelper.EventInfo[] mMeetings;
     protected Weather mWeather = null;
     protected Resources resources;
+    protected Calendar mCalendar;
     Paint mBackgroundPaint;
     int mBackgroundPaintColor;
     Rect mBounds;
@@ -38,7 +39,6 @@ public abstract class BaseWatchFace implements WatchFace {
     boolean ambientMode;
     boolean mLowBitAmbient;
     boolean mMute;
-    protected Calendar mCalendar;
     private SimpleDateFormat mDayFormat;
     private SimpleDateFormat mDateFormat;
     private SimpleDateFormat mShortDateFormat;
@@ -92,7 +92,7 @@ public abstract class BaseWatchFace implements WatchFace {
 
     private void setDebugPeekCardRect(Rect rect) {
         if (debugPeekCardPercentage > 0) {
-            int top = ((100- debugPeekCardPercentage) * mBounds.height()) / 100;
+            int top = ((100 - debugPeekCardPercentage) * mBounds.height()) / 100;
             if (rect != null && !rect.isEmpty())
                 top = Math.min(top, rect.top);
 

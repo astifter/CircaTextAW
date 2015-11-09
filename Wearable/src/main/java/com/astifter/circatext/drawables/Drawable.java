@@ -58,6 +58,12 @@ public interface Drawable {
 
     ArrayList<Rect> getDrawnRects();
 
+    enum RoundEmulation {
+        NONE,
+        CIRCULAR,
+        CHIN
+    }
+
     interface Align {
         int LEFT = 0;
         int CENTER = 1;
@@ -69,11 +75,5 @@ public interface Drawable {
         int UNKNOWN = -1;
         int FINISHED = -3;
         int FIRST = 0;
-    }
-
-    enum RoundEmulation {
-        NONE,
-        CIRCULAR,
-        CHIN
     }
 }

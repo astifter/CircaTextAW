@@ -64,11 +64,10 @@ public class CircaTextStringerV1 extends CircaTextStringerBase {
         ArrayList<String> returnvalue = new ArrayList<>();
 
         int qmin = minute % 15;
-        if (1 <= qmin && qmin <=7) {
+        if (1 <= qmin && qmin <= 7) {
             returnvalue.add(german_numbers[qmin] + " nach");
-        } else
-        if (8 <= qmin && qmin <=14) {
-            returnvalue.add(german_numbers[15-qmin] + " vor");
+        } else if (8 <= qmin && qmin <= 14) {
+            returnvalue.add(german_numbers[15 - qmin] + " vor");
         }
 
         // To make things easier the first eight minutes of the new hour are

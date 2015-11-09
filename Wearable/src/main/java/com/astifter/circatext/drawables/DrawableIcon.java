@@ -3,7 +3,6 @@ package com.astifter.circatext.drawables;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class DrawableIcon implements Drawable {

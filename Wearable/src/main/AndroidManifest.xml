@@ -28,8 +28,8 @@
         android:allowBackup="true"
         android:fullBackupContent="@xml/mybackupscheme"
         android:fullBackupOnly="true"
-        android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
         tools:ignore="MissingApplicationIcon">
 
         <service

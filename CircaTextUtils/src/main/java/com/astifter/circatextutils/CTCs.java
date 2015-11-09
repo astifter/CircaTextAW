@@ -1,6 +1,5 @@
 package com.astifter.circatextutils;
 
-import android.graphics.Color;
 import android.util.Log;
 
 import com.google.android.gms.wearable.DataMap;
@@ -19,7 +18,8 @@ public class CTCs {
     public static final String TAGCON = "CircaTextConnections";
 
     public static void setDefaultValuesForMissingConfigKeys(DataMap config) {
-        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "setDefaultValuesForMissingConfigKeys()");
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+            Log.d(CTCs.TAGCON, "setDefaultValuesForMissingConfigKeys()");
 
         addConfigKeyIfMissing(config, KEY_EXCLUDED_CALENDARS, "");
         addConfigKeyIfMissing(config, KEY_WATCHFACE_CONFIG, Config.PLAIN.toString());
@@ -27,14 +27,16 @@ public class CTCs {
     }
 
     private static void addConfigKeyIfMissing(DataMap config, String key, int value) {
-        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "addConfigKeyIfMissing(): key=" + key + ", value=" + value);
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+            Log.d(CTCs.TAGCON, "addConfigKeyIfMissing(): key=" + key + ", value=" + value);
         if (!config.containsKey(key)) {
             config.putInt(key, value);
         }
     }
 
     private static void addConfigKeyIfMissing(DataMap config, String key, String value) {
-        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "addConfigKeyIfMissing(): key=" + key + ", value=" + value);
+        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+            Log.d(CTCs.TAGCON, "addConfigKeyIfMissing(): key=" + key + ", value=" + value);
         if (!config.containsKey(key)) {
             config.putString(key, value);
         }

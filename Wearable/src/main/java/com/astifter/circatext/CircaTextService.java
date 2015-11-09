@@ -421,7 +421,7 @@ public class CircaTextService extends CanvasWatchFaceService {
                 mCalendarHelper.setExcludedCalendars(config.getString(CTCs.KEY_EXCLUDED_CALENDARS));
                 uiUpdated = true;
             }
-            if (config.containsKey(CTCs.KEY_WATCHFACE_CONFIG))  {
+            if (config.containsKey(CTCs.KEY_WATCHFACE_CONFIG)) {
                 if (Log.isLoggable(TAG, Log.DEBUG))
                     Log.d(TAG, "updateUiForConfigDataMap(): case CTCs.KEY_WATCHFACE_CONFIG: " + config.getString(CTCs.KEY_WATCHFACE_CONFIG));
                 CTCs.Config cfg;
