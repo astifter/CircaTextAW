@@ -49,6 +49,11 @@ public abstract class BaseWatchFace implements WatchFace {
     protected boolean debugPeekCardPercentageUp = true;
     protected Drawable.RoundEmulation debugUseRoundEmulation = Drawable.RoundEmulation.NONE;
     protected boolean debugOverdraws = false;       // default false
+//    protected int debugUseFixedDate = -1;           // default -1
+//    protected int debugPeekCardPercentage = -1;     // default -1
+//    protected boolean debugPeekCardPercentageUp = true;
+//    protected Drawable.RoundEmulation debugUseRoundEmulation = Drawable.RoundEmulation.NONE;
+//    protected boolean debugOverdraws = false;       // default false
 
     BaseWatchFace(CircaTextService.Engine parent) {
         this.parent = parent;

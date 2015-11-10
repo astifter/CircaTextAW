@@ -115,11 +115,11 @@ public class CircaTextWatchFace extends BaseWatchFace {
             createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95))
                     .setConfig(CTCs.Config.PEEKSMALL, new Rect(2, 10, 98, 55))
                     .setConfig(CTCs.Config.TIME, new Rect(5, 25, 95, 75), Drawable.Align.CENTER)
-                    .setConfig(CTCs.Config.PEEK, new Rect(5, 5, 95, 65), Drawable.Align.CENTER);
+                    .setConfig(CTCs.Config.PEEK, new Rect(5, 10, 95, 65), Drawable.Align.CENTER);
             createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.PEEKSMALL, new Rect(2, 57, 98, 90))
                     .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN)
-                    .setConfig(CTCs.Config.PEEK, new Rect(5, 65, 95, 90), Drawable.Align.LEFT);
+                    .setConfig(CTCs.Config.PEEK, new Rect(5, 75, 95, 95), Drawable.Align.LEFT);
         }
     }
 
@@ -196,7 +196,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                 }
             } else {
                 debugPeekCardPercentage -= 5;
-                if (debugPeekCardPercentage < 20) {
+                if (debugPeekCardPercentage < 10) {
                     debugPeekCardPercentage += 10;
                     debugPeekCardPercentageUp = true;
                 }
