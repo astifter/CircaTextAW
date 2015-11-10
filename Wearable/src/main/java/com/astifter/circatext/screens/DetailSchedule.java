@@ -63,4 +63,9 @@ public class DetailSchedule implements Screen {
     public int getTouchedText(int x, int y) {
         return DrawingHelpers.getTouchedText(x, y, drawables);
     }
+
+    @Override
+    public ArrayList<Rect> getDrawnRects() {
+        return DrawingHelpers.getDrawnRects(drawables);
+    }
 }

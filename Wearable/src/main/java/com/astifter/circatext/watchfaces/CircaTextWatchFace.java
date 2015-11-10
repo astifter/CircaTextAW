@@ -301,8 +301,12 @@ public class CircaTextWatchFace extends BaseWatchFace {
             p.setColor(Color.RED);
             p.setStyle(Paint.Style.STROKE);
             ArrayList<Rect> rl = new ArrayList<>();
-            for (AnimatableImpl a : topDrawable.values()) {
-                rl.addAll(a.getDrawnRects());
+            if (showScreen != null) {
+                rl.addAll(showScreen.getDrawnRects());
+            } else {
+                for (AnimatableImpl a : topDrawable.values()) {
+                    rl.addAll(a.getDrawnRects());
+                }
             }
             while (rl.size() > 0) {
                 Rect drawn = rl.remove(0);

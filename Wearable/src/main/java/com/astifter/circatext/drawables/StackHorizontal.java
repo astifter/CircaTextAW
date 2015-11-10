@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatextutils.CTCs;
 
 import java.util.ArrayList;
@@ -56,11 +57,7 @@ public class StackHorizontal extends Stack {
 
     @Override
     public ArrayList<Rect> getDrawnRects() {
-        ArrayList<Rect> retval = new ArrayList<>();
-        for (Drawable d : stack) {
-            retval.addAll(d.getDrawnRects());
-        }
-        return retval;
+        return DrawingHelpers.getDrawnRects(stack);
     }
 
     public void add(Drawable d) {

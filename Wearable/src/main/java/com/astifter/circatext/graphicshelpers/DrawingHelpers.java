@@ -36,4 +36,12 @@ public class DrawingHelpers {
             drawables.add(new StaticIcon(Drawable.Touched.CLOSEME, r.getDrawable(R.drawable.ic_arrow_back_24dp, r.newTheme()), new Rect(5, 5, 20, 20), 20));
         }
     }
+
+    public static ArrayList<Rect> getDrawnRects(ArrayList<Drawable> drawables) {
+        ArrayList<Rect> retval = new ArrayList<>();
+        for (Drawable d : drawables) {
+            retval.addAll(retval);
+        }
+        return retval;
+    }
 }

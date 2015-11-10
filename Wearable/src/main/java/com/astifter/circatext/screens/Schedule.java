@@ -89,6 +89,11 @@ public class Schedule implements Screen {
         }
     }
 
+    @Override
+    public ArrayList<Rect> getDrawnRects() {
+        return DrawingHelpers.getDrawnRects(drawables);
+    }
+
     private class ColorRect {
         private final Position position;
         private final Paint p;
