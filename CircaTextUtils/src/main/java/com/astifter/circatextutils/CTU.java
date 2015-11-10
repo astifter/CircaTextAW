@@ -68,7 +68,8 @@ public final class CTU {
                                 .authority(localNode)
                                 .build();
 
-                        Log.d(TAG, "fetching data with Wearable.DataApi.getDataItem(" + uri.toString() + ")");
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "fetching data with Wearable.DataApi.getDataItem(" + uri.toString() + ")");
                         Wearable.DataApi.getDataItem(client, uri)
                                 .setResultCallback(new DataItemResultCallback(callback));
                     }

@@ -111,7 +111,7 @@ public class DrawableIcon implements Drawable {
     @Override
     public ArrayList<Rect> getDrawnRects() {
         ArrayList<Rect> retval = new ArrayList<>();
-        retval.add(icon.getBounds());
+        retval.add(currentBounds);
         return retval;
     }
 
@@ -122,11 +122,10 @@ public class DrawableIcon implements Drawable {
 
     @Override
     public void setColor(int c) {
-
     }
 
     @Override
     public void setAlignment(int a) {
-        // TODO not implemented
+        alignment = a;
     }
 }
