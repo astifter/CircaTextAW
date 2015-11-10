@@ -187,16 +187,28 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public int getTouchedText(int x, int y) {
-        if (debugPeekCardPercentage > 0) {
-            if (this.peekCardPosition.contains(x, y)) {
-                if (debugPeekCardPercentage >= 70) {
-                    debugPeekCardPercentage = 10;
-                } else {
+        if (debugPeekCardPercentage > 0 && this.peekCardPosition.contains(x, y)) {
+            if (debugPeekCardPercentageUp) {
+                debugPeekCardPercentage += 5;
+                if (debugPeekCardPercentage > 70) {
+                    debugPeekCardPercentage -= 10;
+                    debugPeekCardPercentageUp = false;
+                }
+            } else {
+                debugPeekCardPercentage -= 5;
+                if (debugPeekCardPercentage < 20) {
                     debugPeekCardPercentage += 10;
+                    debugPeekCardPercentageUp = true;
                 }
             }
             this.setPeekCardPosition(null);
             return Drawable.Touched.FINISHED;
+        }
+        if (debugUseFixedDate >= 0) {
+            debugUseFixedDate++;
+            if (debugUseFixedDate >= 60)
+                debugUseFixedDate = 0;
+            parent.invalidate();
         }
         if (showScreen != null) {
             int idx = showScreen.getTouchedText(x, y);
@@ -296,7 +308,8 @@ public class CircaTextWatchFace extends BaseWatchFace {
             c.setTextAlign(Paint.Align.CENTER);
             canvas.drawRect(this.peekCardPosition, c);
             c.setColor(Color.BLACK);
-            canvas.drawText(String.valueOf(this.debugPeekCardPercentage) + "%", this.peekCardPosition.centerX(), this.peekCardPosition.centerY(), c);
+            String value = String.valueOf(this.debugPeekCardPercentage) + "%, " + currentConfig.toString();
+            canvas.drawText(value, this.peekCardPosition.centerX(), this.peekCardPosition.centerY(), c);
         }
 
         setTexts();

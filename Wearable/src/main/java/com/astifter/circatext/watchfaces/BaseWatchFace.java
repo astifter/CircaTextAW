@@ -44,10 +44,11 @@ public abstract class BaseWatchFace implements WatchFace {
     private SimpleDateFormat mShortDateFormat;
     private BatteryHelper.BatteryInfo mBatteryInfo;
     // DEBUG OPTIONS
-    private boolean debugUseFixedDate = false;
-    protected int debugPeekCardPercentage = -1;
+    protected int debugUseFixedDate = -1;           // default -1
+    protected int debugPeekCardPercentage = -1;     // default -1
+    protected boolean debugPeekCardPercentageUp = true;
     protected Drawable.RoundEmulation debugUseRoundEmulation = Drawable.RoundEmulation.NONE;
-    protected boolean debugOverdraws = false;
+    protected boolean debugOverdraws = false;       // default false
 
     BaseWatchFace(CircaTextService.Engine parent) {
         this.parent = parent;
@@ -151,8 +152,8 @@ public abstract class BaseWatchFace implements WatchFace {
     void setTexts() {
         long now = System.currentTimeMillis();
         mCalendar.setTimeInMillis(now);
-        if (debugUseFixedDate) {
-            mCalendar.set(2015, 10, 30, 17, 7, 30);
+        if (debugUseFixedDate >= 0) {
+            mCalendar.set(2015, 10, 30, 17, debugUseFixedDate, 30);
         }
 
         {
