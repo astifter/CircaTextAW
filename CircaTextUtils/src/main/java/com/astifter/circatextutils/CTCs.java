@@ -43,7 +43,7 @@ public class CTCs {
     }
 
     public enum Config {
-        PLAIN, PEEK, TIME
+        PLAIN, PEEK, PEEKSMALL, TIME
     }
 
     public enum Stringer {

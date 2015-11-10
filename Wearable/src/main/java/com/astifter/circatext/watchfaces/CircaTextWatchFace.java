@@ -84,6 +84,9 @@ public class CircaTextWatchFace extends BaseWatchFace {
             createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.PEEK, new Rect(2, 70, 98, 98), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);
+            for (Animatable d : topDrawable.values()) {
+                d.setConfig(CTCs.Config.PEEKSMALL, CTCs.Config.PEEK);
+            }
         } else {
             int offset = 12;
             int height = (100 - (2 * offset)) / 3;
@@ -91,25 +94,32 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
             createAnimatable(eTF.SHORTCAL, new Rect(5, 5, 95, 20), Drawable.Align.RIGHT, r, R.drawable.calendar)
                     .setConfig(CTCs.Config.PEEK, new Rect(95, -20, 95, -20), Drawable.Align.RIGHT)
-                    .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);
+                    .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN)
+                    .setConfig(CTCs.Config.PEEKSMALL, CTCs.Config.PEEK);
             createAnimatable(eTF.WEATHER_TEMP, new Rect(5, 5, 95, 20), Drawable.Align.LEFT, r, R.drawable.thermometer)
                     .setConfig(CTCs.Config.PEEK, new Rect(5, -20, 5, -20))
-                    .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);
+                    .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN)
+                    .setConfig(CTCs.Config.PEEKSMALL, CTCs.Config.PEEK);
             createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 42), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, new Rect(5, 80, 95, 87), Drawable.Align.LEFT)
-                    .setConfig(CTCs.Config.PEEK, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT);
+                    .setConfig(CTCs.Config.PEEKSMALL, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT)
+                    .setConfig(CTCs.Config.PEEK, new Rect(5, 60, 95, 75), Drawable.Align.RIGHT);
             createAnimatable(eCT.SECOND, new Rect(5, 39, 95, 61), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, new Rect(5, 84, 95, 91), Drawable.Align.LEFT)
-                    .setConfig(CTCs.Config.PEEK, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT);
+                    .setConfig(CTCs.Config.PEEKSMALL, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT)
+                    .setConfig(CTCs.Config.PEEK, new Rect(5, 70, 95, 85), Drawable.Align.RIGHT);
             createAnimatable(eCT.THIRD, new Rect(5, 58, 95, 80), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, new Rect(5, 88, 95, 95), Drawable.Align.LEFT)
-                    .setConfig(CTCs.Config.PEEK, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT);
+                    .setConfig(CTCs.Config.PEEKSMALL, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT)
+                    .setConfig(CTCs.Config.PEEK, new Rect(5, 80, 95, 95), Drawable.Align.RIGHT);
             createAnimatable(eTF.HOUR, new Rect(5, 80, 95, 95))
-                    .setConfig(CTCs.Config.PEEK, new Rect(2, 10, 98, 55))
-                    .setConfig(CTCs.Config.TIME, new Rect(5, 25, 95, 75), Drawable.Align.CENTER);
+                    .setConfig(CTCs.Config.PEEKSMALL, new Rect(2, 10, 98, 55))
+                    .setConfig(CTCs.Config.TIME, new Rect(5, 25, 95, 75), Drawable.Align.CENTER)
+                    .setConfig(CTCs.Config.PEEK, new Rect(5, 5, 95, 65), Drawable.Align.CENTER);
             createAnimatable(eTF.SHORTDATE, new Rect(5, 80, 95, 95), Drawable.Align.RIGHT)
-                    .setConfig(CTCs.Config.PEEK, new Rect(2, 57, 98, 90))
-                    .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);
+                    .setConfig(CTCs.Config.PEEKSMALL, new Rect(2, 57, 98, 90))
+                    .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN)
+                    .setConfig(CTCs.Config.PEEK, new Rect(5, 65, 95, 90), Drawable.Align.LEFT);
         }
     }
 
@@ -159,7 +169,11 @@ public class CircaTextWatchFace extends BaseWatchFace {
         if (this.peekCardPosition.isEmpty()) {
             newConfig = selectedConfig;
         } else {
-            newConfig = CTCs.Config.PEEK;
+            if (this.peekCardPosition.top > (this.mBounds.height() * 50/100)) {
+                newConfig = CTCs.Config.PEEK;
+            } else {
+                newConfig = CTCs.Config.PEEKSMALL;
+            }
             r.bottom = this.peekCardPosition.top;
         }
         if (newConfig != currentConfig || r.bottom != currentPeekCardPosition.bottom) {
@@ -197,7 +211,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                     break;
             }
             if (eCT.FIRST <= idx && idx <= eCT.THIRD || idx == eTF.HOUR) {
-                if (currentConfig == CTCs.Config.PEEK)
+                if (currentConfig == CTCs.Config.PEEK || currentConfig == CTCs.Config.PEEKSMALL)
                     return Drawable.Touched.FINISHED;
                 if (selectedConfig == CTCs.Config.PLAIN)
                     selectedConfig = CTCs.Config.TIME;
@@ -229,7 +243,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
     @Override
     public void setSelectedConfig(CTCs.Config cfg) {
         this.selectedConfig = cfg;
-        if (this.currentConfig != CTCs.Config.PEEK) {
+        if (currentConfig != CTCs.Config.PEEK && currentConfig != CTCs.Config.PEEKSMALL) {
             currentConfig = selectedConfig;
             for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
                 topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
