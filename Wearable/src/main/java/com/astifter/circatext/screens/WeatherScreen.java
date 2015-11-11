@@ -11,12 +11,19 @@ import com.astifter.circatextutils.Weather;
 import java.util.ArrayList;
 
 public class WeatherScreen implements Screen {
+    private final Weather weather;
+    ArrayList<Drawable> drawables = new ArrayList<>();
 
-    public WeatherScreen(Resources r, Weather mWeather) {
+    public WeatherScreen(Resources r, boolean isRound, Weather mWeather, int bgColor) {
+        this.weather = mWeather;
+        DrawingHelpers.createHeadline(drawables, r, isRound, "Wetter");
     }
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
+        for (Drawable d : drawables) {
+            d.onDraw(canvas, bounds);
+        }
     }
 
     @Override
@@ -26,6 +33,6 @@ public class WeatherScreen implements Screen {
 
     @Override
     public ArrayList<Rect> getDrawnRects() {
-        return new ArrayList<Rect>();
+        return DrawingHelpers.getDrawnRects(drawables);
     }
 }

@@ -22,6 +22,7 @@ import com.astifter.circatext.drawables.DrawableText;
 import com.astifter.circatext.drawables.StackHorizontal;
 import com.astifter.circatext.screens.Schedule;
 import com.astifter.circatext.screens.Screen;
+import com.astifter.circatext.screens.WeatherScreen;
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.CTU;
 
@@ -238,7 +239,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
             } else if (idx == eTF.SHORTCAL) {
                 showScreen = new Schedule(this.resources, this.isRound, this.mMeetings, this.mBackgroundPaint.getColor());
             } else if (idx == eTF.WEATHER_TEMP) {
-                //showScreen = new WeatherScreen(this.resources, this.mWeather);
+                showScreen = new WeatherScreen(this.resources, this.isRound, this.mWeather, this.mBackgroundPaint.getColor());
             } else {
                 return Drawable.Touched.FINISHED;
             }
