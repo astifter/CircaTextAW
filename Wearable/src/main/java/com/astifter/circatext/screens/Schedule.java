@@ -42,8 +42,8 @@ public class Schedule implements Screen {
                 break;
             }
 
-            createStaticTest(ei.formatStart(), i, new Rect(5, top, disection - 2, bottom), Drawable.Align.RIGHT, bgColor);
-            createStaticTest(ei.Title, i, new Rect(disection + 2, top, 95, bottom), Drawable.Align.LEFT, bgColor);
+            DrawingHelpers.createStaticTest(this.drawables, ei.formatStart(), i, new Rect(5, top, disection - 2, bottom), Drawable.Align.RIGHT, bgColor);
+            DrawingHelpers.createStaticTest(this.drawables, ei.Title, i, new Rect(disection + 2, top, 95, bottom), Drawable.Align.LEFT, bgColor);
 
             ColorRect cr = new ColorRect(new Rect(disection - 1, top, disection + 1, bottom), ei.Color);
             rects.add(cr);
@@ -51,12 +51,6 @@ public class Schedule implements Screen {
         }
     }
 
-    private void createStaticTest(String t, int i, Rect pos, int align, int bgColor) {
-        StaticText date = new StaticText(i, t, pos, align);
-        date.autoSize(true);
-        date.setBackgroundColor(bgColor);
-        drawables.add(date);
-    }
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {

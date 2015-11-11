@@ -44,4 +44,11 @@ public class DrawingHelpers {
         }
         return retval;
     }
+
+    public static void createStaticTest(ArrayList<Drawable> drawables, String t, int i, Rect pos, int align, int bgColor) {
+        StaticText date = new StaticText(i, t, pos, align);
+        date.autoSize(true);
+        date.setBackgroundColor(bgColor);
+        drawables.add(date);
+    }
 }
