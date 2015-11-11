@@ -27,6 +27,8 @@ import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -75,6 +77,13 @@ public class CircaTextConfigActivity extends Activity
         htmlText = (TextView) findViewById(R.id.exclude_calendars_expanation);
         htmlText.setText(Html.fromHtml(getResources().getString(R.string.excluded_calendar_explanation)));
 
+        Button weather_update_button = (Button) findViewById(R.id.weather_update_button);
+        weather_update_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CTCs.REQUIRE_WEATHER_MESSAGE, null);
+            }
+        });
     }
 
     @Override // Activity

@@ -31,6 +31,9 @@
         Beschreibung vorkommt.
         ]]>
     </string>
+
+    <string name="digital_config_weather">Wetter</string>
+
     <string name="digital_config_attribution_text">
         <![CDATA[
         Icons von <i>Aaron K. Kim</i> vom<br/>
