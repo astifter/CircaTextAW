@@ -41,6 +41,7 @@ import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.Timer;
@@ -81,7 +82,14 @@ public class CircaTextConfigActivity extends Activity
         weather_update_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CTCs.REQUIRE_WEATHER_MESSAGE, null);
+                if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate().onClick()");
+                Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CTCs.REQUIRE_WEATHER_MESSAGE, null)
+                    .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                        @Override
+                        public void onResult(MessageApi.SendMessageResult r) {
+                            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onCreate().onClick().onResult(): " + r.toString());
+                        }
+                    });
             }
         });
     }
