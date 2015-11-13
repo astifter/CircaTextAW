@@ -72,6 +72,7 @@ public class CircaTextService extends CanvasWatchFaceService {
      * a second to blink the colons.
      */
     private static final long NORMAL_UPDATE_RATE_MS = 1000;
+    public static final int WEATHER_REQUEST_TIMEOUT = 15 * 60 * 1000;
 
     @Override
     public Engine onCreateEngine() {
@@ -96,7 +97,9 @@ public class CircaTextService extends CanvasWatchFaceService {
         boolean lowBitAmbientMode;
         boolean inMuteMode;
         Weather mWeather;
-        private Date mWeatherRequested = null;
+        private Date mWeatherRequested;
+        private Date mWeatherReceived;
+        private int  mWeatherReceivedTimeOut = 1 * 60 * 1000;
         private boolean updateEnabled = true;
         @SuppressLint("HandlerLeak")
         final Handler mUpdateHandler = new Handler() {
@@ -300,9 +303,21 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onTimeTick()");
 
             long now = System.currentTimeMillis();
-            if (mWeatherRequested == null || (now - mWeatherRequested.getTime() > 15 * 60 * 1000)) {
-                mWeatherRequested = new Date(now);
 
+            boolean reRequest = false;
+            if (mWeatherRequested == null || ((now - mWeatherRequested.getTime()) > WEATHER_REQUEST_TIMEOUT)) {
+                reRequest = true;
+            }
+            if (!reRequest && mWeatherReceived != null && ((now - mWeatherReceived.getTime()) > mWeatherReceivedTimeOut)) {
+                reRequest = true;
+                if (mWeatherReceivedTimeOut < WEATHER_REQUEST_TIMEOUT)
+                    mWeatherReceivedTimeOut *= 2;
+                if (mWeatherReceivedTimeOut > WEATHER_REQUEST_TIMEOUT)
+                    mWeatherReceivedTimeOut = WEATHER_REQUEST_TIMEOUT;
+            }
+            wtf.setWeatherInfo(mWeather, mWeatherRequested, mWeatherReceived);
+            if (reRequest) {
+                mWeatherRequested = new Date(now);
                 if (Log.isLoggable(TAG, Log.DEBUG))
                     Log.d(TAG, "onTimeTick() requesting weather update");
                 Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CTCs.REQUIRE_WEATHER_MESSAGE, null);
@@ -374,8 +389,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                 } else if (dataItem.getUri().getPath().equals(CTCs.SEND_WEATHER_MESSAGE)) {
                     if (config.containsKey("weather")) {
                         try {
+                            mWeatherReceived = new Date(System.currentTimeMillis());
+
                             mWeather = (Weather) Serializer.deserialize(config.getByteArray("weather"));
-                            wtf.setWeatherInfo(mWeather);
+                            wtf.setWeatherInfo(mWeather, mWeatherRequested, mWeatherReceived);
                             if (Log.isLoggable(TAG, Log.DEBUG))
                                 Log.d(TAG, "onDataChanged(): weather=" + mWeather.toString());
                         } catch (Throwable t) {

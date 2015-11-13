@@ -15,6 +15,7 @@ import com.astifter.circatext.R;
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.drawables.Drawable;
+import com.astifter.circatextutils.CTU;
 import com.astifter.circatextutils.Weather;
 
 import java.text.SimpleDateFormat;
@@ -30,6 +31,8 @@ public abstract class BaseWatchFace implements WatchFace {
     final CircaTextService.Engine parent;
     protected CalendarHelper.EventInfo[] mMeetings;
     protected Weather mWeather = null;
+    protected Date mWeatherReq;
+    protected Date mWeatherRec;
     protected Resources resources;
     protected Calendar mCalendar;
     Paint mBackgroundPaint;
@@ -208,12 +211,8 @@ public abstract class BaseWatchFace implements WatchFace {
             mTexts.put(eTF.CALENDAR_2, "");
         }
         if (mWeather != null) {
-            long age = now - mWeather.lastupdate.getTime();
-            float ageFloat = age / (60 * 1000);
-            String tempText = String.format("%2.0f°C", mWeather.temperature.getTemp());
-            String ageText = String.format(" (%.0fm)", ageFloat);
-            mTexts.put(eTF.WEATHER_TEMP, tempText);
-            mTexts.put(eTF.WEATHER_AGE, ageText);
+            mTexts.put(eTF.WEATHER_TEMP, String.format("%2.0f°C", mWeather.temperature.getTemp()));
+            mTexts.put(eTF.WEATHER_AGE, CTU.getAge(now, mWeather.lastupdate));
             mTexts.put(eTF.WEATHER_DESC, mWeather.currentCondition.getCondition());
         } else {
             mTexts.put(eTF.WEATHER_TEMP, "");
@@ -237,7 +236,9 @@ public abstract class BaseWatchFace implements WatchFace {
     }
 
     @Override
-    public void setWeatherInfo(Weather weather) {
+    public void setWeatherInfo(Weather weather, Date req, Date rec) {
+        mWeatherReq = req;
+        mWeatherRec = rec;
         mWeather = weather;
     }
 

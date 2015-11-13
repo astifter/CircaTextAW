@@ -11,6 +11,8 @@ import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.Weather;
 
+import java.util.Date;
+
 public interface WatchFace {
     void localeChanged();
 
@@ -30,7 +32,7 @@ public interface WatchFace {
 
     void setEventInfo(CalendarHelper.EventInfo[] meetings);
 
-    void setWeatherInfo(Weather mWeather);
+    void setWeatherInfo(Weather weather, Date requested, Date received);
 
     void onDraw(Canvas canvas, Rect bounds);
 

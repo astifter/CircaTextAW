@@ -239,7 +239,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
             } else if (idx == eTF.SHORTCAL) {
                 showScreen = new Schedule(this.resources, this.isRound, this.mMeetings, this.mBackgroundPaint.getColor());
             } else if (idx == eTF.WEATHER_TEMP) {
-                showScreen = new WeatherScreen(this.resources, this.isRound, this.mWeather, this.mBackgroundPaint.getColor());
+                showScreen = new WeatherScreen(this.resources, this.isRound, mWeather, mWeatherReq, mWeatherRec, this.mBackgroundPaint.getColor());
             } else {
                 return Drawable.Touched.FINISHED;
             }

@@ -30,8 +30,18 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.Date;
+
 public final class CTU {
     private static final String TAG = "CTU";
+
+    public static String getAge(long now, Date lastupdate) {
+        Date nowDate = new Date(now);
+        if (lastupdate == null) return "?";
+        double age = now - lastupdate.getTime();
+        double ageFloat = age / (60.0 * 1000);
+        return String.format("%.1f", ageFloat);
+    }
 
     private CTU() {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CTU()");
