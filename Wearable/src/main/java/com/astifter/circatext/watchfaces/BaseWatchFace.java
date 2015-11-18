@@ -119,9 +119,7 @@ public abstract class BaseWatchFace implements WatchFace {
     public void setAmbientMode(boolean inAmbientMode) {
         this.ambientMode = inAmbientMode;
 
-        mBackgroundPaint.setColor(this.ambientMode ?
-                Color.BLACK :
-                mBackgroundPaintColor);
+        mBackgroundPaint.setColor(this.ambientMode ? Color.BLACK : mBackgroundPaintColor);
         updateVisibilty();
     }
 

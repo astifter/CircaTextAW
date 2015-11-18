@@ -161,6 +161,9 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void updateVisibilty() {
+        if (this.ambientMode)
+            showScreen = null;
+
         for (AnimatableImpl a : topDrawable.values()) {
             a.setAmbientMode(this.ambientMode);
         }
