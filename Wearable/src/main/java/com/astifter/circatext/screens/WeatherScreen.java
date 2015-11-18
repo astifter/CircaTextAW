@@ -21,28 +21,33 @@ public class WeatherScreen implements Screen {
         long now = System.currentTimeMillis();
         String reqAge = CTU.getAge(now, mWeatherReq);
         String recAge = CTU.getAge(now, mWeatherRec);
-        String srvAge, temp, cond1, cond2, loc;
+        String srvAge, temp, condition, loc;
         if (mWeather != null) {
             srvAge = CTU.getAge(now, mWeather.lastupdate);
             temp = String.format("%2.0f°C", mWeather.temperature.getTemp());
-            cond1 = mWeather.currentCondition.getCondition();
-            cond2 = mWeather.currentCondition.getDescr() + ", " + Weather.translate(mWeather.currentCondition.getWeatherId());
-            loc = mWeather.location.getCity() + "," + mWeather.location.getCountry();
+            condition = Weather.translate(mWeather.currentCondition.getWeatherId());
+            loc = mWeather.location.getCity() + ", " + mWeather.location.getCountry();
         } else {
             srvAge = "?";
             temp = "-";
-            cond1 = "-";
-            cond2 = "-";
+            condition = "-";
             loc = "-";
         }
 
         DrawingHelpers.createHeadline(drawables, r, isRound, "Wetter");
 
-        DrawingHelpers.createStaticTest(drawables, loc, 0, new Rect(5, 40, 95, 50), Drawable.Align.LEFT, bgColor);
-        DrawingHelpers.createStaticTest(drawables, temp + ", " + cond1, 0, new Rect(5, 50, 95, 60), Drawable.Align.LEFT, bgColor);
-        DrawingHelpers.createStaticTest(drawables, cond2, 0, new Rect(5, 60, 95, 70), Drawable.Align.LEFT, bgColor);
+        DrawingHelpers.createStaticTest(drawables, temp, 0, new Rect(5, 32, 95, 52), Drawable.Align.CENTER, bgColor);
+        DrawingHelpers.createStaticTest(drawables, condition, 0, new Rect(5, 52, 95, 67), Drawable.Align.CENTER, bgColor);
+        DrawingHelpers.createStaticTest(drawables, loc, 0, new Rect(5, 67, 95, 76), Drawable.Align.CENTER, bgColor);
 
-        DrawingHelpers.createStaticTest(drawables, "Rq: " + reqAge + "m, Rc: " + recAge + "m, Up: " + srvAge + "m", 0, new Rect(5, 87, 95, 95), Drawable.Align.CENTER, bgColor);
+        String detailInfo = "Rq: " + reqAge + "m, Rc: " + recAge + "m, Up: " + srvAge + "m";
+        String detailCondition = "";
+        if (mWeather != null) {
+            detailInfo += ", WC:" + mWeather.currentCondition.getWeatherId();
+            detailCondition = mWeather.currentCondition.getDescr();
+        }
+        DrawingHelpers.createStaticTest(drawables, detailCondition, 0, new Rect(5, 83, 95, 89), Drawable.Align.CENTER, bgColor);
+        DrawingHelpers.createStaticTest(drawables, detailInfo, 0, new Rect(5, 89, 95, 95), Drawable.Align.CENTER, bgColor);
     }
 
     @Override
