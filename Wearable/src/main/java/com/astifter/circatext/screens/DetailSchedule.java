@@ -8,6 +8,7 @@ import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatext.drawables.DrawableText;
 import com.astifter.circatext.drawables.StackHorizontal;
+import com.astifter.circatext.drawables.StaticDrawable;
 import com.astifter.circatext.drawables.StaticText;
 import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatext.graphicshelpers.Position;
@@ -30,8 +31,10 @@ public class DetailSchedule implements Screen {
         sh.add(getDrawableText(ei.formatDate() + " "));
         sh.add(getDrawableText(ei.formatStart() + "-"));
         sh.add(getDrawableText(ei.formatEnd()));
+        drawables.add(new StaticDrawable(sh, new Position(5, 39, 95, 49)));
+        createStaticText(ei.Location, new Rect(5, 49, 95, 59), Drawable.Align.LEFT);
 
-        StaticText desc = createStaticText(ei.Description, new Rect(5, 51, 95, 60), Drawable.Align.LEFT);
+        StaticText desc = createStaticText(ei.Description, new Rect(5, 60, 95, 69), Drawable.Align.LEFT);
         desc.setMultiLine(4);
     }
 
@@ -52,8 +55,6 @@ public class DetailSchedule implements Screen {
 
     @Override
     public void onDraw(Canvas canvas, Rect bounds) {
-        Rect r = Position.percentagePosition(new Position(5, 39, 95, 49), bounds).toRect();
-        sh.onDraw(canvas, r);
         for (Drawable d : drawables) {
             d.onDraw(canvas, bounds);
         }

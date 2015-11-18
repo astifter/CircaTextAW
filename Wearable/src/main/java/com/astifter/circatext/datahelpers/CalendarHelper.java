@@ -93,8 +93,10 @@ public class CalendarHelper {
         public final boolean Disabled;
         public final String Description;
         private final Date DtEnd;
-        private final Locale locale;
+        public final String Location;
         public int Color;
+
+        private final Locale locale;
 
         public EventInfo(Cursor cursor, boolean h, boolean d) {
             Title = cursor.getString(0);
@@ -102,6 +104,7 @@ public class CalendarHelper {
             Description = cursor.getString(4);
             Color = cursor.getInt(5);
             DtEnd = new Date(cursor.getLong(6));
+            Location = cursor.getString(7);
 
             Hidden = h;
             Disabled = d;
@@ -145,6 +148,7 @@ public class CalendarHelper {
                 CalendarContract.Instances.DESCRIPTION,
                 CalendarContract.Calendars.CALENDAR_COLOR,
                 CalendarContract.Instances.END,
+                CalendarContract.Instances.EVENT_LOCATION,
         };
         private PowerManager.WakeLock mWakeLock;
 
