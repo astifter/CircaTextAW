@@ -68,32 +68,7 @@ public class CircaTextWearableConfigActivity extends Activity implements
         watchFaceListAdapter = new WatchFaceListAdapter(watchfaces);
         listView.setAdapter(watchFaceListAdapter);
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle connectionHint) {
-                        if (Log.isLoggable(TAG, Log.DEBUG)) {
-                            Log.d(TAG, "onConnected: " + connectionHint);
-                        }
-                    }
-
-                    @Override
-                    public void onConnectionSuspended(int cause) {
-                        if (Log.isLoggable(TAG, Log.DEBUG)) {
-                            Log.d(TAG, "onConnectionSuspended: " + cause);
-                        }
-                    }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult result) {
-                        if (Log.isLoggable(TAG, Log.DEBUG)) {
-                            Log.d(TAG, "onConnectionFailed: " + result);
-                        }
-                    }
-                })
-                .addApi(Wearable.API)
-                .build();
+        mGoogleApiClient = CTU.buildBasicGoogleApiClient(this);
     }
 
     @Override

@@ -13,6 +13,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.astifter.circatextutils.CTCs;
+import com.astifter.circatextutils.CTU;
 import com.astifter.circatextutils.Serializer;
 import com.astifter.circatextutils.Weather;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -167,7 +168,7 @@ public class CircaTextWeatherService extends WearableListenerService {
             if (mGoogleApiClient == null) {
                 if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
                     Log.d(CTCs.TAGCON, "onPostExecute(): mGoogleApiClient == null");
-                mGoogleApiClient = new GoogleApiClient.Builder(this.context).addApi(Wearable.API).build();
+                mGoogleApiClient = CTU.buildBasicGoogleApiClient(this.context);
             }
             if (!mGoogleApiClient.isConnected()) {
                 if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))

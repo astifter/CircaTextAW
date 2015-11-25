@@ -18,8 +18,10 @@ package com.astifter.circatextutils;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
@@ -47,16 +49,46 @@ public final class CTU {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CTU()");
     }
 
+    private static GoogleApiClient.Builder getBuilder(Context c) {
+        return new GoogleApiClient.Builder(c).addApi(Wearable.API);
+    }
+
+    public static GoogleApiClient buildBasicGoogleApiClient(Context c) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildBasicGoogleApiClient()");
+
+        return getBuilder(c)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle bundle) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "buildBasicGoogleApiClient().onConnected()");
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "buildBasicGoogleApiClient().onConnectionSuspended(): " + i);
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "buildBasicGoogleApiClient().onConnectionFailed(): " + connectionResult.toString());
+                    }
+                })
+                .build();
+    }
+
     public static GoogleApiClient buildGoogleApiClient(
             Context c,
             GoogleApiClient.ConnectionCallbacks cl,
             GoogleApiClient.OnConnectionFailedListener cfl) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildGoogleApiClient()");
 
-        return new GoogleApiClient.Builder(c)
+        return getBuilder(c)
                 .addConnectionCallbacks(cl)
                 .addOnConnectionFailedListener(cfl)
-                .addApi(Wearable.API)
                 .build();
     }
 
