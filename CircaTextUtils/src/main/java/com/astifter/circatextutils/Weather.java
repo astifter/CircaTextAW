@@ -39,6 +39,166 @@ public class Weather implements Serializable {
     public Date time;
     public Date lastupdate;
 
+    public static String translate(int weatherId) {
+        switch (weatherId) {
+            case 200:
+                return "Gewitter mit Leichtem Regen";
+            case 201:
+                return "Gewitter mit Regen";
+            case 202:
+                return "Gewitter mit Starkem Regen";
+            case 210:
+                return "Leichtes Gewitter";
+            case 211:
+                return "Gewitter";
+            case 212:
+                return "Starkes Gewitter";
+            case 221:
+                return "Gewitter";
+            case 230:
+                return "Gewitter mit Leichtem Nieseln";
+            case 231:
+                return "Gewitter mit Nieseln";
+            case 232:
+                return "Gewitter mit Starkem Nieseln";
+
+            case 300:
+                return "Leichtes Nieseln";
+            case 301:
+                return "Nieseln";
+            case 302:
+                return "Starkes Nieseln";
+            case 310:
+                return "Leichter Nieselregen";
+            case 311:
+                return "Nieselregen";
+            case 312:
+                return "Starker Nieselregen";
+            case 313:
+                return "Leichte Schauer";
+            case 314:
+                return "Schauer";
+            case 321:
+                return "Starke Schauer";
+
+            case 500:
+                return "Leichter Regen";
+            case 501:
+                return "Regen";
+            case 502:
+                return "Starker Regen";
+            case 503:
+                return "Sehr Starker Regen";
+            case 504:
+                return "Extremer Regen";
+            case 511:
+                return "Gefrierender Regen";
+            case 520:
+                return "Leichte Schauer";
+            case 521:
+                return "Schauer";
+            case 522:
+                return "Starke Schauer";
+            case 531:
+                return "Schauer";
+
+            case 600:
+                return "Leichter Schneefall";
+            case 601:
+                return "Schnee";
+            case 602:
+                return "Starker Schneefall";
+            case 611:
+                return "Schneeregen";
+            case 612:
+                return "Starker Schneeregen";
+            case 615:
+                return "Leicher Regen und Schneefall";
+            case 616:
+                return "Regen und Schneefall";
+            case 620:
+                return "Leichte Schneeschauer";
+            case 621:
+                return "Schneeschauer";
+            case 622:
+                return "Starke Schneeschauer";
+
+            case 701:
+                return "Leicher Nebel";
+            case 711:
+                return "Rauch";
+            case 721:
+                return "Hochnebel";
+            case 731:
+                return "Sand oder Staub";
+            case 741:
+                return "Nebel";
+            case 751:
+                return "Sand";
+            case 761:
+                return "Staub";
+            case 762:
+                return "Vulkanasche";
+            case 771:
+                return "Böen";
+            case 781:
+                return "Tornado";
+
+            case 800:
+                return "Klar";
+
+            case 801:
+                return "Leichte Bewölkung";
+            case 802:
+                return "Wolken";
+            case 803:
+                return "Wolken";
+            case 804:
+                return "Bewölkt";
+
+            case 900:
+                return "Tornado";
+            case 901:
+                return "Tropensturm";
+            case 902:
+                return "Hurrikan";
+            case 903:
+                return "Kalt";
+            case 904:
+                return "Heiß";
+            case 905:
+                return "Windig";
+            case 906:
+                return "Hagel";
+
+            case 951:
+                return "Ruhig";
+            case 952:
+                return "Schwache Brise";
+            case 953:
+                return "Leichte Brise";
+            case 954:
+                return "Brise";
+            case 955:
+                return "Wind";
+            case 956:
+                return "Starker Wind";
+            case 957:
+                return "Stürmisch";
+            case 958:
+                return "Sturm";
+            case 959:
+                return "Starker Sturm";
+            case 960:
+                return "Orkan";
+            case 961:
+                return "Starker Orkan";
+            case 962:
+                return "Hurrikan";
+        }
+        return "?";
+    }
+
     public class CurrentCondition implements Serializable {
         private int weatherId;
         private String condition;
@@ -191,92 +351,5 @@ public class Weather implements Serializable {
         public void setPerc(int perc) {
             this.perc = perc;
         }
-    }
-
-    public static String translate(int weatherId) {
-        switch (weatherId) {
-            case 200: return "Gewitter mit Leichtem Regen";
-            case 201: return "Gewitter mit Regen";
-            case 202: return "Gewitter mit Starkem Regen";
-            case 210: return "Leichtes Gewitter";
-            case 211: return "Gewitter";
-            case 212: return "Starkes Gewitter";
-            case 221: return "Gewitter";
-            case 230: return "Gewitter mit Leichtem Nieseln";
-            case 231: return "Gewitter mit Nieseln";
-            case 232: return "Gewitter mit Starkem Nieseln";
-
-            case 300: return "Leichtes Nieseln";
-            case 301: return "Nieseln";
-            case 302: return "Starkes Nieseln";
-            case 310: return "Leichter Nieselregen";
-            case 311: return "Nieselregen";
-            case 312: return "Starker Nieselregen";
-            case 313: return "Leichte Schauer";
-            case 314: return "Schauer";
-            case 321: return "Starke Schauer";
-
-            case 500: return "Leichter Regen";
-            case 501: return "Regen";
-            case 502: return "Starker Regen";
-            case 503: return "Sehr Starker Regen";
-            case 504: return "Extremer Regen";
-            case 511: return "Gefrierender Regen";
-            case 520: return "Leichte Schauer";
-            case 521: return "Schauer";
-            case 522: return "Starke Schauer";
-            case 531: return "Schauer";
-
-            case 600: return "Leichter Schneefall";
-            case 601: return "Schnee";
-            case 602: return "Starker Schneefall";
-            case 611: return "Schneeregen";
-            case 612: return "Starker Schneeregen";
-            case 615: return "Leicher Regen und Schneefall";
-            case 616: return "Regen und Schneefall";
-            case 620: return "Leichte Schneeschauer";
-            case 621: return "Schneeschauer";
-            case 622: return "Starke Schneeschauer";
-
-            case 701: return "Leicher Nebel";
-            case 711: return "Rauch";
-            case 721: return "Hochnebel";
-            case 731: return "Sand oder Staub";
-            case 741: return "Nebel";
-            case 751: return "Sand";
-            case 761: return "Staub";
-            case 762: return "Vulkanasche";
-            case 771: return "Böen";
-            case 781: return "Tornado";
-
-            case 800: return "Klar";
-
-            case 801: return "Leichte Bewölkung";
-            case 802: return "Wolken";
-            case 803: return "Wolken";
-            case 804: return "Bewölkt";
-
-            case 900: return "Tornado";
-            case 901: return "Tropensturm";
-            case 902: return "Hurrikan";
-            case 903: return "Kalt";
-            case 904: return "Heiß";
-            case 905: return "Windig";
-            case 906: return "Hagel";
-
-            case 951: return "Ruhig";
-            case 952: return "Schwache Brise";
-            case 953: return "Leichte Brise";
-            case 954: return "Brise";
-            case 955: return "Wind";
-            case 956: return "Starker Wind";
-            case 957: return "Stürmisch";
-            case 958: return "Sturm";
-            case 959: return "Starker Sturm";
-            case 960: return "Orkan";
-            case 961: return "Starker Orkan";
-            case 962: return "Hurrikan";
-        }
-        return "?";
     }
 }

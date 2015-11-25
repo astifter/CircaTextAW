@@ -28,6 +28,7 @@ import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
@@ -37,6 +38,10 @@ import java.util.Date;
 public final class CTU {
     private static final String TAG = "CTU";
 
+    private CTU() {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CTU()");
+    }
+
     public static String getAge(long now, Date lastupdate) {
         Date nowDate = new Date(now);
         if (lastupdate == null) return "?";
@@ -45,161 +50,169 @@ public final class CTU {
         return String.format("%.1f", ageFloat);
     }
 
-    private CTU() {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "CTU()");
-    }
+    public static GoogleApiClient buildBasicAPIClient(Context c) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildBasicAPIClient()");
 
-    private static GoogleApiClient.Builder getBuilder(Context c) {
-        return new GoogleApiClient.Builder(c).addApi(Wearable.API);
-    }
-
-    public static GoogleApiClient buildBasicGoogleApiClient(Context c) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildBasicGoogleApiClient()");
-
-        return getBuilder(c)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+        return buildAPIClient(c,
+                new GoogleApiClient.ConnectionCallbacks() {
                     @Override
-                    public void onConnected(Bundle bundle) {
+                    public void onConnected(Bundle b) {
                         if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "buildBasicGoogleApiClient().onConnected()");
+                            Log.d(TAG, "buildBasicAPIClient().onConnected()");
                     }
 
                     @Override
                     public void onConnectionSuspended(int i) {
                         if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "buildBasicGoogleApiClient().onConnectionSuspended(): " + i);
+                            Log.d(TAG, "buildBasicAPIClient().onConnectionSuspended(): " + i);
                     }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                },
+                new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
-                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                    public void onConnectionFailed(ConnectionResult r) {
                         if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "buildBasicGoogleApiClient().onConnectionFailed(): " + connectionResult.toString());
+                            Log.d(TAG, "buildBasicAPIClient().onConnectionFailed(): " + r.toString());
                     }
-                })
-                .build();
+                });
     }
 
-    public static GoogleApiClient buildGoogleApiClient(
-            Context c,
-            GoogleApiClient.ConnectionCallbacks cl,
-            GoogleApiClient.OnConnectionFailedListener cfl) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildGoogleApiClient()");
+    public static GoogleApiClient buildAPIClient(Context c,
+                                                 GoogleApiClient.ConnectionCallbacks cl,
+                                                 GoogleApiClient.OnConnectionFailedListener cfl) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildAPIClient()");
 
-        return getBuilder(c)
+        return new GoogleApiClient.Builder(c).addApi(Wearable.API)
                 .addConnectionCallbacks(cl)
                 .addOnConnectionFailedListener(cfl)
                 .build();
     }
 
-    public static void fetchConfigDataMap(final GoogleApiClient client,
-                                          final FetchConfigDataMapCallback callback) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "fetchConfigDataMap()");
+    public static void getAPIData(final GoogleApiClient gAPIClient,
+                                  final GetAPIDataCallback callback) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "getAPIData()");
 
-        Wearable.NodeApi.getLocalNode(client).setResultCallback(
+        Wearable.NodeApi.getLocalNode(gAPIClient).setResultCallback(
                 new ResultCallback<NodeApi.GetLocalNodeResult>() {
                     @Override
-                    public void onResult(NodeApi.GetLocalNodeResult getLocalNodeResult) {
+                    public void onResult(NodeApi.GetLocalNodeResult r) {
                         if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "fetchConfigDataMap().onResult()");
+                            Log.d(TAG, "getAPIData().onResult()");
 
-                        String localNode = getLocalNodeResult.getNode().getId();
+                        String localId = r.getNode().getId();
                         Uri uri = new Uri.Builder()
                                 .scheme("wear")
-                                .path(CTCs.PATH_WITH_FEATURE)
-                                .authority(localNode)
+                                .authority(localId)
+                                .path(CTCs.URI_CONFIG)
                                 .build();
 
                         if (Log.isLoggable(TAG, Log.DEBUG))
                             Log.d(TAG, "fetching data with Wearable.DataApi.getDataItem(" + uri.toString() + ")");
-                        Wearable.DataApi.getDataItem(client, uri)
+                        Wearable.DataApi.getDataItem(gAPIClient, uri)
                                 .setResultCallback(new DataItemResultCallback(callback));
-                    }
-                }
-        );
-    }
-
-    public static void overwriteKeysInConfigDataMap(GoogleApiClient googleApiClient, String configKey, String content) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage(String)");
-
-        DataMap config = new DataMap();
-        config.putString(configKey, content);
-        overwriteKeysInConfigDataMap(googleApiClient, config);
-    }
-
-    public static void overwriteKeysInConfigDataMap(final GoogleApiClient googleApiClient,
-                                                    final DataMap configKeysToOverwrite) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteKeysInConfigDataMap()");
-
-        CTU.fetchConfigDataMap(googleApiClient,
-                new FetchConfigDataMapCallback() {
-                    @Override
-                    public void onConfigDataMapFetched(DataMap currentConfig) {
-                        if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "overwriteKeysInConfigDataMap().onConfigDataMapFetched()");
-
-                        DataMap overwrittenConfig = new DataMap();
-                        overwrittenConfig.putAll(currentConfig);
-                        overwrittenConfig.putAll(configKeysToOverwrite);
-                        CTU.putConfigDataItem(googleApiClient, CTCs.PATH_WITH_FEATURE, overwrittenConfig);
-                    }
-                }
-        );
-    }
-
-    public static void sendConfigUpdateMessage(GoogleApiClient googleApiClient, String configKey, String content) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "sendConfigUpdateMessage(String)");
-
-        DataMap config = new DataMap();
-        config.putString(configKey, content);
-        putConfigDataItem(googleApiClient, CTCs.PATH_WITH_FEATURE, config);
-    }
-
-    public static void putConfigDataItem(GoogleApiClient googleApiClient, String path, DataMap newConfig) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "putConfigDataItem()");
-
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(path);
-        DataMap configToPut = putDataMapRequest.getDataMap();
-        configToPut.putAll(newConfig);
-        Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest())
-                .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-                    @Override
-                    public void onResult(DataApi.DataItemResult dataItemResult) {
-                        if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "putConfigDataItem().onResult()");
                     }
                 });
     }
 
-    /// Interface FetchConfigDataMapCallback
-    public interface FetchConfigDataMapCallback {
+    public static void overwriteAPIData(GoogleApiClient gAPIClient, String key, String data) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteAPIData(String)");
+
+        DataMap config = new DataMap();
+        config.putString(key, data);
+        overwriteAPIData(gAPIClient, config);
+    }
+
+    public static void overwriteAPIData(final GoogleApiClient gAPIClient,
+                                        final DataMap config) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteAPIData()");
+
+        CTU.getAPIData(gAPIClient,
+                new GetAPIDataCallback() {
+                    @Override
+                    public void onConfigDataMapFetched(DataMap current) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "overwriteAPIData().onConfigDataMapFetched()");
+
+                        DataMap overwrittenConfig = new DataMap();
+                        overwrittenConfig.putAll(current);
+                        overwrittenConfig.putAll(config);
+                        CTU.putAPIData(gAPIClient, CTCs.URI_CONFIG, overwrittenConfig);
+                    }
+                });
+    }
+
+    public static void putAPIData(GoogleApiClient gAPIClient, String path, DataMap config) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "putAPIData()");
+
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(path);
+        DataMap configToPut = putDataMapRequest.getDataMap();
+        configToPut.putAll(config);
+        Uri uri = putDataMapRequest.getUri();
+
+        Wearable.DataApi.putDataItem(gAPIClient, putDataMapRequest.asPutDataRequest())
+                .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                    @Override
+                    public void onResult(DataApi.DataItemResult r) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "putAPIData().onResult(): " + r.toString());
+                    }
+                });
+    }
+
+    public static void sendAPIMessage(GoogleApiClient client, String target, String msg) {
+        if (Log.isLoggable(TAG, Log.DEBUG))
+            Log.d(TAG, "sendAPIMessage(" + target + ", " + msg + ")");
+
+        Wearable.MessageApi.sendMessage(client, target, msg, null)
+                .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                    @Override
+                    public void onResult(MessageApi.SendMessageResult r) {
+                        if (Log.isLoggable(TAG, Log.DEBUG))
+                            Log.d(TAG, "sendAPIMessage().onResult(): " + r.toString());
+                    }
+                });
+    }
+
+    public static void connectAPI(GoogleApiClient client) {
+        if (!client.isConnected()) {
+            client.connect();
+            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
+                Log.d(CTCs.TAGCON, "connectAPI()");
+        }
+    }
+
+    public static void disconnectAPI(GoogleApiClient client) {
+        if (client != null && client.isConnected()) {
+            client.disconnect();
+            if (Log.isLoggable(TAG, Log.DEBUG))
+                Log.d(TAG, "disconnectAPI(): client.disconnect()");
+        }
+    }
+
+    public interface GetAPIDataCallback {
         void onConfigDataMapFetched(DataMap config);
     }
 
     private static class DataItemResultCallback implements ResultCallback<DataApi.DataItemResult> {
+        private final GetAPIDataCallback mCallback;
 
-        private final FetchConfigDataMapCallback mCallback;
-
-        public DataItemResultCallback(FetchConfigDataMapCallback callback) {
+        public DataItemResultCallback(GetAPIDataCallback callback) {
             if (Log.isLoggable(TAG, Log.DEBUG))
                 Log.d(TAG, "DataItemResultCallback.DataItemResultCallback()");
 
             mCallback = callback;
         }
 
-        @Override // ResultCallback<DataApi.DataItemResult>
-        public void onResult(DataApi.DataItemResult dataItemResult) {
+        @Override
+        public void onResult(DataApi.DataItemResult r) {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "DataItemResultCallback.onResult()");
 
-            if (dataItemResult.getStatus().isSuccess()) {
-                if (dataItemResult.getDataItem() != null) {
-                    DataItem configDataItem = dataItemResult.getDataItem();
-                    DataMapItem dataMapItem = DataMapItem.fromDataItem(configDataItem);
-                    DataMap config = dataMapItem.getDataMap();
-                    mCallback.onConfigDataMapFetched(config);
-                } else {
-                    mCallback.onConfigDataMapFetched(new DataMap());
-                }
+            if (r.getStatus().isSuccess() && r.getDataItem() != null) {
+                DataItem configDataItem = r.getDataItem();
+                DataMapItem dataMapItem = DataMapItem.fromDataItem(configDataItem);
+                DataMap config = dataMapItem.getDataMap();
+                mCallback.onConfigDataMapFetched(config);
+            } else {
+                mCallback.onConfigDataMapFetched(new DataMap());
             }
         }
     }

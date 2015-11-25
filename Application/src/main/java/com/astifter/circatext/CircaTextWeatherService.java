@@ -19,8 +19,9 @@ import com.astifter.circatextutils.Weather;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -34,8 +35,7 @@ import java.util.Locale;
 public class CircaTextWeatherService extends WearableListenerService {
     private static final String TAG = "CircaTextWeatherService";
 
-    private String mPeerId;
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient gAPIClient;
 
     private JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
     //private JSONWeatherParser weatherParser = new YahooJSONParser();
@@ -98,29 +98,34 @@ public class CircaTextWeatherService extends WearableListenerService {
     }
 
     @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
+    public void onMessageReceived(final MessageEvent messageEvent) {
         if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onMessageReceived()");
         super.onMessageReceived(messageEvent);
 
-        mPeerId = messageEvent.getSourceNodeId();
-        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
-            Log.d(CTCs.TAGCON, "onMessageReceived(): mPeerId=" + mPeerId);
+        if (messageEvent.getPath().equals(CTCs.URI_GET_WEATHER)) {
+            gAPIClient = CTU.buildBasicAPIClient(this);
+            CTU.connectAPI(gAPIClient);
 
-        if (messageEvent.getPath().equals(CTCs.REQUIRE_WEATHER_MESSAGE)) {
-            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
-                Log.d(CTCs.TAGCON, "onMessageReceived(): REQUIRE_WEATHER_MESSAGE");
-            getCity();
-            JSONWeatherTask t = new JSONWeatherTask(this);
-            t.execute();
+            Wearable.NodeApi.getConnectedNodes(gAPIClient)
+                    .setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+                        @Override
+                        public void onResult(NodeApi.GetConnectedNodesResult r) {
+                            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) {
+                                String mPeerId = messageEvent.getSourceNodeId();
+                                Log.d(CTCs.TAGCON, "onMessageReceived(): URI_GET_WEATHER from " + mPeerId);
+                            }
+
+                            getCity();
+                            JSONWeatherTask t = new JSONWeatherTask();
+                            t.setNodes(r.getNodes());
+                            t.execute();
+                        }
+                    });
         }
     }
 
     private class JSONWeatherTask extends AsyncTask<Void, Void, Weather> {
-        private final Context context;
-
-        public JSONWeatherTask(Context c) {
-            this.context = c;
-        }
+        private List<Node> nodes;
 
         @Override
         protected Weather doInBackground(Void... params) {
@@ -163,29 +168,18 @@ public class CircaTextWeatherService extends WearableListenerService {
                 if (Log.isLoggable(TAG, Log.DEBUG))
                     Log.d(TAG, "onPostExecute(): " + e.toString());
             }
+            // update data every time with current time which forces retransmission even when data
+            // has not changed.
+            weatherData.putLong("updated", System.currentTimeMillis());
 
             if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onPostExecute()");
-            if (mGoogleApiClient == null) {
-                if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
-                    Log.d(CTCs.TAGCON, "onPostExecute(): mGoogleApiClient == null");
-                mGoogleApiClient = CTU.buildBasicGoogleApiClient(this.context);
+            for (Node n : this.nodes) {
+                CTU.putAPIData(gAPIClient, CTCs.URI_PUT_WEATHER, weatherData);
             }
-            if (!mGoogleApiClient.isConnected()) {
-                if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
-                    Log.d(CTCs.TAGCON, "onPostExecute(): mGoogleApiClient not connected");
-                mGoogleApiClient.connect();
-            }
+        }
 
-            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
-                Log.d(CTCs.TAGCON, "onPostExecute(): sendMessage()");
-            Wearable.MessageApi.sendMessage(mGoogleApiClient, mPeerId, CTCs.SEND_WEATHER_MESSAGE, weatherData.toByteArray())
-                    .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
-                        @Override
-                        public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                            if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
-                                Log.d(CTCs.TAGCON, "onPostExecute(): onResult=" + sendMessageResult.toString());
-                        }
-                    });
+        public void setNodes(List<Node> nodes) {
+            this.nodes = nodes;
         }
     }
 }
