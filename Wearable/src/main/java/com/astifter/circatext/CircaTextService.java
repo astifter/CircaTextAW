@@ -98,8 +98,8 @@ public class CircaTextService extends CanvasWatchFaceService {
         boolean inMuteMode;
         Weather mWeather;
         private Date mWeatherRequested;
+        private int  mWeatherRequestTimeOut = 1 * 60 * 1000;
         private Date mWeatherReceived;
-        private int  mWeatherReceivedTimeOut = 1 * 60 * 1000;
         private boolean updateEnabled = true;
         @SuppressLint("HandlerLeak")
         final Handler mUpdateHandler = new Handler() {
@@ -305,19 +305,14 @@ public class CircaTextService extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
 
             boolean reRequest = false;
-            if (mWeatherRequested == null || ((now - mWeatherRequested.getTime()) > WEATHER_REQUEST_TIMEOUT)) {
+            if (mWeatherRequested == null || ((now - mWeatherRequested.getTime()) > mWeatherRequestTimeOut)) {
+                mWeatherRequested = new Date(now);
                 reRequest = true;
-            }
-            if (!reRequest && mWeatherReceived != null && ((now - mWeatherReceived.getTime()) > mWeatherReceivedTimeOut)) {
-                reRequest = true;
-                if (mWeatherReceivedTimeOut < WEATHER_REQUEST_TIMEOUT)
-                    mWeatherReceivedTimeOut *= 2;
-                if (mWeatherReceivedTimeOut > WEATHER_REQUEST_TIMEOUT)
-                    mWeatherReceivedTimeOut = WEATHER_REQUEST_TIMEOUT;
+                if (mWeatherRequestTimeOut < WEATHER_REQUEST_TIMEOUT)
+                    mWeatherRequestTimeOut *= 2;
             }
             wtf.setWeatherInfo(mWeather, mWeatherRequested, mWeatherReceived);
             if (reRequest) {
-                mWeatherRequested = new Date(now);
                 if (Log.isLoggable(TAG, Log.DEBUG))
                     Log.d(TAG, "onTimeTick() requesting weather update");
                 Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CTCs.REQUIRE_WEATHER_MESSAGE, null);
@@ -390,8 +385,8 @@ public class CircaTextService extends CanvasWatchFaceService {
                     if (config.containsKey("weather")) {
                         try {
                             mWeatherReceived = new Date(System.currentTimeMillis());
-
                             mWeather = (Weather) Serializer.deserialize(config.getByteArray("weather"));
+
                             wtf.setWeatherInfo(mWeather, mWeatherRequested, mWeatherReceived);
                             if (Log.isLoggable(TAG, Log.DEBUG))
                                 Log.d(TAG, "onDataChanged(): weather=" + mWeather.toString());
