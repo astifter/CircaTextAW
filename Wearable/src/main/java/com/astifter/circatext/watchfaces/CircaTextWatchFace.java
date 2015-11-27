@@ -233,7 +233,7 @@ public class CircaTextWatchFace extends BaseWatchFace {
                     selectedConfig = CTCs.Config.TIME;
                 else if (selectedConfig == CTCs.Config.TIME)
                     selectedConfig = CTCs.Config.PLAIN;
-                CTU.overwriteKeysInConfigDataMap(parent.mGoogleApiClient, CTCs.KEY_WATCHFACE_CONFIG, selectedConfig.toString());
+                CTU.overwriteAPIData(parent.gAPIClient, CTCs.KEY_WATCHFACE_CONFIG, selectedConfig.toString());
                 currentConfig = selectedConfig;
                 for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
                     topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);

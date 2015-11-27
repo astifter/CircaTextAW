@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.view.CircledImageView;
 import android.support.wearable.view.WearableListView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -32,16 +31,14 @@ import android.widget.TextView;
 
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.CTU;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.Wearable;
 
 public class CircaTextWearableConfigActivity extends Activity implements
         WearableListView.ClickListener, WearableListView.OnScrollListener {
     private static final String TAG = "DigitalWatchFaceConfig";
 
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient gAPIClient;
     private TextView mHeader;
     private WatchFaceListAdapter watchFaceListAdapter;
     private WearableListView listView;
@@ -68,41 +65,44 @@ public class CircaTextWearableConfigActivity extends Activity implements
         watchFaceListAdapter = new WatchFaceListAdapter(watchfaces);
         listView.setAdapter(watchFaceListAdapter);
 
-        mGoogleApiClient = CTU.buildBasicGoogleApiClient(this);
+        gAPIClient = CTU.buildBasicAPIClient(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
 
-        CTU.fetchConfigDataMap(mGoogleApiClient, new CTU.FetchConfigDataMapCallback() {
+        CTU.connectAPI(gAPIClient, new CTU.ConnectAPICallback() {
             @Override
-            public void onConfigDataMapFetched(DataMap config) {
-                String selectedValue = config.getString(CTCs.KEY_WATCHFACE_STRINGER);
-                WatchFaceConfig[] watchfaces = watchFaceListAdapter.getWatchFaces();
-                for (int i = 0; i < watchfaces.length; i++) {
-                    if (watchfaces[i].equals(selectedValue)) {
-                        listView.scrollToPosition(i);
-                        break;
+            public void onConnected() {
+                CTU.getAPIData(gAPIClient, new CTU.GetAPIDataCallback() {
+                    @Override
+                    public void onConfigDataMapFetched(DataMap config) {
+                        String selectedValue = config.getString(CTCs.KEY_WATCHFACE_STRINGER);
+                        WatchFaceConfig[] watchfaces = watchFaceListAdapter.getWatchFaces();
+                        for (int i = 0; i < watchfaces.length; i++) {
+                            if (watchfaces[i].equals(selectedValue)) {
+                                listView.scrollToPosition(i);
+                                break;
+                            }
+                        }
                     }
-                }
+                });
             }
         });
     }
 
     @Override
     protected void onStop() {
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
+        CTU.disconnectAPI(gAPIClient);
+
         super.onStop();
     }
 
     @Override // WearableListView.ClickListener
     public void onClick(WearableListView.ViewHolder viewHolder) {
         WatchFaceViewHolder watchFaceViewHolder = (WatchFaceViewHolder) viewHolder;
-        updateConfigDataItem(watchFaceViewHolder.mWatchFace.getLabel());
+        CTU.overwriteAPIData(gAPIClient, CTCs.KEY_WATCHFACE_STRINGER, watchFaceViewHolder.mWatchFace.getLabel());
         finish();
     }
 
@@ -126,12 +126,6 @@ public class CircaTextWearableConfigActivity extends Activity implements
 
     @Override // WearableListView.OnScrollListener
     public void onCentralPositionChanged(int centralPosition) {
-    }
-
-    private void updateConfigDataItem(final String d) {
-        DataMap configKeysToOverwrite = new DataMap();
-        configKeysToOverwrite.putString(CTCs.KEY_WATCHFACE_STRINGER, d);
-        CTU.overwriteKeysInConfigDataMap(mGoogleApiClient, configKeysToOverwrite);
     }
 
     private static class WatchFaceItem extends LinearLayout implements WearableListView.OnCenterProximityListener {

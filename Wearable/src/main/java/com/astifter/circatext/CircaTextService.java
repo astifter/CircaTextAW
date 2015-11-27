@@ -81,12 +81,10 @@ public class CircaTextService extends CanvasWatchFaceService {
     }
 
     public class Engine extends CanvasWatchFaceService.Engine
-                      implements DataApi.DataListener,
-                                 GoogleApiClient.ConnectionCallbacks,
-                                 GoogleApiClient.OnConnectionFailedListener {
+                      implements DataApi.DataListener {
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
-        public final GoogleApiClient mGoogleApiClient = CTU.buildGoogleApiClient(CircaTextService.this, this, this);
+        public final GoogleApiClient gAPIClient = CTU.buildBasicAPIClient(CircaTextService.this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
         WatchFace wtf;
@@ -211,10 +209,33 @@ public class CircaTextService extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
 
             if (visible) {
-                mGoogleApiClient.connect();
+                CTU.connectAPI(gAPIClient, new CTU.ConnectAPICallback() {
+                    @Override
+                    public void onConnected() {
+                        Wearable.DataApi.addListener(gAPIClient, Engine.this);
+
+                        CTU.getAPIData(gAPIClient,
+                                new CTU.GetAPIDataCallback() {
+                                    @Override
+                                    public void onConfigDataMapFetched(DataMap startupConfig) {
+                                        if (Log.isLoggable(TAG, Log.DEBUG))
+                                            Log.d(TAG, "onConnected().onConfigDataMapFetched()");
+
+                                        CTCs.setDefaultValuesForMissingConfigKeys(startupConfig);
+                                        CTU.putAPIData(gAPIClient, CTCs.URI_CONFIG, startupConfig);
+
+                                        updateUiForConfigDataMap(startupConfig);
+                                    }
+                                }
+                        );
+                        {
+                            DataMap blankWeather = new DataMap();
+                            CTU.putAPIData(gAPIClient, CTCs.URI_PUT_WEATHER, blankWeather);
+                        }
+                    }
+                });
 
                 registerReceiver();
-
                 // Update time zone and date formats, in case they changed while we weren't visible.
                 wtf.localeChanged();
 
@@ -224,10 +245,8 @@ public class CircaTextService extends CanvasWatchFaceService {
 
                 unregisterReceiver();
 
-                if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-                    Wearable.DataApi.removeListener(mGoogleApiClient, this);
-                    mGoogleApiClient.disconnect();
-                }
+                Wearable.DataApi.removeListener(gAPIClient, this);
+                CTU.disconnectAPI(gAPIClient);
             }
 
             // Whether the timer should be running depends on whether we're visible (as well as
@@ -315,7 +334,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (reRequest) {
                 if (Log.isLoggable(TAG, Log.DEBUG))
                     Log.d(TAG, "onTimeTick() requesting weather update");
-                Wearable.MessageApi.sendMessage(mGoogleApiClient, "", CTCs.REQUIRE_WEATHER_MESSAGE, null);
+                Wearable.MessageApi.sendMessage(gAPIClient, "", CTCs.URI_GET_WEATHER, null);
             }
 
             super.onTimeTick();
@@ -379,9 +398,10 @@ public class CircaTextService extends CanvasWatchFaceService {
                 DataItem dataItem = dataEvent.getDataItem();
                 DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
                 DataMap config = dataMapItem.getDataMap();
-                if (dataItem.getUri().getPath().equals(CTCs.PATH_WITH_FEATURE)) {
+
+                if (dataItem.getUri().getPath().equals(CTCs.URI_CONFIG)) {
                     updateUiForConfigDataMap(config);
-                } else if (dataItem.getUri().getPath().equals(CTCs.SEND_WEATHER_MESSAGE)) {
+                } else if (dataItem.getUri().getPath().equals(CTCs.URI_PUT_WEATHER)) {
                     if (config.containsKey("weather")) {
                         try {
                             mWeatherReceived = new Date(System.currentTimeMillis());
@@ -396,32 +416,6 @@ public class CircaTextService extends CanvasWatchFaceService {
                         }
                     }
                 }
-            }
-        }
-
-        @Override  // GoogleApiClient.ConnectionCallbacks
-        public void onConnected(Bundle connectionHint) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnected()");
-
-            Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
-
-            CTU.fetchConfigDataMap(mGoogleApiClient,
-                    new CTU.FetchConfigDataMapCallback() {
-                        @Override
-                        public void onConfigDataMapFetched(DataMap startupConfig) {
-                            if (Log.isLoggable(TAG, Log.DEBUG))
-                                Log.d(TAG, "onConnected().onConfigDataMapFetched()");
-
-                            CTCs.setDefaultValuesForMissingConfigKeys(startupConfig);
-                            CTU.putConfigDataItem(mGoogleApiClient, CTCs.PATH_WITH_FEATURE, startupConfig);
-
-                            updateUiForConfigDataMap(startupConfig);
-                        }
-                    }
-            );
-            {
-                DataMap blankWeather = new DataMap();
-                CTU.putConfigDataItem(mGoogleApiClient, CTCs.SEND_WEATHER_MESSAGE, blankWeather);
             }
         }
 
@@ -464,19 +458,6 @@ public class CircaTextService extends CanvasWatchFaceService {
             if (uiUpdated) {
                 invalidate();
             }
-        }
-
-        @Override  // GoogleApiClient.ConnectionCallbacks
-        public void onConnectionSuspended(int cause) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionSuspended()");
-        }
-
-        @Override  // GoogleApiClient.OnConnectionFailedListener
-        public void onConnectionFailed(ConnectionResult result) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onConnectionFailed()");
-            if (result.getErrorCode() == ConnectionResult.API_UNAVAILABLE)
-                if (Log.isLoggable(TAG, Log.DEBUG))
-                    Log.d(TAG, "onConnectionFailed(): API_UNAVAILABLE");
         }
 
         @Override
