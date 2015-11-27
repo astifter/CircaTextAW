@@ -104,7 +104,7 @@ public class CircaTextWeatherService extends WearableListenerService {
 
         if (messageEvent.getPath().equals(CTCs.URI_GET_WEATHER)) {
             gAPIClient = CTU.buildBasicAPIClient(this);
-            CTU.connectAPI(gAPIClient);
+            CTU.connectAPI(gAPIClient, null);
 
             Wearable.NodeApi.getConnectedNodes(gAPIClient)
                     .setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {

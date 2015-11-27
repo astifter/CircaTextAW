@@ -39,9 +39,7 @@ import com.google.android.gms.wearable.Wearable;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class CircaTextConfigActivity extends Activity
-                                  implements GoogleApiClient.ConnectionCallbacks,
-                                             GoogleApiClient.OnConnectionFailedListener {
+public class CircaTextConfigActivity extends Activity {
     private static final String TAG = "CircaTextConfigActivity";
 
     private GoogleApiClient gAPIClient;
@@ -54,7 +52,7 @@ public class CircaTextConfigActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_circa_text_config);
 
-        gAPIClient = CTU.buildAPIClient(this, this, this);
+        gAPIClient = CTU.buildBasicAPIClient(this);
         Wearable.NodeApi.getLocalNode(gAPIClient).setResultCallback(new ResultCallback<NodeApi.GetLocalNodeResult>() {
             @Override
             public void onResult(NodeApi.GetLocalNodeResult r) {
@@ -84,7 +82,17 @@ public class CircaTextConfigActivity extends Activity
 
         super.onStart();
 
-        CTU.connectAPI(gAPIClient);
+        CTU.connectAPI(gAPIClient, new CTU.ConnectAPICallback() {
+            @Override
+            public void onConnected() {
+                CTU.getAPIData(gAPIClient, new CTU.GetAPIDataCallback() {
+                    @Override
+                    public void onConfigDataMapFetched(DataMap config) {
+                        setUpAllPickers(config);
+                    }
+                });
+            }
+        });
     }
 
     @Override // Activity
@@ -94,28 +102,6 @@ public class CircaTextConfigActivity extends Activity
         CTU.disconnectAPI(gAPIClient);
 
         super.onStop();
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onConnected()");
-
-        CTU.getAPIData(gAPIClient, new CTU.GetAPIDataCallback() {
-            @Override
-            public void onConfigDataMapFetched(DataMap config) {
-                setUpAllPickers(config);
-            }
-        });
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onConnectionSuspended()");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG)) Log.d(CTCs.TAGCON, "onConnectionFailed()");
     }
 
     private void setUpAllPickers(DataMap config) {

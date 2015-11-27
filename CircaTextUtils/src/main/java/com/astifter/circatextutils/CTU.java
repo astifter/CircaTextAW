@@ -54,19 +54,6 @@ public final class CTU {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildBasicAPIClient()");
 
         return buildAPIClient(c,
-                new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle b) {
-                        if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "buildBasicAPIClient().onConnected()");
-                    }
-
-                    @Override
-                    public void onConnectionSuspended(int i) {
-                        if (Log.isLoggable(TAG, Log.DEBUG))
-                            Log.d(TAG, "buildBasicAPIClient().onConnectionSuspended(): " + i);
-                    }
-                },
                 new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(ConnectionResult r) {
@@ -76,13 +63,11 @@ public final class CTU {
                 });
     }
 
-    public static GoogleApiClient buildAPIClient(Context c,
-                                                 GoogleApiClient.ConnectionCallbacks cl,
+    private static GoogleApiClient buildAPIClient(Context c,
                                                  GoogleApiClient.OnConnectionFailedListener cfl) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildAPIClient()");
 
         return new GoogleApiClient.Builder(c).addApi(Wearable.API)
-                .addConnectionCallbacks(cl)
                 .addOnConnectionFailedListener(cfl)
                 .build();
     }
@@ -172,8 +157,23 @@ public final class CTU {
                 });
     }
 
-    public static void connectAPI(GoogleApiClient client) {
+    public static void connectAPI(GoogleApiClient client, final ConnectAPICallback cb) {
         if (!client.isConnected()) {
+            client.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                @Override
+                public void onConnected(Bundle b) {
+                    if (Log.isLoggable(TAG, Log.DEBUG))
+                        Log.d(TAG, "buildBasicAPIClient().onConnected()");
+                    if (cb != null)
+                        cb.onConnected();
+                }
+
+                @Override
+                public void onConnectionSuspended(int i) {
+                    if (Log.isLoggable(TAG, Log.DEBUG))
+                        Log.d(TAG, "buildBasicAPIClient().onConnectionSuspended(): " + i);
+                }
+            });
             client.connect();
             if (Log.isLoggable(CTCs.TAGCON, Log.DEBUG))
                 Log.d(CTCs.TAGCON, "connectAPI()");
@@ -215,5 +215,9 @@ public final class CTU {
                 mCallback.onConfigDataMapFetched(new DataMap());
             }
         }
+    }
+
+    public interface ConnectAPICallback {
+        void onConnected();
     }
 }
