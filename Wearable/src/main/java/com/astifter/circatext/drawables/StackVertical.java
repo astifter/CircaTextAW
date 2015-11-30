@@ -12,8 +12,8 @@ import java.util.ArrayList;
 public class StackVertical extends Stack {
     private int yCenter = -1;
 
-    private ArrayList<Drawable> aboveStack;
-    private ArrayList<Drawable> belowStack;
+    private final ArrayList<Drawable> aboveStack;
+    private final ArrayList<Drawable> belowStack;
 
     public StackVertical() {
         aboveStack = new ArrayList<>();

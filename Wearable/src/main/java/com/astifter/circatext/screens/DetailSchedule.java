@@ -18,7 +18,6 @@ import java.util.ArrayList;
 public class DetailSchedule implements Screen {
     private final ArrayList<Drawable> drawables;
     private final int bgColor;
-    private final StackHorizontal sh;
 
     DetailSchedule(Resources r, boolean isRound, CalendarHelper.EventInfo ei, int bgColor) {
         this.bgColor = bgColor;
@@ -27,7 +26,7 @@ public class DetailSchedule implements Screen {
         ScreenHelpers.createHeadline(drawables, r, isRound, "Termindetails");
         createStaticText(ei.Title, new Rect(5, 22, 95, 37), Drawable.Align.LEFT);
 
-        sh = new StackHorizontal();
+        StackHorizontal sh = new StackHorizontal();
         sh.add(getDrawableText(ei.formatDate() + " "));
         sh.add(getDrawableText(ei.formatStart() + "-"));
         sh.add(getDrawableText(ei.formatEnd()));

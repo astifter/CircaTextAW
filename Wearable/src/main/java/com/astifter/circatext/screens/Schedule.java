@@ -13,8 +13,8 @@ import com.astifter.circatext.drawables.DrawableHelpers;
 import java.util.ArrayList;
 
 public class Schedule implements Screen {
-    final static int disection = 27;
-    final static int lineHeight = 10;
+    private final static int disection = 27;
+    private final static int lineHeight = 10;
     private final CalendarHelper.EventInfo[] meetings;
     private final ArrayList<Drawable> drawables;
     private final ArrayList<ColorRect> rects;

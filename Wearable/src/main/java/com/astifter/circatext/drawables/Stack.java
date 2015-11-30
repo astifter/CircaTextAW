@@ -7,7 +7,7 @@ import java.util.ArrayList;
 abstract class Stack implements Drawable {
     boolean hidden = false;
     Rect bounds = new Rect(0, 0, 0, 0);
-    ArrayList<Drawable> stack;
+    final ArrayList<Drawable> stack;
     int alignment;
     private int color;
 

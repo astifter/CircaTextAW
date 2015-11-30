@@ -18,9 +18,6 @@
 
     <string name="digital_config_calendars">Kalender</string>
 
-    <string name="title_no_device_connected">No wearable device is currently connected.</string>
-    <string name="ok_no_device_connected">Connected.</string>
-
     <string name="excluded_calendar_hint">Mit Beistrichen getrennte Kalender-Namen</string>
     <string name="excluded_calendar_explanation"><![CDATA[
         CircaText zeigt eine kurze Zusammenfassung der nächsten Termine im Watchface an. Hier
@@ -40,4 +37,5 @@
         <a href="https://thenounproject.com/">https://thenounproject.com/</a>
         ]]>
     </string>
+    <string name="digital_config_weather_update">Wetter Aktualisieren</string>
 </resources>

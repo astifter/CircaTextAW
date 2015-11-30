@@ -21,7 +21,7 @@ public class DrawableHelpers {
     public static ArrayList<Rect> getDrawnRects(ArrayList<Drawable> drawables) {
         ArrayList<Rect> retval = new ArrayList<>();
         for (Drawable d : drawables) {
-            retval.addAll(retval);
+            retval.addAll(d.getDrawnRects());
         }
         return retval;
     }

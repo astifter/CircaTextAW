@@ -95,7 +95,7 @@ public class CalendarHelper {
         public final String Location;
         private final Date DtEnd;
         private final Locale locale;
-        public int Color;
+        public final int Color;
 
         public EventInfo(Cursor cursor, boolean h, boolean d) {
             Title = cursor.getString(0);

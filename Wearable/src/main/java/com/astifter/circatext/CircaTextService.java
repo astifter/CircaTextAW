@@ -64,7 +64,7 @@ import java.util.Date;
  * mode.
  */
 public class CircaTextService extends CanvasWatchFaceService {
-    public static final int WEATHER_REQUEST_TIMEOUT = 15 * 60 * 1000;
+    private static final int WEATHER_REQUEST_TIMEOUT = 15 * 60 * 1000;
     private static final String TAG = "CircaTextService";
     /**
      * Update rate in milliseconds for normal (not ambient and not mute) mode. We update twice
@@ -85,7 +85,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         public final GoogleApiClient gAPIClient = CTU.buildBasicAPIClient(CircaTextService.this);
         private final CalendarHelper mCalendarHelper = new CalendarHelper(this, CircaTextService.this);
         private final BatteryHelper mBatteryHelper = new BatteryHelper(this);
-        WatchFace wtf;
+        final WatchFace wtf;
         long lastInvalidated = 0;
         long nonUpdate = 0;
         boolean mRegisteredReceiver = false;
@@ -96,7 +96,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         private Date mWeatherRequested;
         private int mWeatherRequestTimeOut = 1 * 60 * 1000;
         private Date mWeatherReceived;
-        private boolean updateEnabled = true;
         @SuppressLint("HandlerLeak")
         final Handler mUpdateHandler = new Handler() {
             @Override
@@ -154,7 +153,7 @@ public class CircaTextService extends CanvasWatchFaceService {
             final int FPS = 15;
             final int updateRate = 1000 / FPS;
             long timeMs = System.currentTimeMillis();
-            if (((lastInvalidated + updateRate) < timeMs) && updateEnabled) {
+            if ((lastInvalidated + updateRate) < timeMs) {
                 if (lastInvalidated == 0)
                     lastInvalidated = timeMs;
                 else
@@ -462,7 +461,6 @@ public class CircaTextService extends CanvasWatchFaceService {
         public void onTapCommand(int tapType, int x, int y, long eventTime) {
             switch (tapType) {
                 case WatchFaceService.TAP_TYPE_TAP:
-                    wtf.startTapHighlight();
                     wtf.getTouchedText(x, y);
                     break;
                 case WatchFaceService.TAP_TYPE_TOUCH:

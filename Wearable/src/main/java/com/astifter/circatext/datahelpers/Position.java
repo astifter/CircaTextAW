@@ -11,7 +11,7 @@ public class Position {
     private int left;
     private int alignment;
 
-    public Position() {
+    private Position() {
     }
 
     public Position(Rect r) {

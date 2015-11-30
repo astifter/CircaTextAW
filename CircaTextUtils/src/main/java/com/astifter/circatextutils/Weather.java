@@ -30,12 +30,12 @@ import java.util.Date;
  */
 public class Weather implements Serializable {
     public Location location;
-    public CurrentCondition currentCondition = new CurrentCondition();
-    public Temperature temperature = new Temperature();
-    public Wind wind = new Wind();
+    public final CurrentCondition currentCondition = new CurrentCondition();
+    public final Temperature temperature = new Temperature();
+    public final Wind wind = new Wind();
     public Rain rain = new Rain();
     public Snow snow = new Snow();
-    public Clouds clouds = new Clouds();
+    public final Clouds clouds = new Clouds();
     public Date time;
     public Date lastupdate;
 

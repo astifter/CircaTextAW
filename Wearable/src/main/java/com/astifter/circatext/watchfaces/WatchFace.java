@@ -7,7 +7,6 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
-import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.Weather;
 
@@ -26,8 +25,6 @@ public interface WatchFace {
 
     void setMuteMode(boolean inMuteMode);
 
-    void startTapHighlight();
-
     void setBatteryInfo(BatteryHelper.BatteryInfo batteryInfo);
 
     void setEventInfo(CalendarHelper.EventInfo[] meetings);
@@ -38,9 +35,7 @@ public interface WatchFace {
 
     void updateVisibilty();
 
-    int getTouchedText(int x, int y);
-
-    void setRoundMode(Drawable.RoundEmulation b);
+    void getTouchedText(int x, int y);
 
     void setSelectedConfig(CTCs.Config cfg);
 

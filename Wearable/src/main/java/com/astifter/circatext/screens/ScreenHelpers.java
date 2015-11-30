@@ -10,7 +10,7 @@ import com.astifter.circatext.drawables.StaticText;
 
 import java.util.ArrayList;
 
-public class ScreenHelpers {
+class ScreenHelpers {
     public static void createHeadline(ArrayList<Drawable> drawables, Resources r, boolean isRound, String text) {
         if (isRound) {
             drawables.add(new StaticIcon(Drawable.Touched.CLOSEME, r.getDrawable(R.drawable.ic_arrow_back_24dp, r.newTheme()), new Rect(5, 5, 95, 20), 20, Drawable.Align.CENTER));

@@ -60,7 +60,7 @@ public class CircaTextStringerV1 extends CircaTextStringerBase {
         return r;
     }
 
-    public String[] getPreciseStringFromTime(int hour, int minute) {
+    private String[] getPreciseStringFromTime(int hour, int minute) {
         ArrayList<String> returnvalue = new ArrayList<>();
 
         int qmin = minute % 15;

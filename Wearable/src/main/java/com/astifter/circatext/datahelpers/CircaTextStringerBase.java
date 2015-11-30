@@ -3,7 +3,7 @@ package com.astifter.circatext.datahelpers;
 import java.util.Calendar;
 
 abstract class CircaTextStringerBase implements CircaTextStringer {
-    protected static String[] german_numbers = {
+    static final String[] german_numbers = {
             "null",
             "eins",
             "zwei",
@@ -21,8 +21,8 @@ abstract class CircaTextStringerBase implements CircaTextStringer {
             "vierzehn",
             "fünfzehn"
     };
-    protected boolean precise;
-    protected Calendar calendar;
+    boolean precise;
+    Calendar calendar;
 
     public String[] getString() {
         long now = System.currentTimeMillis();

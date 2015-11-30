@@ -7,9 +7,6 @@ import com.astifter.circatext.datahelpers.Position;
 
 import java.util.ArrayList;
 
-/**
- * Created by astifter on 18.11.15.
- */
 public class StaticDrawable implements Drawable {
     private final Drawable drawable;
     private final Position position;

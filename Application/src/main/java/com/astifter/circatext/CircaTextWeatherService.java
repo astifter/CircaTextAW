@@ -37,12 +37,12 @@ public class CircaTextWeatherService extends WearableListenerService {
 
     private GoogleApiClient gAPIClient;
 
-    private JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
+    private final JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
     //private JSONWeatherParser weatherParser = new YahooJSONParser();
 
     private Location city;
     private String cityName;
-    private LocationListener locListener = new LocationListener() {
+    private final LocationListener locListener = new LocationListener() {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
         }
@@ -79,7 +79,7 @@ public class CircaTextWeatherService extends WearableListenerService {
         return null;
     }
 
-    void getCity() {
+    private void getCity() {
         LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         Criteria searchProviderCriteria = new Criteria();

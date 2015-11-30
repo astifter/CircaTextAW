@@ -69,7 +69,7 @@
         android:id="@+id/weather_update_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Wetter Aktualisieren" />
+        android:text="@string/digital_config_weather_update" />
 
     <LinearLayout
         android:layout_width="match_parent"

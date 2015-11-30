@@ -25,10 +25,10 @@ public class DrawableText implements Drawable {
     private Integer textSourceName;
     private HashMap<Integer, String> textSource;
     private boolean autoSize;
-    private int backgroundColor;
     private int multiLine = 1;
+    private int backgroundColor;
 
-    public DrawableText() {
+    DrawableText() {
         this.textPaint = createTextPaint(DrawableHelpers.NORMAL_TYPEFACE);
         setAlignment(Align.LEFT);
     }
@@ -112,7 +112,7 @@ public class DrawableText implements Drawable {
         return (-fm.ascent + fm.descent);
     }
 
-    protected void setText(int where, HashMap<Integer, String> source) {
+    void setText(int where, HashMap<Integer, String> source) {
         this.textSourceName = where;
         this.textSource = source;
         if (this.textSource.get(this.textSourceName) == null)
@@ -326,7 +326,7 @@ public class DrawableText implements Drawable {
         }
     }
 
-    public float getMaximumTextHeight(Rect pos) {
+    private float getMaximumTextHeight(Rect pos) {
         return getMaximumTextHeight(this.textPaint.getTypeface(), pos);
     }
 

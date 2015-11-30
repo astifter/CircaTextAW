@@ -6,7 +6,7 @@ import android.graphics.Rect;
 import com.astifter.circatext.datahelpers.Position;
 
 public class StaticIcon extends DrawableIcon {
-    private Position position;
+    private final Position position;
 
     public StaticIcon(int idx, android.graphics.drawable.Drawable drawable, Rect p, int scale) {
         super(idx, drawable, Align.LEFT, scale);

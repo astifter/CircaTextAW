@@ -42,28 +42,22 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class CircaTextWatchFace implements WatchFace {
-    final HashMap<Integer, String> mTexts = new HashMap<>();
-    final CircaTextService.Engine parent;
+    private final HashMap<Integer, String> mTexts = new HashMap<>();
+    private final CircaTextService.Engine parent;
     private final HashMap<Integer, AnimatableImpl> topDrawable;
-    protected CalendarHelper.EventInfo[] mMeetings;
-    protected Weather mWeather = null;
-    protected Date mWeatherReq;
-    protected Date mWeatherRec;
-    protected Resources resources;
-    protected Calendar mCalendar;
-    // DEBUG OPTIONS
-    protected int debugUseFixedDate = -1;           // default -1
-    protected int debugPeekCardPercentage = -1;     // default -1
-    protected boolean debugPeekCardPercentageUp = true;
-    protected Drawable.RoundEmulation debugUseRoundEmulation = Drawable.RoundEmulation.NONE;
-    protected boolean debugOverdraws = false;       // default false
-    Paint mBackgroundPaint;
-    int mBackgroundPaintColor;
-    Rect mBounds;
-    Rect peekCardPosition = new Rect();
-    boolean ambientMode;
-    boolean mLowBitAmbient;
-    boolean mMute;
+    private CalendarHelper.EventInfo[] mMeetings;
+    private Weather mWeather = null;
+    private Date mWeatherReq;
+    private Date mWeatherRec;
+    private Resources resources;
+    private final Calendar mCalendar;
+    private final Paint mBackgroundPaint;
+    private int mBackgroundPaintColor;
+    private Rect mBounds;
+    private Rect peekCardPosition = new Rect();
+    private boolean ambientMode;
+    private boolean mLowBitAmbient;
+    private boolean mMute;
     private volatile CircaTextStringer cts;
     private CTCs.Config currentConfig;
     private CTCs.Config selectedConfig;
@@ -74,6 +68,12 @@ public class CircaTextWatchFace implements WatchFace {
     private SimpleDateFormat mDateFormat;
     private SimpleDateFormat mShortDateFormat;
     private BatteryHelper.BatteryInfo mBatteryInfo;
+    // DEBUG OPTIONS
+    private int debugUseFixedDate = -1;             // default -1
+    private int debugPeekCardPercentage = -1;       // default -1
+    private boolean debugPeekCardPercentageUp = true;
+    private final Drawable.RoundEmulation debugUseRoundEmulation = Drawable.RoundEmulation.NONE;
+    private final boolean debugOverdraws = false;   // default false
 
     public CircaTextWatchFace(CircaTextService.Engine parent) {
         this.parent = parent;
@@ -245,7 +245,7 @@ public class CircaTextWatchFace implements WatchFace {
     }
 
     @Override
-    public int getTouchedText(int x, int y) {
+    public void getTouchedText(int x, int y) {
         if (debugPeekCardPercentage > 0 && this.peekCardPosition.contains(x, y)) {
             if (debugPeekCardPercentageUp) {
                 debugPeekCardPercentage += 5;
@@ -261,7 +261,7 @@ public class CircaTextWatchFace implements WatchFace {
                 }
             }
             this.setPeekCardPosition(null);
-            return Drawable.Touched.FINISHED;
+            return;
         }
         if (debugUseFixedDate >= 0) {
             debugUseFixedDate++;
@@ -283,7 +283,7 @@ public class CircaTextWatchFace implements WatchFace {
             }
             if (eCT.FIRST <= idx && idx <= eCT.THIRD || idx == eTF.HOUR) {
                 if (currentConfig == CTCs.Config.PEEK || currentConfig == CTCs.Config.PEEKSMALL)
-                    return Drawable.Touched.FINISHED;
+                    return;
                 if (selectedConfig == CTCs.Config.PLAIN)
                     selectedConfig = CTCs.Config.TIME;
                 else if (selectedConfig == CTCs.Config.TIME)
@@ -299,16 +299,11 @@ public class CircaTextWatchFace implements WatchFace {
             } else if (idx == eTF.WEATHER_TEMP) {
                 showScreen = new WeatherScreen(this.resources, this.isRound, mWeather, mWeatherReq, mWeatherRec, this.mBackgroundPaint.getColor());
             } else {
-                return Drawable.Touched.FINISHED;
+                return;
             }
         }
         parent.invalidate();
-        return Drawable.Touched.FINISHED;
-    }
-
-    @Override
-    public void setRoundMode(Drawable.RoundEmulation b) {
-        this.debugUseRoundEmulation = b;
+        return;
     }
 
     @Override
@@ -337,10 +332,6 @@ public class CircaTextWatchFace implements WatchFace {
                 this.cts = new CircaTextStringerV1(true);
                 break;
         }
-    }
-
-    @Override
-    public void startTapHighlight() {
     }
 
     @Override
@@ -432,7 +423,7 @@ public class CircaTextWatchFace implements WatchFace {
         mShortDateFormat.setCalendar(mCalendar);
     }
 
-    protected void setDebugPeekCardRect(Rect rect) {
+    private void setDebugPeekCardRect(Rect rect) {
         if (debugPeekCardPercentage > 0) {
             int top = ((100 - debugPeekCardPercentage) * mBounds.height()) / 100;
             if (rect != null && !rect.isEmpty())
@@ -488,7 +479,7 @@ public class CircaTextWatchFace implements WatchFace {
         }
     }
 
-    void setTexts() {
+    private void setTexts() {
         long now = System.currentTimeMillis();
         mCalendar.setTimeInMillis(now);
         if (debugUseFixedDate >= 0) {
@@ -571,15 +562,6 @@ public class CircaTextWatchFace implements WatchFace {
         mWeatherReq = req;
         mWeatherRec = rec;
         mWeather = weather;
-    }
-
-    boolean haveWeather() {
-        return mWeather != null;
-    }
-
-    void startTapHighlight(Drawable ct) {
-        Animator.AnimatorListener listener = new ReverseListener(ct);
-        startAlphaAnimation(ct, 255, 192, listener);
     }
 
     class eCT {

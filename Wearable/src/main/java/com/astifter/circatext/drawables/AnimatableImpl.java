@@ -19,11 +19,11 @@ import java.util.HashMap;
 public class AnimatableImpl implements Drawable, Animatable {
     private static final String TAG = "Drawable";
 
-    final CanvasWatchFaceService.Engine parent;
+    private final CanvasWatchFaceService.Engine parent;
     private final Drawable drawable;
-    HashMap<CTCs.Config, Position> configs;
+    private final HashMap<CTCs.Config, Position> configs;
 
-    Position currentPosition;
+    private Position currentPosition;
     private boolean hidden;
 
     public AnimatableImpl(CanvasWatchFaceService.Engine p, Drawable d) {
@@ -39,7 +39,7 @@ public class AnimatableImpl implements Drawable, Animatable {
         this.currentPosition = Position.percentagePosition(p, bounds);
     }
 
-    public Animatable setConfig(CTCs.Config c, Position p) {
+    private Animatable setConfig(CTCs.Config c, Position p) {
         configs.put(c, p);
         return this;
     }

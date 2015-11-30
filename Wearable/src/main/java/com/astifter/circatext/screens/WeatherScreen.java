@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class WeatherScreen implements Screen {
-    ArrayList<Drawable> drawables = new ArrayList<>();
+    private final ArrayList<Drawable> drawables = new ArrayList<>();
 
     public WeatherScreen(Resources r, boolean isRound, Weather mWeather, Date mWeatherReq, Date mWeatherRec, int bgColor) {
         long now = System.currentTimeMillis();

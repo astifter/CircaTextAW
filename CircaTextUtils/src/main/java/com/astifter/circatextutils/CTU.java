@@ -43,7 +43,6 @@ public final class CTU {
     }
 
     public static String getAge(long now, Date lastupdate) {
-        Date nowDate = new Date(now);
         if (lastupdate == null) return "?";
         double age = now - lastupdate.getTime();
         double ageFloat = age / (60.0 * 1000);
@@ -106,8 +105,8 @@ public final class CTU {
         overwriteAPIData(gAPIClient, config);
     }
 
-    public static void overwriteAPIData(final GoogleApiClient gAPIClient,
-                                        final DataMap config) {
+    private static void overwriteAPIData(final GoogleApiClient gAPIClient,
+                                         final DataMap config) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "overwriteAPIData()");
 
         CTU.getAPIData(gAPIClient,
@@ -131,7 +130,6 @@ public final class CTU {
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(path);
         DataMap configToPut = putDataMapRequest.getDataMap();
         configToPut.putAll(config);
-        Uri uri = putDataMapRequest.getUri();
 
         Wearable.DataApi.putDataItem(gAPIClient, putDataMapRequest.asPutDataRequest())
                 .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
