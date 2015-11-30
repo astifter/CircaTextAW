@@ -1,13 +1,7 @@
 package com.astifter.circatext.drawables;
 
-import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-
-import com.astifter.circatext.R;
-import com.astifter.circatext.drawables.Drawable;
-import com.astifter.circatext.drawables.StaticIcon;
-import com.astifter.circatext.drawables.StaticText;
 
 import java.util.ArrayList;
 

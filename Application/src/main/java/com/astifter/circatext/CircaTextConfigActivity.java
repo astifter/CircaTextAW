@@ -29,7 +29,6 @@ import android.widget.TextView;
 
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.CTU;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataMap;

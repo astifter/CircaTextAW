@@ -6,9 +6,9 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.astifter.circatext.datahelpers.CalendarHelper;
+import com.astifter.circatext.datahelpers.Position;
 import com.astifter.circatext.drawables.Drawable;
 import com.astifter.circatext.drawables.DrawableHelpers;
-import com.astifter.circatext.datahelpers.Position;
 
 import java.util.ArrayList;
 

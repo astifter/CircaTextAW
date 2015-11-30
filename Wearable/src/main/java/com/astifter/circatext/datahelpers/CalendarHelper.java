@@ -92,11 +92,10 @@ public class CalendarHelper {
         public final boolean Hidden;
         public final boolean Disabled;
         public final String Description;
-        private final Date DtEnd;
         public final String Location;
-        public int Color;
-
+        private final Date DtEnd;
         private final Locale locale;
+        public int Color;
 
         public EventInfo(Cursor cursor, boolean h, boolean d) {
             Title = cursor.getString(0);

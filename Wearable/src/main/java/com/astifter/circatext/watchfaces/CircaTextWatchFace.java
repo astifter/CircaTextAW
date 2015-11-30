@@ -228,7 +228,7 @@ public class CircaTextWatchFace implements WatchFace {
         if (this.peekCardPosition.isEmpty()) {
             newConfig = selectedConfig;
         } else {
-            if (this.peekCardPosition.top > (this.mBounds.height() * 50/100)) {
+            if (this.peekCardPosition.top > (this.mBounds.height() * 50 / 100)) {
                 newConfig = CTCs.Config.PEEK;
             } else {
                 newConfig = CTCs.Config.PEEKSMALL;

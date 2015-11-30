@@ -64,7 +64,7 @@ public final class CTU {
     }
 
     private static GoogleApiClient buildAPIClient(Context c,
-                                                 GoogleApiClient.OnConnectionFailedListener cfl) {
+                                                  GoogleApiClient.OnConnectionFailedListener cfl) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildAPIClient()");
 
         return new GoogleApiClient.Builder(c).addApi(Wearable.API)
@@ -192,6 +192,10 @@ public final class CTU {
         void onConfigDataMapFetched(DataMap config);
     }
 
+    public interface ConnectAPICallback {
+        void onConnected();
+    }
+
     private static class DataItemResultCallback implements ResultCallback<DataApi.DataItemResult> {
         private final GetAPIDataCallback mCallback;
 
@@ -215,9 +219,5 @@ public final class CTU {
                 mCallback.onConfigDataMapFetched(new DataMap());
             }
         }
-    }
-
-    public interface ConnectAPICallback {
-        void onConnected();
     }
 }

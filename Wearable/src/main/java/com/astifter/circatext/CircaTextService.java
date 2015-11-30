@@ -64,14 +64,13 @@ import java.util.Date;
  * mode.
  */
 public class CircaTextService extends CanvasWatchFaceService {
+    public static final int WEATHER_REQUEST_TIMEOUT = 15 * 60 * 1000;
     private static final String TAG = "CircaTextService";
-
     /**
      * Update rate in milliseconds for normal (not ambient and not mute) mode. We update twice
      * a second to blink the colons.
      */
     private static final long NORMAL_UPDATE_RATE_MS = 1000;
-    public static final int WEATHER_REQUEST_TIMEOUT = 15 * 60 * 1000;
 
     @Override
     public Engine onCreateEngine() {
@@ -80,7 +79,7 @@ public class CircaTextService extends CanvasWatchFaceService {
     }
 
     public class Engine extends CanvasWatchFaceService.Engine
-                      implements DataApi.DataListener {
+                     implements DataApi.DataListener {
         static final int MSG_UPDATE_TIME = 0;
         static final int MSG_LOAD_MEETINGS = 1;
         public final GoogleApiClient gAPIClient = CTU.buildBasicAPIClient(CircaTextService.this);
@@ -95,7 +94,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         boolean inMuteMode;
         Weather mWeather;
         private Date mWeatherRequested;
-        private int  mWeatherRequestTimeOut = 1 * 60 * 1000;
+        private int mWeatherRequestTimeOut = 1 * 60 * 1000;
         private Date mWeatherReceived;
         private boolean updateEnabled = true;
         @SuppressLint("HandlerLeak")
