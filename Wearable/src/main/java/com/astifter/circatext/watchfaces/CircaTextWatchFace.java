@@ -1,5 +1,8 @@
 package com.astifter.circatext.watchfaces;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -7,10 +10,13 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.os.Build;
 import android.view.WindowInsets;
 
 import com.astifter.circatext.CircaTextService;
 import com.astifter.circatext.R;
+import com.astifter.circatext.datahelpers.BatteryHelper;
+import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.datahelpers.CircaTextStringer;
 import com.astifter.circatext.datahelpers.CircaTextStringerV1;
 import com.astifter.circatext.datahelpers.CircaTextStringerV2;
@@ -25,21 +31,59 @@ import com.astifter.circatext.screens.Screen;
 import com.astifter.circatext.screens.WeatherScreen;
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.CTU;
+import com.astifter.circatextutils.Weather;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
 
-public class CircaTextWatchFace extends BaseWatchFace {
+public class CircaTextWatchFace implements WatchFace {
+    final HashMap<Integer, String> mTexts = new HashMap<>();
+    final CircaTextService.Engine parent;
     private final HashMap<Integer, AnimatableImpl> topDrawable;
+    protected CalendarHelper.EventInfo[] mMeetings;
+    protected Weather mWeather = null;
+    protected Date mWeatherReq;
+    protected Date mWeatherRec;
+    protected Resources resources;
+    protected Calendar mCalendar;
+    // DEBUG OPTIONS
+    protected int debugUseFixedDate = -1;           // default -1
+    protected int debugPeekCardPercentage = -1;     // default -1
+    protected boolean debugPeekCardPercentageUp = true;
+    protected Drawable.RoundEmulation debugUseRoundEmulation = Drawable.RoundEmulation.NONE;
+    protected boolean debugOverdraws = false;       // default false
+    Paint mBackgroundPaint;
+    int mBackgroundPaintColor;
+    Rect mBounds;
+    Rect peekCardPosition = new Rect();
+    boolean ambientMode;
+    boolean mLowBitAmbient;
+    boolean mMute;
     private volatile CircaTextStringer cts;
     private CTCs.Config currentConfig;
     private CTCs.Config selectedConfig;
     private boolean isRound = false;
     private Screen showScreen;
     private Rect currentPeekCardPosition;
+    private SimpleDateFormat mDayFormat;
+    private SimpleDateFormat mDateFormat;
+    private SimpleDateFormat mShortDateFormat;
+    private BatteryHelper.BatteryInfo mBatteryInfo;
 
     public CircaTextWatchFace(CircaTextService.Engine parent) {
-        super(parent);
+        this.parent = parent;
+
+        mBackgroundPaint = new Paint();
+
+        mCalendar = Calendar.getInstance();
+        localeChanged();
+
+        setTexts();
 
         this.cts = new CircaTextStringerV1();
         fillCircaTexts();
@@ -51,7 +95,18 @@ public class CircaTextWatchFace extends BaseWatchFace {
 
     @Override
     public void setMetrics(Resources r, WindowInsets insets) {
-        super.setMetrics(r, insets);
+        this.resources = r;
+        mBounds = new Rect(0, 0, r.getDisplayMetrics().widthPixels, r.getDisplayMetrics().heightPixels);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mBackgroundPaintColor = r.getColor(R.color.transparent, r.newTheme());
+        } else {
+            //noinspection deprecation
+            mBackgroundPaintColor = r.getColor(R.color.transparent);
+        }
+        mBackgroundPaint.setColor(mBackgroundPaintColor);
+
+        setDebugPeekCardRect(null);
 
         this.isRound = (this.debugUseRoundEmulation != Drawable.RoundEmulation.NONE) || insets.isRound();
         if (isRound) {
@@ -365,10 +420,215 @@ public class CircaTextWatchFace extends BaseWatchFace {
         }
     }
 
+    @Override
+    public void localeChanged() {
+        mCalendar.setTimeZone(TimeZone.getDefault());
+        Locale de = Locale.GERMANY;
+        mDayFormat = new SimpleDateFormat("EEE", de);
+        mDayFormat.setCalendar(mCalendar);
+        mDateFormat = new SimpleDateFormat("d. MMM yyyy", de);
+        mDateFormat.setCalendar(mCalendar);
+        mShortDateFormat = new SimpleDateFormat("d. MMM", de);
+        mShortDateFormat.setCalendar(mCalendar);
+    }
+
+    protected void setDebugPeekCardRect(Rect rect) {
+        if (debugPeekCardPercentage > 0) {
+            int top = ((100 - debugPeekCardPercentage) * mBounds.height()) / 100;
+            if (rect != null && !rect.isEmpty())
+                top = Math.min(top, rect.top);
+
+            this.peekCardPosition = new Rect(mBounds);
+            this.peekCardPosition.top = top;
+        }
+    }
+
+    @Override
+    public void setLowBitAmbientMode(boolean aBoolean) {
+        this.mLowBitAmbient = aBoolean;
+    }
+
+    @Override
+    public void setAmbientMode(boolean inAmbientMode) {
+        this.ambientMode = inAmbientMode;
+
+        mBackgroundPaint.setColor(this.ambientMode ? Color.BLACK : mBackgroundPaintColor);
+        updateVisibilty();
+    }
+
+    private void startAlphaAnimation(Drawable t, int start, int stop,
+                                     Animator.AnimatorListener a) {
+        ValueAnimator anim = ObjectAnimator.ofInt(t, "alpha", start, stop);
+        anim.setDuration(50);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                parent.invalidate();
+            }
+        });
+        if (a != null)
+            anim.addListener(a);
+        anim.start();
+    }
+
+    @Override
+    public void setPeekCardPosition(Rect rect) {
+        this.peekCardPosition = rect;
+        setDebugPeekCardRect(rect);
+        updateVisibilty();
+        parent.invalidate();
+    }
+
+    @Override
+    public void setMuteMode(boolean inMuteMode) {
+        if (mMute != inMuteMode) {
+            mMute = inMuteMode;
+            updateVisibilty();
+            parent.invalidate();
+        }
+    }
+
+    void setTexts() {
+        long now = System.currentTimeMillis();
+        mCalendar.setTimeInMillis(now);
+        if (debugUseFixedDate >= 0) {
+            mCalendar.set(2015, 10, 30, 17, debugUseFixedDate, 30);
+        }
+
+        {
+            String sb = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY)) + ":" +
+                        formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
+            mTexts.put(eTF.HOUR, sb);
+        }
+        {
+            String sb = ":" + formatTwoDigitNumber(mCalendar.get(Calendar.SECOND));
+            mTexts.put(eTF.SECOND, sb);
+        }
+        Date d = mCalendar.getTime();
+        mTexts.put(eTF.DAY_OF_WEEK, mDayFormat.format(d));
+        mTexts.put(eTF.DATE, mDateFormat.format(d));
+        mTexts.put(eTF.SHORTDATE, mShortDateFormat.format(d));
+        if (mBatteryInfo != null) {
+            mTexts.put(eTF.BATTERY, String.format("%3.0f%%", mBatteryInfo.getPercent() * 100));
+        } else {
+            mTexts.put(eTF.BATTERY, "");
+        }
+        if (mMeetings != null) {
+            ArrayList<CalendarHelper.EventInfo> m = new ArrayList<>();
+            for (CalendarHelper.EventInfo ei : mMeetings) {
+                if (ei.DtStart.getTime() >= now && !ei.Hidden && !ei.Disabled)
+                    m.add(ei);
+            }
+
+            if (m.size() == 0) {
+                mTexts.put(eTF.SHORTCAL, "-");
+                mTexts.put(eTF.CALENDAR_1, "no meetings");
+                mTexts.put(eTF.CALENDAR_2, "");
+            } else {
+                CalendarHelper.EventInfo first = m.get(0);
+                m.remove(0);
+                mTexts.put(eTF.SHORTCAL, first.formatStart());
+                mTexts.put(eTF.CALENDAR_1, first.formatEnd() + " " + first.Title);
+
+                int additionalEvents = m.size();
+                if (additionalEvents == 1)
+                    mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional event");
+                if (additionalEvents > 1)
+                    mTexts.put(eTF.CALENDAR_2, "+" + additionalEvents + " additional events");
+            }
+        } else {
+            mTexts.put(eTF.SHORTCAL, "-");
+            mTexts.put(eTF.CALENDAR_1, "");
+            mTexts.put(eTF.CALENDAR_2, "");
+        }
+        if (mWeather != null) {
+            mTexts.put(eTF.WEATHER_TEMP, String.format("%2.0f°C", mWeather.temperature.getTemp()));
+            mTexts.put(eTF.WEATHER_AGE, CTU.getAge(now, mWeather.lastupdate));
+            mTexts.put(eTF.WEATHER_DESC, mWeather.currentCondition.getCondition());
+        } else {
+            mTexts.put(eTF.WEATHER_TEMP, "");
+            mTexts.put(eTF.WEATHER_AGE, "");
+            mTexts.put(eTF.WEATHER_DESC, "");
+        }
+    }
+
+    private String formatTwoDigitNumber(int hour) {
+        return String.format("%02d", hour);
+    }
+
+    @Override
+    public void setBatteryInfo(BatteryHelper.BatteryInfo batteryInfo) {
+        mBatteryInfo = batteryInfo;
+    }
+
+    @Override
+    public void setEventInfo(CalendarHelper.EventInfo[] meetings) {
+        mMeetings = meetings;
+    }
+
+    @Override
+    public void setWeatherInfo(Weather weather, Date req, Date rec) {
+        mWeatherReq = req;
+        mWeatherRec = rec;
+        mWeather = weather;
+    }
+
+    boolean haveWeather() {
+        return mWeather != null;
+    }
+
+    void startTapHighlight(Drawable ct) {
+        Animator.AnimatorListener listener = new ReverseListener(ct);
+        startAlphaAnimation(ct, 255, 192, listener);
+    }
+
     class eCT {
         public static final int FIRST = eTF.SIZE;
         public static final int SECOND = FIRST + 1;
         public static final int THIRD = SECOND + 1;
         public static final int SIZE = THIRD + 1;
+    }
+
+    class eTF {
+        public static final int DAY_OF_WEEK = 0;
+        public static final int DATE = DAY_OF_WEEK + 1;
+        public static final int SHORTDATE = DATE + 1;
+        public static final int SHORTCAL = SHORTDATE + 1;
+        public static final int CALENDAR_1 = SHORTCAL + 1;
+        public static final int CALENDAR_2 = CALENDAR_1 + 1;
+        public static final int BATTERY = CALENDAR_2 + 1;
+        public static final int HOUR = BATTERY + 1;
+        public static final int SECOND = HOUR + 1;
+        public static final int WEATHER_TEMP = SECOND + 1;
+        public static final int WEATHER_AGE = WEATHER_TEMP + 1;
+        public static final int WEATHER_DESC = WEATHER_AGE + 1;
+        public static final int SIZE = WEATHER_DESC + 1;
+    }
+
+    private class ReverseListener implements Animator.AnimatorListener {
+        private final Drawable drawable;
+
+        public ReverseListener(Drawable d) {
+            this.drawable = d;
+        }
+
+        @Override
+        public void onAnimationStart(Animator animator) {
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animator) {
+            startAlphaAnimation(drawable, 0, 255, null);
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animator) {
+
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animator) {
+
+        }
     }
 }
