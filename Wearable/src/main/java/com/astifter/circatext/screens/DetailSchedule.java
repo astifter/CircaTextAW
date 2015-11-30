@@ -10,8 +10,8 @@ import com.astifter.circatext.drawables.DrawableText;
 import com.astifter.circatext.drawables.StackHorizontal;
 import com.astifter.circatext.drawables.StaticDrawable;
 import com.astifter.circatext.drawables.StaticText;
-import com.astifter.circatext.graphicshelpers.DrawingHelpers;
-import com.astifter.circatext.graphicshelpers.Position;
+import com.astifter.circatext.drawables.DrawableHelpers;
+import com.astifter.circatext.datahelpers.Position;
 
 import java.util.ArrayList;
 
@@ -24,7 +24,7 @@ public class DetailSchedule implements Screen {
         this.bgColor = bgColor;
         drawables = new ArrayList<>();
 
-        DrawingHelpers.createHeadline(drawables, r, isRound, "Termindetails");
+        ScreenHelpers.createHeadline(drawables, r, isRound, "Termindetails");
         createStaticText(ei.Title, new Rect(5, 22, 95, 37), Drawable.Align.LEFT);
 
         sh = new StackHorizontal();
@@ -62,11 +62,11 @@ public class DetailSchedule implements Screen {
 
     @Override
     public int getTouchedText(int x, int y) {
-        return DrawingHelpers.getTouchedText(x, y, drawables);
+        return DrawableHelpers.getTouchedText(x, y, drawables);
     }
 
     @Override
     public ArrayList<Rect> getDrawnRects() {
-        return DrawingHelpers.getDrawnRects(drawables);
+        return DrawableHelpers.getDrawnRects(drawables);
     }
 }

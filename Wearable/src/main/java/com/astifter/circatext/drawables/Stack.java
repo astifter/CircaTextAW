@@ -2,8 +2,6 @@ package com.astifter.circatext.drawables;
 
 import android.graphics.Rect;
 
-import com.astifter.circatext.graphicshelpers.DrawingHelpers;
-
 import java.util.ArrayList;
 
 abstract class Stack implements Drawable {
@@ -72,7 +70,7 @@ abstract class Stack implements Drawable {
 
     @Override
     public int getTouchedText(int x, int y) {
-        return DrawingHelpers.getTouchedText(x, y, this.stack);
+        return DrawableHelpers.getTouchedText(x, y, this.stack);
     }
 
     @Override

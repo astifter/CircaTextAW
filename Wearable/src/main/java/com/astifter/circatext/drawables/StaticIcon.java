@@ -3,7 +3,7 @@ package com.astifter.circatext.drawables;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
-import com.astifter.circatext.graphicshelpers.Position;
+import com.astifter.circatext.datahelpers.Position;
 
 public class StaticIcon extends DrawableIcon {
     private Position position;

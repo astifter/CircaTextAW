@@ -1,4 +1,4 @@
-package com.astifter.circatext.graphicshelpers;
+package com.astifter.circatext.datahelpers;
 
 import android.graphics.Rect;
 

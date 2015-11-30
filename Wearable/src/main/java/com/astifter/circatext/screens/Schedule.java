@@ -7,9 +7,8 @@ import android.graphics.Rect;
 
 import com.astifter.circatext.datahelpers.CalendarHelper;
 import com.astifter.circatext.drawables.Drawable;
-import com.astifter.circatext.drawables.StaticText;
-import com.astifter.circatext.graphicshelpers.DrawingHelpers;
-import com.astifter.circatext.graphicshelpers.Position;
+import com.astifter.circatext.drawables.DrawableHelpers;
+import com.astifter.circatext.datahelpers.Position;
 
 import java.util.ArrayList;
 
@@ -32,7 +31,7 @@ public class Schedule implements Screen {
         rects = new ArrayList<>();
 
         this.isRound = isRound;
-        DrawingHelpers.createHeadline(drawables, r, isRound, "Termine");
+        ScreenHelpers.createHeadline(drawables, r, isRound, "Termine");
 
         int i = 0;
         for (CalendarHelper.EventInfo ei : mMeetings) {
@@ -42,8 +41,8 @@ public class Schedule implements Screen {
                 break;
             }
 
-            DrawingHelpers.createStaticTest(this.drawables, ei.formatStart(), i, new Rect(5, top, disection - 2, bottom), Drawable.Align.RIGHT, bgColor);
-            DrawingHelpers.createStaticTest(this.drawables, ei.Title, i, new Rect(disection + 2, top, 95, bottom), Drawable.Align.LEFT, bgColor);
+            ScreenHelpers.createStaticTest(this.drawables, ei.formatStart(), i, new Rect(5, top, disection - 2, bottom), Drawable.Align.RIGHT, bgColor);
+            ScreenHelpers.createStaticTest(this.drawables, ei.Title, i, new Rect(disection + 2, top, 95, bottom), Drawable.Align.LEFT, bgColor);
 
             ColorRect cr = new ColorRect(new Rect(disection - 1, top, disection + 1, bottom), ei.Color);
             rects.add(cr);
@@ -74,7 +73,7 @@ public class Schedule implements Screen {
                 detailedScreen = null;
             return Drawable.Touched.FINISHED;
         } else {
-            int idx = DrawingHelpers.getTouchedText(x, y, drawables);
+            int idx = DrawableHelpers.getTouchedText(x, y, drawables);
             if (idx >= Drawable.Touched.FIRST) {
                 detailedScreen = new DetailSchedule(this.resources, this.isRound, meetings[idx], bgColor);
                 return Drawable.Touched.FINISHED;
@@ -85,7 +84,7 @@ public class Schedule implements Screen {
 
     @Override
     public ArrayList<Rect> getDrawnRects() {
-        return DrawingHelpers.getDrawnRects(drawables);
+        return DrawableHelpers.getDrawnRects(drawables);
     }
 
     private class ColorRect {

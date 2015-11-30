@@ -5,14 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 
 import com.astifter.circatext.drawables.Drawable;
-import com.astifter.circatext.graphicshelpers.DrawingHelpers;
-import com.astifter.circatext.watchfaces.BaseWatchFace;
+import com.astifter.circatext.drawables.DrawableHelpers;
 import com.astifter.circatextutils.CTU;
 import com.astifter.circatextutils.Weather;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 public class WeatherScreen implements Screen {
     ArrayList<Drawable> drawables = new ArrayList<>();
@@ -34,11 +32,11 @@ public class WeatherScreen implements Screen {
             loc = "-";
         }
 
-        DrawingHelpers.createHeadline(drawables, r, isRound, "Wetter");
+        ScreenHelpers.createHeadline(drawables, r, isRound, "Wetter");
 
-        DrawingHelpers.createStaticTest(drawables, temp, 0, new Rect(5, 32, 95, 52), Drawable.Align.CENTER, bgColor);
-        DrawingHelpers.createStaticTest(drawables, condition, 0, new Rect(5, 52, 95, 67), Drawable.Align.CENTER, bgColor);
-        DrawingHelpers.createStaticTest(drawables, loc, 0, new Rect(5, 67, 95, 76), Drawable.Align.CENTER, bgColor);
+        ScreenHelpers.createStaticTest(drawables, temp, 0, new Rect(5, 32, 95, 52), Drawable.Align.CENTER, bgColor);
+        ScreenHelpers.createStaticTest(drawables, condition, 0, new Rect(5, 52, 95, 67), Drawable.Align.CENTER, bgColor);
+        ScreenHelpers.createStaticTest(drawables, loc, 0, new Rect(5, 67, 95, 76), Drawable.Align.CENTER, bgColor);
 
         String detailInfo = "Rq: " + reqAge + "m, Rc: " + recAge + "m, Up: " + srvAge + "m";
         String detailCondition = "";
@@ -46,8 +44,8 @@ public class WeatherScreen implements Screen {
             detailInfo += ", WC:" + mWeather.currentCondition.getWeatherId();
             detailCondition = mWeather.currentCondition.getDescr();
         }
-        DrawingHelpers.createStaticTest(drawables, detailCondition, 0, new Rect(5, 83, 95, 89), Drawable.Align.CENTER, bgColor);
-        DrawingHelpers.createStaticTest(drawables, detailInfo, 0, new Rect(5, 89, 95, 95), Drawable.Align.CENTER, bgColor);
+        ScreenHelpers.createStaticTest(drawables, detailCondition, 0, new Rect(5, 83, 95, 89), Drawable.Align.CENTER, bgColor);
+        ScreenHelpers.createStaticTest(drawables, detailInfo, 0, new Rect(5, 89, 95, 95), Drawable.Align.CENTER, bgColor);
     }
 
     @Override
@@ -64,6 +62,6 @@ public class WeatherScreen implements Screen {
 
     @Override
     public ArrayList<Rect> getDrawnRects() {
-        return DrawingHelpers.getDrawnRects(drawables);
+        return DrawableHelpers.getDrawnRects(drawables);
     }
 }

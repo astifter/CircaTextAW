@@ -7,7 +7,6 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 
-import com.astifter.circatext.graphicshelpers.DrawingHelpers;
 import com.astifter.circatextutils.CTCs;
 
 import java.util.ArrayList;
@@ -30,12 +29,12 @@ public class DrawableText implements Drawable {
     private int multiLine = 1;
 
     public DrawableText() {
-        this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
+        this.textPaint = createTextPaint(DrawableHelpers.NORMAL_TYPEFACE);
         setAlignment(Align.LEFT);
     }
 
     public DrawableText(int where, HashMap<Integer, String> source) {
-        this.textPaint = createTextPaint(DrawingHelpers.NORMAL_TYPEFACE);
+        this.textPaint = createTextPaint(DrawableHelpers.NORMAL_TYPEFACE);
         setAlignment(Align.LEFT);
         setText(where, source);
     }

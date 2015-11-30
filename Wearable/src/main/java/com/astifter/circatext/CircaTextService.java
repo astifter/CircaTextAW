@@ -38,14 +38,13 @@ import android.view.WindowInsets;
 
 import com.astifter.circatext.datahelpers.BatteryHelper;
 import com.astifter.circatext.datahelpers.CalendarHelper;
-import com.astifter.circatext.graphicshelpers.DrawingHelpers;
+import com.astifter.circatext.drawables.DrawableHelpers;
 import com.astifter.circatext.watchfaces.CircaTextWatchFace;
 import com.astifter.circatext.watchfaces.WatchFace;
 import com.astifter.circatextutils.CTCs;
 import com.astifter.circatextutils.CTU;
 import com.astifter.circatextutils.Serializer;
 import com.astifter.circatextutils.Weather;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
@@ -140,10 +139,10 @@ public class CircaTextService extends CanvasWatchFaceService {
         Engine() {
             if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Engine()");
 
-            DrawingHelpers.NORMAL_TYPEFACE =
+            DrawableHelpers.NORMAL_TYPEFACE =
                     Typeface.createFromAsset(getResources().getAssets(),
                                              "fonts/RobotoCondensed-Light.ttf");
-            DrawingHelpers.BOLD_TYPEFACE =
+            DrawableHelpers.BOLD_TYPEFACE =
                     Typeface.createFromAsset(getResources().getAssets(),
                                              "fonts/RobotoCondensed-Bold.ttf");
 

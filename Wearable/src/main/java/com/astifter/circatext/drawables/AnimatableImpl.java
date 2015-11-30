@@ -10,7 +10,7 @@ import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.util.Log;
 import android.view.animation.LinearInterpolator;
 
-import com.astifter.circatext.graphicshelpers.Position;
+import com.astifter.circatext.datahelpers.Position;
 import com.astifter.circatextutils.CTCs;
 
 import java.util.ArrayList;
