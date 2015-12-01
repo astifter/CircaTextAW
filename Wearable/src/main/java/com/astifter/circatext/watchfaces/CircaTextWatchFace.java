@@ -50,8 +50,8 @@ public class CircaTextWatchFace implements WatchFace {
     private Date mWeatherReq;
     private Date mWeatherRec;
     private Resources resources;
-    private final Calendar mCalendar;
-    private final Paint mBackgroundPaint;
+    private final Calendar mCalendar = Calendar.getInstance();;
+    private final Paint mBackgroundPaint = new Paint();;
     private int mBackgroundPaintColor;
     private Rect mBounds;
     private Rect peekCardPosition = new Rect();
@@ -75,18 +75,13 @@ public class CircaTextWatchFace implements WatchFace {
     private final Drawable.RoundEmulation debugUseRoundEmulation = Drawable.RoundEmulation.NONE;
     private final boolean debugOverdraws = false;   // default false
 
-    public CircaTextWatchFace(CircaTextService.Engine parent) {
-        this.parent = parent;
+    public CircaTextWatchFace(CircaTextService.Engine p) {
+        parent = p;
 
-        mBackgroundPaint = new Paint();
-
-        mCalendar = Calendar.getInstance();
         localeChanged();
-
-        setTexts();
-
         this.cts = new CircaTextStringerV1();
         fillCircaTexts();
+
         setTexts();
 
         topDrawable = new HashMap<>();
@@ -101,7 +96,6 @@ public class CircaTextWatchFace implements WatchFace {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mBackgroundPaintColor = r.getColor(R.color.transparent, r.newTheme());
         } else {
-            //noinspection deprecation
             mBackgroundPaintColor = r.getColor(R.color.transparent);
         }
         mBackgroundPaint.setColor(mBackgroundPaintColor);
@@ -125,13 +119,13 @@ public class CircaTextWatchFace implements WatchFace {
             createAnimatable(eTF.WEATHER_TEMP, new Rect(20, 8, 95, 20), Drawable.Align.LEFT, r, R.drawable.thermometer)
                     .setConfig(CTCs.Config.PEEK, new Rect(50, -20, 50, -20), Drawable.Align.LEFT)
                     .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN);
-            createAnimatable(eCT.FIRST, new Rect(0, 17, 100, 43), Drawable.Align.CENTER)
+            createAnimatable(eTF.FIRST_LINE, new Rect(0, 17, 100, 43), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.TIME, new Rect(105, 17, 195, 43), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.PEEK, CTCs.Config.TIME);
-            createAnimatable(eCT.SECOND, new Rect(0, 37, 100, 63), Drawable.Align.CENTER)
+            createAnimatable(eTF.SECOND_LINE, new Rect(0, 37, 100, 63), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.TIME, new Rect(105, 37, 195, 63), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.PEEK, CTCs.Config.TIME);
-            createAnimatable(eCT.THIRD, new Rect(0, 57, 100, 83), Drawable.Align.CENTER)
+            createAnimatable(eTF.THIRD_LINE, new Rect(0, 57, 100, 83), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.TIME, new Rect(105, 57, 195, 83), Drawable.Align.CENTER)
                     .setConfig(CTCs.Config.PEEK, CTCs.Config.TIME);
             createAnimatable(eTF.HOUR, new Rect(-95, 22, -5, 75))
@@ -156,15 +150,15 @@ public class CircaTextWatchFace implements WatchFace {
                     .setConfig(CTCs.Config.PEEK, new Rect(5, -20, 5, -20))
                     .setConfig(CTCs.Config.TIME, CTCs.Config.PLAIN)
                     .setConfig(CTCs.Config.PEEKSMALL, CTCs.Config.PEEK);
-            createAnimatable(eCT.FIRST, new Rect(5, 20, 95, 42), Drawable.Align.RIGHT)
+            createAnimatable(eTF.FIRST_LINE, new Rect(5, 20, 95, 42), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, new Rect(5, 80, 95, 87), Drawable.Align.LEFT)
                     .setConfig(CTCs.Config.PEEKSMALL, new Rect(5, offset - io, 98, offset + height + io), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.PEEK, new Rect(5, 60, 95, 75), Drawable.Align.RIGHT);
-            createAnimatable(eCT.SECOND, new Rect(5, 39, 95, 61), Drawable.Align.RIGHT)
+            createAnimatable(eTF.SECOND_LINE, new Rect(5, 39, 95, 61), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, new Rect(5, 84, 95, 91), Drawable.Align.LEFT)
                     .setConfig(CTCs.Config.PEEKSMALL, new Rect(5, offset + height - io, 98, offset + (height * 2) + io), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.PEEK, new Rect(5, 70, 95, 85), Drawable.Align.RIGHT);
-            createAnimatable(eCT.THIRD, new Rect(5, 58, 95, 80), Drawable.Align.RIGHT)
+            createAnimatable(eTF.THIRD_LINE, new Rect(5, 58, 95, 80), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.TIME, new Rect(5, 88, 95, 95), Drawable.Align.LEFT)
                     .setConfig(CTCs.Config.PEEKSMALL, new Rect(5, offset + (height * 2) - io, 98, 100 - offset + io), Drawable.Align.RIGHT)
                     .setConfig(CTCs.Config.PEEK, new Rect(5, 80, 95, 95), Drawable.Align.RIGHT);
@@ -199,7 +193,7 @@ public class CircaTextWatchFace implements WatchFace {
             d = dt;
         }
 
-        AnimatableImpl adi = new AnimatableImpl(this.parent, d);
+        AnimatableImpl adi = new AnimatableImpl(parent, d);
         adi.setPosition(CTCs.Config.PLAIN, fp, fpa, this.mBounds);
         topDrawable.put(textid, adi);
 
@@ -219,7 +213,7 @@ public class CircaTextWatchFace implements WatchFace {
         if (this.ambientMode)
             showScreen = null;
 
-        for (AnimatableImpl a : topDrawable.values()) {
+        for (Drawable a : topDrawable.values()) {
             a.setAmbientMode(this.ambientMode);
         }
 
@@ -238,7 +232,7 @@ public class CircaTextWatchFace implements WatchFace {
         if (newConfig != currentConfig || r.bottom != currentPeekCardPosition.bottom) {
             currentConfig = newConfig;
             currentPeekCardPosition = r;
-            for (AnimatableImpl a : topDrawable.values()) {
+            for (Animatable a : topDrawable.values()) {
                 a.animateToConfig(currentConfig, r);
             }
         }
@@ -281,19 +275,15 @@ public class CircaTextWatchFace implements WatchFace {
                 if (idx >= Drawable.Touched.FIRST)
                     break;
             }
-            if (eCT.FIRST <= idx && idx <= eCT.THIRD || idx == eTF.HOUR) {
+            if (eTF.FIRST_LINE <= idx && idx <= eTF.THIRD_LINE || idx == eTF.HOUR) {
                 if (currentConfig == CTCs.Config.PEEK || currentConfig == CTCs.Config.PEEKSMALL)
                     return;
                 if (selectedConfig == CTCs.Config.PLAIN)
                     selectedConfig = CTCs.Config.TIME;
                 else if (selectedConfig == CTCs.Config.TIME)
                     selectedConfig = CTCs.Config.PLAIN;
-                CTU.overwriteAPIData(parent.gAPIClient, CTCs.KEY_WATCHFACE_CONFIG, selectedConfig.toString());
-                currentConfig = selectedConfig;
-                for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
-                    topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
-                }
-                topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
+                parent.setWatchfaceConfig(selectedConfig.toString());
+                setSelectedConfig(selectedConfig);
             } else if (idx == eTF.SHORTCAL) {
                 showScreen = new Schedule(this.resources, this.isRound, this.mMeetings, this.mBackgroundPaint.getColor());
             } else if (idx == eTF.WEATHER_TEMP) {
@@ -311,7 +301,7 @@ public class CircaTextWatchFace implements WatchFace {
         this.selectedConfig = cfg;
         if (currentConfig != CTCs.Config.PEEK && currentConfig != CTCs.Config.PEEKSMALL) {
             currentConfig = selectedConfig;
-            for (int i = eCT.FIRST; i <= eCT.THIRD; i++) {
+            for (int i = eTF.FIRST_LINE; i <= eTF.THIRD_LINE; i++) {
                 topDrawable.get(i).animateToConfig(currentConfig, this.mBounds);
             }
             topDrawable.get(eTF.HOUR).animateToConfig(currentConfig, this.mBounds);
@@ -350,7 +340,7 @@ public class CircaTextWatchFace implements WatchFace {
             }
         }
 
-        canvas.drawRect(bounds, this.mBackgroundPaint);
+        canvas.drawRect(bounds, mBackgroundPaint);
         if (this.debugPeekCardPercentage > 0) {
             Paint c = new Paint();
             c.setColor(Color.WHITE);
@@ -399,14 +389,14 @@ public class CircaTextWatchFace implements WatchFace {
 
     private void fillCircaTexts() {
         String[] circaTexts = this.cts.getString(this.mCalendar);
-        for (int i = eCT.FIRST; i < eCT.SIZE; i++) {
+        for (int i = eTF.FIRST_LINE; i < eTF.SIZE; i++) {
             mTexts.put(i, "");
         }
         if (circaTexts.length == 1) {
-            mTexts.put(eCT.SECOND, circaTexts[0]);
+            mTexts.put(eTF.SECOND, circaTexts[0]);
         } else {
             for (int i = 0; i < circaTexts.length; i++) {
-                mTexts.put(eCT.FIRST + i, circaTexts[i]);
+                mTexts.put(eTF.FIRST_LINE + i, circaTexts[i]);
             }
         }
     }
@@ -564,13 +554,6 @@ public class CircaTextWatchFace implements WatchFace {
         mWeather = weather;
     }
 
-    class eCT {
-        public static final int FIRST = eTF.SIZE;
-        public static final int SECOND = FIRST + 1;
-        public static final int THIRD = SECOND + 1;
-        public static final int SIZE = THIRD + 1;
-    }
-
     class eTF {
         public static final int DAY_OF_WEEK = 0;
         public static final int DATE = DAY_OF_WEEK + 1;
@@ -584,7 +567,10 @@ public class CircaTextWatchFace implements WatchFace {
         public static final int WEATHER_TEMP = SECOND + 1;
         public static final int WEATHER_AGE = WEATHER_TEMP + 1;
         public static final int WEATHER_DESC = WEATHER_AGE + 1;
-        public static final int SIZE = WEATHER_DESC + 1;
+        public static final int FIRST_LINE = WEATHER_DESC + 1;
+        public static final int SECOND_LINE = FIRST_LINE + 1;
+        public static final int THIRD_LINE = SECOND_LINE + 1;
+        public static final int SIZE = THIRD_LINE + 1;
     }
 
     private class ReverseListener implements Animator.AnimatorListener {

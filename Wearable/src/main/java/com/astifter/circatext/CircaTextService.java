@@ -489,5 +489,9 @@ public class CircaTextService extends CanvasWatchFaceService {
                 Log.d(TAG, output);
             }
         }
+
+        public void setWatchfaceConfig(String c) {
+            CTU.overwriteAPIData(gAPIClient, CTCs.KEY_WATCHFACE_CONFIG, c);
+        }
     }
 }
