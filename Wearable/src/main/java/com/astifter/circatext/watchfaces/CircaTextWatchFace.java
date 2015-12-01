@@ -534,7 +534,7 @@ public class CircaTextWatchFace implements WatchFace {
             mTexts.put(i, "");
         }
         if (circaTexts.length == 1) {
-            mTexts.put(eTF.SECOND, circaTexts[0]);
+            mTexts.put(eTF.SECOND_LINE, circaTexts[0]);
         } else {
             for (int i = 0; i < circaTexts.length; i++) {
                 mTexts.put(eTF.FIRST_LINE + i, circaTexts[i]);
