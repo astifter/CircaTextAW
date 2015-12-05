@@ -36,6 +36,7 @@ android {
         applicationId project.circaTextId.toString()
         minSdkVersion 21
         targetSdkVersion 23
+        //noinspection GroovyAssignabilityCheck
         versionCode project.circaTextVersionId.toInteger()
         versionName project.circaTextVersion.toString()
     }

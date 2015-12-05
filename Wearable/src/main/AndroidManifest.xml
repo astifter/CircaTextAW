@@ -30,7 +30,7 @@
         android:fullBackupOnly="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        tools:ignore="MissingApplicationIcon">
+        tools:ignore="GoogleAppIndexingWarning,MissingApplicationIcon">
 
         <service
             android:name=".CircaTextService"

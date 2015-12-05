@@ -1,8 +1,5 @@
 package com.astifter.circatext.watchfaces;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -45,14 +42,14 @@ import java.util.TimeZone;
 public class CircaTextWatchFace implements WatchFace {
     private final HashMap<Integer, String> mTexts = new HashMap<>();
     private final CircaTextService.Engine parent;
-    private final HashMap<Integer, AnimatableImpl> topDrawable = new HashMap<>();;
+    private final HashMap<Integer, AnimatableImpl> topDrawable = new HashMap<>();
     private CalendarHelper.EventInfo[] mMeetings;
     private Weather mWeather = null;
     private Date mWeatherReq;
     private Date mWeatherRec;
     private Resources resources;
-    private final Calendar mCalendar = Calendar.getInstance();;
-    private final Paint mBackgroundPaint = new Paint();;
+    private final Calendar mCalendar = Calendar.getInstance();
+    private final Paint mBackgroundPaint = new Paint();
     private int mBackgroundPaintColor;
     private Rect mBounds;
     private Rect peekCardPosition = new Rect();
