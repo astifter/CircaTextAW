@@ -10,6 +10,8 @@
  */
 package com.astifter.circatext;
 
+import android.location.Address;
+
 import com.astifter.circatextutils.Location;
 import com.astifter.circatextutils.Weather;
 
@@ -58,7 +60,7 @@ public class OpenWeatherMapJSONParser implements JSONWeatherParser {
         return jObj.getLong(tagName);
     }
 
-    public Weather getWeather(String data) throws JSONException {
+    public Weather getWeather(String data, Address address) throws JSONException {
         Weather weather = new Weather();
 
         // We create out JSONObject from the data

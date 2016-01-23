@@ -23,7 +23,7 @@ public class WeatherScreen implements Screen {
         if (mWeather != null) {
             srvAge = CTU.getAge(now, mWeather.lastupdate);
             temp = String.format("%2.0f°C", mWeather.temperature.getTemp());
-            condition = Weather.translate(mWeather.currentCondition.getWeatherId());
+            condition = mWeather.currentCondition.getDescr();
             loc = mWeather.location.getCity() + ", " + mWeather.location.getCountry();
         } else {
             srvAge = "?";

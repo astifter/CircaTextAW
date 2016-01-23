@@ -11,7 +11,9 @@
 package com.astifter.circatext;
 
 import android.annotation.SuppressLint;
+import android.location.Address;
 
+import com.astifter.circatextutils.Location;
 import com.astifter.circatextutils.Weather;
 
 import org.json.JSONException;
@@ -60,7 +62,7 @@ public class YahooJSONParser implements JSONWeatherParser {
         return jObj.getLong(tagName);
     }
 
-    public Weather getWeather(String data) throws JSONException {
+    public Weather getWeather(String data, Address address) throws JSONException {
         Weather weather = new Weather();
 
         // We create out JSONObject from the data
@@ -80,18 +82,26 @@ public class YahooJSONParser implements JSONWeatherParser {
         JSONObject condition = getObject("condition", itemObj);
 
         weather.currentCondition.setCondition(getString("text", condition));
+        int code = getInt("code", condition);
+        weather.currentCondition.setWeatherId(code);
+        weather.currentCondition.setDescr(Weather.translateYahoo(code));
         float temperatureF = getFloat("temp", condition);
         float temperatureC = (temperatureF - 32f) / 1.8f;
         weather.temperature.setTemp(temperatureC);
         try {
             // Tue, 04 Aug 2015 10:59 pm CEST
             Locale l = Locale.ENGLISH;
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm a zzz", l);
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            weather.lastupdate = sdf.parse(getString("date", condition));
+            SimpleDateFormat sdf = new SimpleDateFormat("E, d MMM yyyy hh:mm a", l);
+            String date = getString("date", condition).replace("pm", "PM").replace("am", "AM");
+            weather.lastupdate = sdf.parse(date);
         } catch (Throwable t) {
             weather.lastupdate = null;
         }
+
+        Location loc = new Location();
+        loc.setCountry(address.getCountryCode());
+        loc.setCity(address.getLocality());
+        weather.location = loc;
 
         return weather;
     }

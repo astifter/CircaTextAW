@@ -37,11 +37,11 @@ public class CircaTextWeatherService extends WearableListenerService {
 
     private GoogleApiClient gAPIClient;
 
-    private final JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
-    //private JSONWeatherParser weatherParser = new YahooJSONParser();
+    //private final JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
+    private JSONWeatherParser weatherParser = new YahooJSONParser();
 
     private Location city;
-    private String cityName;
+    private Address address;
     private final LocationListener locListener = new LocationListener() {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -58,20 +58,19 @@ public class CircaTextWeatherService extends WearableListenerService {
         @Override
         public void onLocationChanged(android.location.Location location) {
             city = location;
-            cityName = getCityName(city);
+            address = getCityName(city);
 
             LocationManager locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             locManager.removeUpdates(locListener);
         }
     };
 
-    private String getCityName(Location loc) {
+    private Address getCityName(Location loc) {
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
             List<Address> listAddresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
             if (null != listAddresses && listAddresses.size() > 0) {
-                Address address = listAddresses.get(0);
-                return address.getLocality() + "," + address.getCountryCode();
+                return listAddresses.get(0);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -90,7 +89,7 @@ public class CircaTextWeatherService extends WearableListenerService {
         String provider = locManager.getBestProvider(searchProviderCriteria, true);
 
         city = locManager.getLastKnownLocation(provider);
-        cityName = getCityName(city);
+        address = getCityName(city);
 
         if (city == null || (SystemClock.elapsedRealtime() - city.getTime()) > 10000) {
             locManager.requestSingleUpdate(provider, locListener, null);
@@ -129,7 +128,8 @@ public class CircaTextWeatherService extends WearableListenerService {
 
         @Override
         protected Weather doInBackground(Void... params) {
-            URL url = weatherParser.getURL(city, cityName);
+            String cityString = address.getLocality() + "," + address.getCountryCode();
+            URL url = weatherParser.getURL(city, cityString);
             if (url == null) return null;
 
             String data;
@@ -142,7 +142,7 @@ public class CircaTextWeatherService extends WearableListenerService {
 
             Weather weather = null;
             try {
-                weather = weatherParser.getWeather(data);
+                weather = weatherParser.getWeather(data, address);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
