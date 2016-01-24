@@ -24,7 +24,6 @@ public class DrawableText implements Drawable {
     private HashMap<Integer, String> textSource;
     private boolean autoSize;
     private int multiLine = 1;
-    private int backgroundColor;
 
     DrawableText() {
         this.textPaint = createTextPaint(DrawableHelpers.NORMAL_TYPEFACE);
@@ -326,9 +325,7 @@ public class DrawableText implements Drawable {
         this.autoSize = b;
     }
 
-    public void setBackgroundColor(int backgroundColor) {
-        this.backgroundColor = backgroundColor;
-    }
+    public void setBackgroundColor(int backgroundColor) {}
 
     public void setMultiLine(int multiLine) {
         this.multiLine = multiLine;

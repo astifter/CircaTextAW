@@ -38,7 +38,7 @@ public class CircaTextWeatherService extends WearableListenerService {
     private GoogleApiClient gAPIClient;
 
     //private final JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
-    private JSONWeatherParser weatherParser = new YahooJSONParser();
+    private final JSONWeatherParser weatherParser = new YahooJSONParser();
 
     private Location city;
     private Address address;
