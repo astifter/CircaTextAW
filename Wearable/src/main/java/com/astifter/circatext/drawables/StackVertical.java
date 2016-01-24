@@ -22,9 +22,6 @@ public class StackVertical extends Stack {
 
     @Override
     public void onDraw(Canvas canvas, Rect b) {
-        if (this.hidden) {
-            return;
-        }
         this.bounds = b;
 
         if (yCenter >= 0) {
@@ -35,7 +32,6 @@ public class StackVertical extends Stack {
         int width = 0;
         int heigth = 0;
         for (Drawable t : this.belowStack) {
-            if (t.isHidden()) continue;
             Rect newBounds = new Rect(this.bounds.left, this.bounds.top + heigth,
                                       this.bounds.right, this.bounds.bottom);
             t.onDraw(canvas, newBounds);
@@ -60,7 +56,6 @@ public class StackVertical extends Stack {
 
         int heigthAbove = 0;
         for (Drawable t : this.aboveStack) {
-            if (t.isHidden()) continue;
             int currentHeight = (int) t.getFutureHeight();
             Rect newBounds = new Rect(this.bounds.left, yCenter - heigthAbove - currentHeight,
                                       this.bounds.right, yCenter - heigthAbove);
@@ -72,7 +67,6 @@ public class StackVertical extends Stack {
         }
         int heigthBelow = 0;
         for (Drawable t : this.belowStack) {
-            if (t.isHidden()) continue;
             Rect newBounds = new Rect(this.bounds.left, yCenter + heigthBelow,
                                       this.bounds.right, this.bounds.bottom);
             t.onDraw(canvas, newBounds);

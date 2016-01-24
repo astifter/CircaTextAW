@@ -12,7 +12,6 @@ public class DrawableIcon implements Drawable {
     private Rect dimensions;
     private Rect currentBounds;
     private int alignment;
-    private boolean hidden;
 
     public DrawableIcon(int idx, android.graphics.drawable.Drawable drawable, int align, int scale) {
         this.index = idx;
@@ -31,8 +30,6 @@ public class DrawableIcon implements Drawable {
         currentBounds = new Rect(bounds);
 
         float targetWidth = currentBounds.height() * dimensions.width() / dimensions.height();
-        if (hidden)
-            targetWidth = 0;
         switch (this.alignment) {
             case Align.LEFT:
                 currentBounds.right = currentBounds.left + (int) Math.ceil(targetWidth);
@@ -45,10 +42,6 @@ public class DrawableIcon implements Drawable {
             case Align.RIGHT:
                 currentBounds.left = currentBounds.right - (int) Math.ceil(targetWidth);
                 break;
-        }
-        if (hidden) {
-            currentBounds.bottom = currentBounds.top;
-            return;
         }
         Rect scaledbounds = new Rect(currentBounds);
         if (scale != 0) {
@@ -89,16 +82,6 @@ public class DrawableIcon implements Drawable {
     @Override
     public void setAlpha(int a) {
         icon.setAlpha(a);
-    }
-
-    @Override
-    public void hide(boolean hidden) {
-        this.hidden = true;
-    }
-
-    @Override
-    public boolean isHidden() {
-        return this.hidden;
     }
 
     @Override

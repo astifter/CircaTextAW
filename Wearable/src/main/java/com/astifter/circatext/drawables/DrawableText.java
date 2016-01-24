@@ -20,8 +20,6 @@ public class DrawableText implements Drawable {
     private Rect drawnBounds = new Rect(0, 0, 0, 0);
     private int textAlignment = Drawable.Align.LEFT;
 
-    private boolean hidden = false;
-
     private Integer textSourceName;
     private HashMap<Integer, String> textSource;
     private boolean autoSize;
@@ -121,7 +119,6 @@ public class DrawableText implements Drawable {
 
     @Override
     public float getFutureHeight() {
-        if (this.hidden) return 0;
         return getTextHeightForPaint(this.textPaint);
     }
 
@@ -131,7 +128,6 @@ public class DrawableText implements Drawable {
     }
 
     private float getFutureWidth(String text) {
-        if (this.hidden) return 0;
         return this.textPaint.measureText(text);
     }
 
@@ -147,10 +143,6 @@ public class DrawableText implements Drawable {
     }
 
     public void onDraw(Canvas canvas, Rect b) {
-        if (this.hidden) {
-            return;
-        }
-
         ArrayList<String> remainingText = new ArrayList<>();
         remainingText.addAll(Arrays.asList(getTextFromSource().split(" ")));
         if (this.autoSize) {
@@ -285,16 +277,6 @@ public class DrawableText implements Drawable {
     @Override
     public void setAlpha(int a) {
         this.textPaint.setAlpha(a);
-    }
-
-    @Override
-    public void hide(boolean h) {
-        this.hidden = h;
-    }
-
-    @Override
-    public boolean isHidden() {
-        return this.hidden;
     }
 
     @Override

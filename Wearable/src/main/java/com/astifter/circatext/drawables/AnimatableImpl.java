@@ -24,7 +24,6 @@ public class AnimatableImpl implements Drawable, Animatable {
     private final HashMap<CTCs.Config, Position> configs;
 
     private Position currentPosition;
-    private boolean hidden;
 
     public AnimatableImpl(CanvasWatchFaceService.Engine p, Drawable d) {
         configs = new HashMap<>();
@@ -156,9 +155,6 @@ public class AnimatableImpl implements Drawable, Animatable {
 
     @Override
     public void onDraw(Canvas canvas, Rect b) {
-        if (this.hidden) {
-            return;
-        }
         if (Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, String.format("AnimatableImpl: onDraw: %s", currentPosition.toString()));
         }
@@ -193,16 +189,6 @@ public class AnimatableImpl implements Drawable, Animatable {
     @Override
     public void setAlpha(int a) {
         this.drawable.setAlpha(a);
-    }
-
-    @Override
-    public void hide(boolean h) {
-        this.hidden = h;
-    }
-
-    @Override
-    public boolean isHidden() {
-        return this.hidden;
     }
 
     @Override

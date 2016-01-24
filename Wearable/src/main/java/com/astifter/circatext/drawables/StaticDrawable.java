@@ -68,16 +68,6 @@ public class StaticDrawable implements Drawable {
     }
 
     @Override
-    public void hide(boolean hidden) {
-        this.drawable.hide(hidden);
-    }
-
-    @Override
-    public boolean isHidden() {
-        return this.drawable.isHidden();
-    }
-
-    @Override
     public int getTouchedText(int x, int y) {
         return this.drawable.getTouchedText(x, y);
     }

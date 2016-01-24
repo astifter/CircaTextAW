@@ -5,7 +5,6 @@ import android.graphics.Rect;
 import java.util.ArrayList;
 
 abstract class Stack implements Drawable {
-    boolean hidden = false;
     Rect bounds = new Rect(0, 0, 0, 0);
     final ArrayList<Drawable> stack;
     int alignment;
@@ -37,16 +36,6 @@ abstract class Stack implements Drawable {
         for (Drawable t : stack) {
             t.setAlpha(a);
         }
-    }
-
-    @Override
-    public void hide(boolean h) {
-        this.hidden = h;
-    }
-
-    @Override
-    public boolean isHidden() {
-        return this.hidden;
     }
 
     @Override

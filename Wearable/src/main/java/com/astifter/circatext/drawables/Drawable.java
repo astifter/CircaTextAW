@@ -47,13 +47,6 @@ public interface Drawable {
 
     void setAlignment(int a);
 
-    /**
-     * Disable drawing of {@link Drawable}.
-     */
-    void hide(boolean hidden);
-
-    boolean isHidden();
-
     int getTouchedText(int x, int y);
 
     ArrayList<Rect> getDrawnRects();
