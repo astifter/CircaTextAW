@@ -66,9 +66,14 @@ public final class CTU {
                                                   GoogleApiClient.OnConnectionFailedListener cfl) {
         if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildAPIClient()");
 
-        return new GoogleApiClient.Builder(c).addApi(Wearable.API)
-                .addOnConnectionFailedListener(cfl)
-                .build();
+        try {
+            return new GoogleApiClient.Builder(c).addApi(Wearable.API)
+                    .addOnConnectionFailedListener(cfl)
+                    .build();
+        } catch (Throwable t) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "buildAPIClient(): " + t.getMessage());
+            return null;
+        }
     }
 
     public static void getAPIData(final GoogleApiClient gAPIClient,
@@ -156,6 +161,7 @@ public final class CTU {
     }
 
     public static void connectAPI(GoogleApiClient client, final ConnectAPICallback cb) {
+        if (client == null) return;
         if (!client.isConnected()) {
             client.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                 @Override
