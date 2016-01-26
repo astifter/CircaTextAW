@@ -38,4 +38,7 @@
         ]]>
     </string>
     <string name="digital_config_weather_update">Wetter Aktualisieren</string>
+    <string name="radiobutton_openweathermap">OpenWeatherMap</string>
+    <string name="radiobutton_yahooweather">Yahoo! Weather</string>
+    <string name="radiobutton_wunderground">weather.com (Weather Underground)</string>
 </resources>

@@ -9,6 +9,7 @@ public class CTCs {
     public static final String KEY_EXCLUDED_CALENDARS = "EXCLUDED_CALENDARS";
     public static final String KEY_WATCHFACE_CONFIG = "WATCHFACE_CONFIG";
     public static final String KEY_WATCHFACE_STRINGER = "WATCHFACE_STRINGER";
+    public static final String KEY_USED_WEATHER_PROVIDER = "WEATHER_PROVIDER";
 
     public static final String URI_CONFIG = "/com.astifter.circatext/config";
 
@@ -24,6 +25,7 @@ public class CTCs {
         addConfigKeyIfMissing(config, KEY_EXCLUDED_CALENDARS, "");
         addConfigKeyIfMissing(config, KEY_WATCHFACE_CONFIG, Config.PLAIN.toString());
         addConfigKeyIfMissing(config, KEY_WATCHFACE_STRINGER, Stringer.CIRCA.toString());
+        addConfigKeyIfMissing(config, KEY_USED_WEATHER_PROVIDER, WeatherProvider.Yahoo.toString());
     }
 
     private static void addConfigKeyIfMissing(DataMap config, String key, String value) {
@@ -40,5 +42,9 @@ public class CTCs {
 
     public enum Stringer {
         CIRCA, RELAXED, PRECISE
+    }
+
+    public enum WeatherProvider {
+        OWM, Yahoo, WUnderground
     }
 }
