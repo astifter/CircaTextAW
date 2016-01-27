@@ -42,6 +42,19 @@ import java.util.TimeZone;
  */
 public class YahooJSONParser extends JSONWeatherParser {
     public Weather getWeather(String data, Address address) throws JSONException {
+//      {"query":
+//          {"count":1,
+//           "created":"2016-01-27T21:36:11Z",
+//           "lang":"en-GB",
+//           "results":
+//              {"channel":
+//                  {"item":
+//                      {"condition":
+//                          {"code":"26",
+//                           "date":"Wed, 27 Jan 2016 9:59 pm CET",
+//                           "temp":"53",
+//                           "text":"Cloudy"
+//      }   }   }   }   }   }
         Weather weather = new Weather();
 
         // We create out JSONObject from the data
@@ -61,12 +74,13 @@ public class YahooJSONParser extends JSONWeatherParser {
         JSONObject condition = getObject("condition", itemObj);
 
         weather.currentCondition.setCondition(getString("text", condition));
-        int code = getInt("code", condition);
-        weather.currentCondition.setWeatherId(code);
-        weather.currentCondition.setDescr(Weather.translateYahoo(code));
+        weather.currentCondition.setWeatherId(getInt("code", condition));
+        weather.currentCondition.setDescr(Weather.translateYahoo(weather.currentCondition.getWeatherId()));
+
         float temperatureF = getFloat("temp", condition);
         float temperatureC = (temperatureF - 32f) / 1.8f;
         weather.temperature.setTemp(temperatureC);
+
         try {
             // Tue, 04 Aug 2015 10:59 pm CEST
             Locale l = Locale.ENGLISH;
@@ -87,6 +101,7 @@ public class YahooJSONParser extends JSONWeatherParser {
 
     @Override
     public URL getURL(android.location.Location location, String cityName) {
+        // https://query.yahooapis.com/v1/public/yql?q=select%20item.condition%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22AT%2CStetten%22)&format=json
         String urlCityName = cityName.replace(",", "%2C");
         String BASE_URL = "https://query.yahooapis.com/v1/public/yql?q=select%20item.condition%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22" + urlCityName + "%22)&format=json";
         try {

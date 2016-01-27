@@ -40,6 +40,26 @@ import java.util.Date;
  */
 public class OpenWeatherMapJSONParser extends JSONWeatherParser {
     public Weather getWeather(String data, Address address) throws JSONException {
+//      {"coord":
+//          {"lon":16.39,"lat":48.36},
+//       "weather":
+//          [{"id":501,"main":"Rain","description":"moderate rain","icon":"10n"}],
+//       "base":"cmc stations",
+//       "main":
+//          {"temp":5.71,"pressure":1022,"humidity":75,"temp_min":0.4,"temp_max":10.5},
+//       "wind":
+//          {"speed":1.5},
+//       "rain":
+//          {"1h":2.36},
+//       "clouds":
+//          {"all":36},
+//       "dt":1453931101,
+//       "sys":
+//          {"type":1,"id":5940,"message":0.0056,"country":"AT","sunrise":1453876150,"sunset":1453909552},
+//       "id":7871794,
+//       "name":"Stetten",
+//       "cod":200
+//      }
         Weather weather = new Weather();
 
         // We create out JSONObject from the data
@@ -98,7 +118,7 @@ public class OpenWeatherMapJSONParser extends JSONWeatherParser {
 
     @Override
     public URL getURL(android.location.Location location, String cityName) {
-        // api.openweathermap.org/data/2.5/weather?lat=35&lon=139
+        // http://api.openweathermap.org/data/2.5/weather?units=metric&APPID=d9b53ed2098c82758e054eec0d9112d5&lat=48.364748&lon=16.387343
         String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?units=metric&APPID=d9b53ed2098c82758e054eec0d9112d5&";
         String lat = "lat=" + Double.toString(location.getLatitude());
         String lon = "lon=" + Double.toString(location.getLongitude());
