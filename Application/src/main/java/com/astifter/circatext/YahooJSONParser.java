@@ -40,28 +40,7 @@ import java.util.TimeZone;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class YahooJSONParser implements JSONWeatherParser {
-
-    private static JSONObject getObject(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getJSONObject(tagName);
-    }
-
-    private static String getString(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getString(tagName);
-    }
-
-    private static float getFloat(String tagName, JSONObject jObj) throws JSONException {
-        return (float) jObj.getDouble(tagName);
-    }
-
-    private static int getInt(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getInt(tagName);
-    }
-
-    private static long getLong(String tagName, JSONObject jObj) throws JSONException {
-        return jObj.getLong(tagName);
-    }
-
+public class YahooJSONParser extends JSONWeatherParser {
     public Weather getWeather(String data, Address address) throws JSONException {
         Weather weather = new Weather();
 

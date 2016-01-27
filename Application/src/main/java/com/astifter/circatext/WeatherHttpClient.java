@@ -32,7 +32,6 @@ import java.net.URL;
  * limitations under the License.
  */
 class WeatherHttpClient {
-
     public String getWeatherData(URL url) throws java.io.IOException {
         HttpURLConnection con = null;
         InputStream is = null;
