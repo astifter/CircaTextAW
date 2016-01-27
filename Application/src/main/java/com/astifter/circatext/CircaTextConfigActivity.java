@@ -78,6 +78,7 @@ public class CircaTextConfigActivity extends Activity {
 
         RadioGroup weatherselection = (RadioGroup) findViewById(R.id.weatherselection);
         weatherselection.setVisibility(View.INVISIBLE);
+
     }
 
     @Override
