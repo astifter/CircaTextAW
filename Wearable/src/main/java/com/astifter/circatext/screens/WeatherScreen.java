@@ -35,7 +35,7 @@ public class WeatherScreen implements Screen {
         }
         try {
             condition = mWeather.currentCondition.getDescr();
-            detailCondition = mWeather.currentCondition.getDescr();
+            detailCondition = mWeather.currentCondition.getCondition();
             code = ", WC:" + mWeather.currentCondition.getWeatherId();
         } catch (Throwable t) {
             condition = "-";

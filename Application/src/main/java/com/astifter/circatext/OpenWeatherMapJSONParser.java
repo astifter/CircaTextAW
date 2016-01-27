@@ -65,7 +65,7 @@ public class OpenWeatherMapJSONParser extends JSONWeatherParser {
         // We use only the first value
         JSONObject JSONWeather = jArr.getJSONObject(0);
         weather.currentCondition.setWeatherId(getInt("id", JSONWeather));
-        weather.currentCondition.setDescr(getString("description", JSONWeather));
+        weather.currentCondition.setDescr(Weather.translateOpenWeather(weather.currentCondition.getWeatherId()));
         weather.currentCondition.setCondition(getString("main", JSONWeather));
 
         JSONObject mainObj = getObject("main", jObj);
