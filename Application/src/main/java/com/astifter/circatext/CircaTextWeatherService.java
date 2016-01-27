@@ -220,7 +220,7 @@ public class CircaTextWeatherService extends WearableListenerService implements 
                     return null;
                 }
 
-                Weather weather = null;
+                Weather weather = new Weather();
                 try {
                     weather = weatherParser.getWeather(data, address);
                 } catch (JSONException e) {

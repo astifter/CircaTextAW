@@ -28,13 +28,12 @@ import java.io.Serializable;
  * limitations under the License.
  */
 public class Location implements Serializable {
-
-    private float longitude;
-    private float latitude;
+    private float longitude = 0.0f;
+    private float latitude = 0.0f;
     private long sunset;
     private long sunrise;
-    private String country;
-    private String city;
+    private String country = "-";
+    private String city = "-";
 
     public float getLongitude() {
         return longitude;

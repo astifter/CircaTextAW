@@ -29,15 +29,15 @@ import java.util.Date;
  * limitations under the License.
  */
 public class Weather implements Serializable {
-    public Location location;
+    public Location location = new Location();
     public final CurrentCondition currentCondition = new CurrentCondition();
     public final Temperature temperature = new Temperature();
     public final Wind wind = new Wind();
     public Rain rain = new Rain();
     public Snow snow = new Snow();
     public final Clouds clouds = new Clouds();
-    public Date time;
-    public Date lastupdate;
+    public Date time = new Date();
+    public Date lastupdate = new Date();
 
     public static String translateOpenWeather(int weatherId) {
         switch (weatherId) {
@@ -255,12 +255,12 @@ public class Weather implements Serializable {
     }
 
     public class CurrentCondition implements Serializable {
-        private int weatherId;
-        private String condition;
-        private String descr;
-        private String icon;
-        private float pressure;
-        private float humidity;
+        private int weatherId = -1;
+        private String condition = "-";
+        private String descr = "-";
+        private String icon = "-";
+        private float pressure = 0.0f;
+        private float humidity = 0.0f;
 
         public int getWeatherId() {
             return weatherId;
@@ -304,9 +304,9 @@ public class Weather implements Serializable {
     }
 
     public class Temperature implements Serializable {
-        private float temp;
-        private float minTemp;
-        private float maxTemp;
+        private float temp = 0.0f;
+        private float minTemp = 0.0f;
+        private float maxTemp = 0.0f;
 
         public float getTemp() {
             return temp;
@@ -334,8 +334,8 @@ public class Weather implements Serializable {
     }
 
     public class Wind implements Serializable {
-        private float speed;
-        private float deg;
+        private float speed = 0.0f;
+        private float deg = 0.0f;
 
         public float getSpeed() {
             return speed;
@@ -355,8 +355,8 @@ public class Weather implements Serializable {
     }
 
     public class Rain implements Serializable {
-        private String time;
-        private float ammount;
+        private String time = "-";
+        private float ammount = 0.0f;
 
         public String getTime() {
             return time;
@@ -376,8 +376,8 @@ public class Weather implements Serializable {
     }
 
     public class Snow implements Serializable {
-        private String time;
-        private float ammount;
+        private String time = "-";
+        private float ammount = 0.0f;
 
         public String getTime() {
             return time;
@@ -397,7 +397,7 @@ public class Weather implements Serializable {
     }
 
     public class Clouds implements Serializable {
-        private int perc;
+        private int perc = 0;
 
         public int getPerc() {
             return perc;
