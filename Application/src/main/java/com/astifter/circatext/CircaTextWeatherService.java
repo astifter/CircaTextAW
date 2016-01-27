@@ -18,7 +18,12 @@ import com.astifter.circatextutils.Serializer;
 import com.astifter.circatextutils.Weather;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
@@ -32,13 +37,14 @@ import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 
-public class CircaTextWeatherService extends WearableListenerService {
+public class CircaTextWeatherService extends WearableListenerService implements DataApi.DataListener {
     private static final String TAG = "CircaTextWeatherService";
 
     private GoogleApiClient gAPIClient;
+    private String mLocalId;
 
-    //private final JSONWeatherParser weatherParser = new OpenWeatherMapJSONParser();
-    private final JSONWeatherParser weatherParser = new YahooJSONParser();
+    static private JSONWeatherParser weatherParser;
+    static private Object weatherParserLock = new Object();
 
     private Location city;
     private Address address;
@@ -64,6 +70,43 @@ public class CircaTextWeatherService extends WearableListenerService {
             locManager.removeUpdates(locListener);
         }
     };
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        gAPIClient = CTU.buildBasicAPIClient(this);
+        CTU.connectAPI(gAPIClient, new CTU.ConnectAPICallback() {
+            @Override
+            public void onConnected() {
+                Wearable.NodeApi.getLocalNode(gAPIClient).setResultCallback(new ResultCallback<NodeApi.GetLocalNodeResult>() {
+                    @Override
+                    public void onResult(NodeApi.GetLocalNodeResult r) {
+                        mLocalId = r.getNode().getId();
+                    }
+                });
+                CTU.getAPIData(gAPIClient,
+                        new CTU.GetAPIDataCallback() {
+                            @Override
+                            public void onConfigDataMapFetched(DataMap startupConfig) {
+                                if (Log.isLoggable(TAG, Log.DEBUG))
+                                    Log.d(TAG, "onConnected().onConfigDataMapFetched()");
+
+                                updateUiForConfigDataMap(startupConfig);
+                            }
+                        }
+                );
+            }
+        });
+    }
+
+    private void updateUiForConfigDataMap(DataMap config) {
+        if (!config.containsKey(CTCs.KEY_USED_WEATHER_PROVIDER))
+            return;
+        CTCs.WeatherProvider provider =
+                CTCs.WeatherProvider.valueOf(config.getString(CTCs.KEY_USED_WEATHER_PROVIDER, CTCs.WeatherProvider.Yahoo.toString()));
+        setUpProvider(provider);
+    }
 
     private Address getCityName(Location loc) {
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
@@ -102,9 +145,6 @@ public class CircaTextWeatherService extends WearableListenerService {
         super.onMessageReceived(messageEvent);
 
         if (messageEvent.getPath().equals(CTCs.URI_GET_WEATHER)) {
-            gAPIClient = CTU.buildBasicAPIClient(this);
-            CTU.connectAPI(gAPIClient, null);
-
             Wearable.NodeApi.getConnectedNodes(gAPIClient)
                     .setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
                         @Override
@@ -123,30 +163,71 @@ public class CircaTextWeatherService extends WearableListenerService {
         }
     }
 
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "onDataChanged()");
+
+        for (DataEvent dataEvent : dataEvents) {
+            if (dataEvent.getType() != DataEvent.TYPE_CHANGED) {
+                continue;
+            }
+
+            DataItem dataItem = dataEvent.getDataItem();
+            if (!dataItem.getUri().getPath().equals(CTCs.URI_CONFIG))
+                continue;
+
+            DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
+            DataMap config = dataMapItem.getDataMap();
+
+            updateUiForConfigDataMap(config);
+        }
+    }
+
+    private void setUpProvider(CTCs.WeatherProvider provider) {
+        synchronized (weatherParserLock) {
+            weatherParser = null;
+            switch (provider) {
+                case OWM:
+                    weatherParser = new OpenWeatherMapJSONParser();
+                    break;
+                case Yahoo:
+                    weatherParser = new YahooJSONParser();
+                    break;
+                case WUnderground:
+                    weatherParser = new WundergroundJSONParser();
+                    break;
+            }
+        }
+    }
+
     private class JSONWeatherTask extends AsyncTask<Void, Void, Weather> {
         private List<Node> nodes;
 
         @Override
         protected Weather doInBackground(Void... params) {
-            String cityString = address.getLocality() + "," + address.getCountryCode();
-            URL url = weatherParser.getURL(city, cityString);
-            if (url == null) return null;
+            synchronized (weatherParserLock) {
+                if (weatherParser == null)
+                    return new Weather();
 
-            String data;
-            try {
-                data = (new WeatherHttpClient()).getWeatherData(url);
-                if (data == null) return null;
-            } catch (Throwable t) {
-                return null;
-            }
+                String cityString = address.getLocality() + "," + address.getCountryCode();
+                URL url = weatherParser.getURL(city, cityString);
+                if (url == null) return null;
 
-            Weather weather = null;
-            try {
-                weather = weatherParser.getWeather(data, address);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                String data;
+                try {
+                    data = (new WeatherHttpClient()).getWeatherData(url);
+                    if (data == null) return null;
+                } catch (Throwable t) {
+                    return null;
+                }
+
+                Weather weather = null;
+                try {
+                    weather = weatherParser.getWeather(data, address);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return weather;
             }
-            return weather;
         }
 
         @Override
