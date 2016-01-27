@@ -25,24 +25,27 @@ public class WeatherScreen implements Screen {
         String srvAge, temp, condition, detailCondition, loc, code;
         try {
             srvAge = CTU.getAge(now, mWeather.lastupdate);
-
-            temp = String.format("%2.0f°C", mWeather.temperature.getTemp());
-            condition = mWeather.currentCondition.getDescr();
-            detailCondition = mWeather.currentCondition.getDescr();
-
-            if (mWeather.location != null)
-                loc = mWeather.location.getCity() + ", " + mWeather.location.getCountry();
-            else
-                loc = "null";
-
-            code = ", WC:" + mWeather.currentCondition.getWeatherId();
         } catch (Throwable t) {
             srvAge = "?";
+        }
+        try {
+            temp = String.format("%2.0f°C", mWeather.temperature.getTemp());
+        } catch (Throwable t) {
             temp = "-";
+        }
+        try {
+            condition = mWeather.currentCondition.getDescr();
+            detailCondition = mWeather.currentCondition.getDescr();
+            code = ", WC:" + mWeather.currentCondition.getWeatherId();
+        } catch (Throwable t) {
             condition = "-";
             detailCondition = "-";
-            loc = "-";
             code = "";
+        }
+        try {
+            loc = mWeather.location.getCity() + ", " + mWeather.location.getCountry();
+        } catch (Throwable t) {
+            loc = "-";
         }
         detailInfo += "Up: " + srvAge + "m" + code;
 
