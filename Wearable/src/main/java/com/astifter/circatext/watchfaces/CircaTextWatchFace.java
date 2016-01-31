@@ -516,12 +516,15 @@ public class CircaTextWatchFace implements WatchFace {
             mTexts.put(eTF.CALENDAR_1, "");
             mTexts.put(eTF.CALENDAR_2, "");
         }
-        if (mWeather != null) {
+        if (mWeather != null && mWeather.errorMessage == null) {
             mTexts.put(eTF.WEATHER_TEMP, String.format("%2.0f°C", mWeather.temperature.getTemp()));
             mTexts.put(eTF.WEATHER_AGE, CTU.getAge(now, mWeather.lastupdate));
             mTexts.put(eTF.WEATHER_DESC, mWeather.currentCondition.getCondition());
         } else {
-            mTexts.put(eTF.WEATHER_TEMP, "");
+            if (mWeather != null && mWeather.errorMessage != null)
+                mTexts.put(eTF.WEATHER_TEMP, "");
+            else
+                mTexts.put(eTF.WEATHER_TEMP, "e");
             mTexts.put(eTF.WEATHER_AGE, "");
             mTexts.put(eTF.WEATHER_DESC, "");
         }

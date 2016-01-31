@@ -96,6 +96,7 @@ public class CircaTextService extends CanvasWatchFaceService {
         private Date mWeatherRequested;
         private int mWeatherRequestTimeOut = 1 * 60 * 1000;
         private Date mWeatherReceived;
+
         @SuppressLint("HandlerLeak")
         final Handler mUpdateHandler = new Handler() {
             @Override
