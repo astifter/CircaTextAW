@@ -101,7 +101,20 @@ public class CircaTextWeatherService extends WearableListenerService implements 
             return;
         CTCs.WeatherProvider provider =
                 CTCs.WeatherProvider.valueOf(config.getString(CTCs.KEY_USED_WEATHER_PROVIDER, CTCs.WeatherProvider.Yahoo.toString()));
-        setUpProvider(provider);
+        synchronized (weatherParserLock) {
+            weatherParser = null;
+            switch (provider) {
+                case OWM:
+                    weatherParser = new OpenWeatherMapJSONParser();
+                    break;
+                case Yahoo:
+                    weatherParser = new YahooJSONParser();
+                    break;
+                case WUnderground:
+                    weatherParser = new WundergroundJSONParser();
+                    break;
+            }
+        }
     }
 
     private Address getCityName(Location loc) {
@@ -175,23 +188,6 @@ public class CircaTextWeatherService extends WearableListenerService implements 
             DataMap config = dataMapItem.getDataMap();
 
             updateUiForConfigDataMap(config);
-        }
-    }
-
-    private void setUpProvider(CTCs.WeatherProvider provider) {
-        synchronized (weatherParserLock) {
-            weatherParser = null;
-            switch (provider) {
-                case OWM:
-                    weatherParser = new OpenWeatherMapJSONParser();
-                    break;
-                case Yahoo:
-                    weatherParser = new YahooJSONParser();
-                    break;
-                case WUnderground:
-                    weatherParser = new WundergroundJSONParser();
-                    break;
-            }
         }
     }
 
