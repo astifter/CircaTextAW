@@ -86,6 +86,8 @@ public class CircaTextWeatherService extends WearableListenerService implements 
                                 if (Log.isLoggable(TAG, Log.DEBUG))
                                     Log.d(TAG, "onConnected().onConfigDataMapFetched()");
 
+                                CTU.putAPIData(gAPIClient, CTCs.URI_CONFIG, startupConfig);
+
                                 updateUiForConfigDataMap(startupConfig);
                             }
                         }
