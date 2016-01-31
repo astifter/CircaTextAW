@@ -154,12 +154,13 @@ public class WundergroundJSONParser extends JSONWeatherParser {
         JSONObject condition = getObject("condition", itemObj);
 
         weather.currentCondition.setCondition(getString("text", condition));
-        int code = getInt("code", condition);
-        weather.currentCondition.setWeatherId(code);
-        weather.currentCondition.setDescr(Weather.translateYahoo(code));
+        weather.currentCondition.setWeatherId(getInt("code", condition));
+        weather.currentCondition.setDescr(Weather.translateYahoo(weather.currentCondition.getWeatherId()));
+
         float temperatureF = getFloat("temp", condition);
         float temperatureC = (temperatureF - 32f) / 1.8f;
         weather.temperature.setTemp(temperatureC);
+
         try {
             // Tue, 04 Aug 2015 10:59 pm CEST
             Locale l = Locale.ENGLISH;
