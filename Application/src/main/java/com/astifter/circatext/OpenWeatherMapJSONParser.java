@@ -60,7 +60,7 @@ public class OpenWeatherMapJSONParser extends JSONWeatherParser {
 //       "name":"Stetten",
 //       "cod":200
 //      }
-        Weather weather = new Weather();
+        Weather weather = new Weather("no error");
 
         // We create out JSONObject from the data
         JSONObject jObj = new JSONObject(data);
@@ -113,6 +113,7 @@ public class OpenWeatherMapJSONParser extends JSONWeatherParser {
         weather.time = new Date(dt * 1000);
         weather.lastupdate = weather.time;
 
+        weather.clearErrorMessage();
         return weather;
     }
 

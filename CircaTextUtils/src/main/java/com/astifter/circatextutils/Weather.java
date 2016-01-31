@@ -29,6 +29,7 @@ import java.util.Date;
  * limitations under the License.
  */
 public class Weather implements Serializable {
+    public String errorMessage;
     public Location location = new Location();
     public final CurrentCondition currentCondition = new CurrentCondition();
     public final Temperature temperature = new Temperature();
@@ -38,6 +39,14 @@ public class Weather implements Serializable {
     public final Clouds clouds = new Clouds();
     public Date time = new Date();
     public Date lastupdate = new Date();
+
+    public Weather(String message) {
+        errorMessage = message;
+    }
+
+    public void clearErrorMessage() {
+        errorMessage = null;
+    }
 
     public static String translateOpenWeather(int weatherId) {
         switch (weatherId) {

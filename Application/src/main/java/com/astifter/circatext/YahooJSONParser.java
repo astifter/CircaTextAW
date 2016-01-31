@@ -55,7 +55,7 @@ public class YahooJSONParser extends JSONWeatherParser {
 //                           "temp":"53",
 //                           "text":"Cloudy"
 //      }   }   }   }   }   }
-        Weather weather = new Weather();
+        Weather weather = new Weather("no error");
 
         // We create out JSONObject from the data
         JSONObject jObj = new JSONObject(data);
@@ -96,6 +96,7 @@ public class YahooJSONParser extends JSONWeatherParser {
         loc.setCity(address.getLocality());
         weather.location = loc;
 
+        weather.clearErrorMessage();
         return weather;
     }
 

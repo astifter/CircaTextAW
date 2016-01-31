@@ -198,7 +198,7 @@ public class CircaTextWeatherService extends WearableListenerService implements 
         protected Weather doInBackground(Void... params) {
             synchronized (weatherParserLock) {
                 if (weatherParser == null)
-                    return new Weather();
+                    return new Weather("null weatherParser");
 
                 String cityString = address.getLocality() + "," + address.getCountryCode();
                 URL url = weatherParser.getURL(city, cityString);
@@ -212,11 +212,12 @@ public class CircaTextWeatherService extends WearableListenerService implements 
                     return null;
                 }
 
-                Weather weather = new Weather();
+                Weather weather;
                 try {
                     weather = weatherParser.getWeather(data, address);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    weather = new Weather("exception in weatherParser");
                 }
                 return weather;
             }
