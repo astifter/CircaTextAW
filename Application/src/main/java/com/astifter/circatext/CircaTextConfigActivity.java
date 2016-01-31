@@ -25,6 +25,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.astifter.circatextutils.CTCs;
@@ -73,6 +75,9 @@ public class CircaTextConfigActivity extends Activity {
                 CTU.sendAPIMessage(gAPIClient, mLocalId, CTCs.URI_GET_WEATHER);
             }
         });
+
+        RadioGroup weatherselection = (RadioGroup) findViewById(R.id.weatherselection);
+        weatherselection.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -108,6 +113,28 @@ public class CircaTextConfigActivity extends Activity {
             Log.d(CTCs.TAGCON, "setUpAllPickers(): config=" + config.toString());
 
         setUpEditTextContent(R.id.exclude_calendars, CTCs.KEY_EXCLUDED_CALENDARS, config, "");
+
+        RadioGroup weatherselection = (RadioGroup) findViewById(R.id.weatherselection);
+        CTCs.WeatherProvider provider =
+                CTCs.WeatherProvider.valueOf(config.getString(CTCs.KEY_USED_WEATHER_PROVIDER, CTCs.WeatherProvider.Yahoo.toString()));
+        switch (provider) {
+            case OWM: weatherselection.check(R.id.radioButtonOWM); break;
+            case Yahoo: weatherselection.check(R.id.radioButtonYahoo); break;
+            case WUnderground: weatherselection.check(R.id.radioButtonWUnderground); break;
+        }
+        weatherselection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                CTCs.WeatherProvider provider = CTCs.WeatherProvider.Yahoo;
+                switch (checkedId) {
+                    case R.id.radioButtonOWM: provider = CTCs.WeatherProvider.OWM; break;
+                    case R.id.radioButtonYahoo: provider = CTCs.WeatherProvider.Yahoo; break;
+                    case R.id.radioButtonWUnderground: provider = CTCs.WeatherProvider.WUnderground; break;
+                }
+                CTU.overwriteAPIData(gAPIClient, CTCs.KEY_USED_WEATHER_PROVIDER, provider.toString());
+            }
+        });
+        weatherselection.setVisibility(View.VISIBLE);
     }
 
     private void setUpEditTextContent(int editTextId, final String configKey, DataMap config,
