@@ -41,13 +41,13 @@ public class CircaTextWeatherService extends WearableListenerService implements 
     private static final String TAG = "CircaTextWeatherService";
 
     private GoogleApiClient gAPIClient;
-    private String mLocalId;
 
     static private JSONWeatherParser weatherParser;
     static private Object weatherParserLock = new Object();
 
     private Location city;
     private Address address;
+
     private final LocationListener locListener = new LocationListener() {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -79,12 +79,6 @@ public class CircaTextWeatherService extends WearableListenerService implements 
         CTU.connectAPI(gAPIClient, new CTU.ConnectAPICallback() {
             @Override
             public void onConnected() {
-                Wearable.NodeApi.getLocalNode(gAPIClient).setResultCallback(new ResultCallback<NodeApi.GetLocalNodeResult>() {
-                    @Override
-                    public void onResult(NodeApi.GetLocalNodeResult r) {
-                        mLocalId = r.getNode().getId();
-                    }
-                });
                 CTU.getAPIData(gAPIClient,
                         new CTU.GetAPIDataCallback() {
                             @Override
